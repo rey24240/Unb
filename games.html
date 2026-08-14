@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COIN-OP Games</title>
+<title>Gorilla Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -12,9 +12,9 @@
 
 <nav class="topnav">
   <button class="menu-btn" id="menuBtn">☰</button>
-  <div class="logo">UNBLOCKED GAMES</div>
+  <div class="logo">GORILLA GAMES</div>
   <div class="searchbar">
-    🔍 <input type="text" placeholder="Search games...">
+    🔍 <input type="text" placeholder="Search Google or enter a link...">
   </div>
   <div class="nav-right" id="navRight">
     <button class="nav-btn" id="loginBtn">Log in</button>
@@ -64,11 +64,10 @@
 
     <!-- Landing: centered title, search, games button -->
     <section class="landing">
-      <h1 class="landing-title">UNBLOCKED GAMES</h1>
+      <h1 class="landing-title">Gorilla Games</h1>
       <div class="landing-search">
-        🔍 <input type="text" id="landingSearch" placeholder="Search games...">
+        🔍 <input type="text" id="landingSearch" placeholder="Search Google or enter a link...">
       </div>
-      <button class="games-btn" id="gamesBtn">Games</button>
     </section>
 
     <!-- Featured playable game -->
@@ -96,8 +95,8 @@
     <div class="tabs" id="tabs"></div>
 
     <div class="section-head">
-      <h2>Trending Now</h2>
-      <div class="see-all">See all</div>
+      <h2>Featured Games</h2>
+      <div class="see-all">Popular right now</div>
     </div>
     <div class="grid" id="trendingGrid"></div>
 
@@ -111,7 +110,7 @@
 </div>
 
 <footer>
-  COIN-OP · drop your own HTML5 game files into a card to make it playable
+  GORILLA GAMES · your unblocked gaming hub
 </footer>
 
 <script>
@@ -158,10 +157,6 @@ document.getElementById('menuBtn').addEventListener('click', () => {
   document.querySelector('.sidebar').classList.toggle('open');
 });
 
-document.getElementById('gamesBtn').addEventListener('click', () => {
-  document.getElementById('trendingGrid').scrollIntoView({behavior:'smooth', block:'start'});
-});
-
 document.getElementById('landingSearch').addEventListener('input', e => {
   const q = e.target.value.trim().toLowerCase();
   const cards = document.querySelectorAll('#allGrid .card');
@@ -173,9 +168,6 @@ document.getElementById('landingSearch').addEventListener('input', e => {
     if(show) count++;
   });
   document.getElementById('resultCount').textContent = count + ' games';
-  if(q){
-    document.getElementById('trendingGrid').closest('div').style.display = '';
-  }
 });
 
 /* ---------- Auth (client-side only, stored in this browser) ---------- */
