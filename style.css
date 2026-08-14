@@ -435,3 +435,73 @@ a{color:inherit; text-decoration:none;}
   flex-shrink:0;
   box-shadow:0 0 8px currentColor;
 }
+
+/* ---------- Profile modal extras ---------- */
+.modal-sub{
+  font-size:13px;
+  color:var(--dim);
+  margin:0 0 18px;
+  line-height:1.4;
+}
+.modal-tabs{
+  display:flex;
+  gap:6px;
+  margin-bottom:18px;
+  background:var(--panel-2);
+  border-radius:10px;
+  padding:4px;
+}
+.modal-tab{
+  flex:1;
+  padding:9px 0;
+  border:none;
+  border-radius:8px;
+  background:transparent;
+  color:var(--dim);
+  font-weight:600;
+  font-size:14px;
+  cursor:pointer;
+}
+.modal-tab.active{
+  background:var(--green);
+  color:#0b0f0d;
+}
+.modal-form{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.modal-form label{
+  font-size:12px;
+  color:var(--dim);
+  margin-top:8px;
+}
+.modal-form input{
+  background:var(--panel-2);
+  border:1px solid var(--edge);
+  border-radius:8px;
+  padding:10px 12px;
+  color:var(--text);
+  font-size:14px;
+  outline:none;
+}
+.modal-form input:focus{
+  border-color:var(--green);
+}
+.modal-error{
+  min-height:16px;
+  font-size:12px;
+  color:#f87171;
+}
+.modal-submit{
+  margin-top:10px;
+  width:100%;
+  padding:11px 0;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg, var(--green), var(--green-2));
+  color:#0b0f0d;
+  font-weight:800;
+  font-size:14px;
+  cursor:pointer;
+}

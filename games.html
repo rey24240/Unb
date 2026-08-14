@@ -20,6 +20,14 @@
     <span class="side-icon">🏠</span>
     <span class="side-label">Home</span>
   </div>
+  <div class="side-item" data-target="games">
+    <span class="side-icon">🕹️</span>
+    <span class="side-label">Games</span>
+  </div>
+  <div class="side-item" id="profileBtn">
+    <span class="side-icon">🎮</span>
+    <span class="side-label" id="profileLabel">Guest</span>
+  </div>
   <div class="side-item" id="infoBtn">
     <span class="side-icon">ℹ️</span>
     <span class="side-label">Info</span>
@@ -38,8 +46,6 @@
     <form class="search-bar" id="searchForm">
       <input type="text" id="searchInput" placeholder="Search Google or Enter a Link" autocomplete="off">
     </form>
-
-    <button class="games-btn" id="gamesBtn">Games</button>
   </section>
 
   <section class="games-section" id="games">
@@ -76,6 +82,44 @@
     <button class="modal-close" id="settingsClose">✕</button>
     <h3 class="modal-title">Theme</h3>
     <div class="theme-grid" id="themeGrid"></div>
+  </div>
+</div>
+
+<!-- Profile / account panel -->
+<div class="modal-overlay" id="profileOverlay">
+  <div class="modal">
+    <button class="modal-close" id="profileClose">✕</button>
+
+    <div id="guestView">
+      <h3 class="modal-title">Guest</h3>
+      <p class="modal-sub">You're browsing as a guest. Sign in or create an account to save your name here.</p>
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tabLogin">Log in</button>
+        <button class="modal-tab" id="tabSignup">Sign up</button>
+      </div>
+      <form id="loginForm" class="modal-form">
+        <label>Username</label>
+        <input type="text" id="loginUsername" autocomplete="username" required>
+        <label>Password</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" required>
+        <div class="modal-error" id="loginError"></div>
+        <button type="submit" class="modal-submit">Log in</button>
+      </form>
+      <form id="signupForm" class="modal-form" style="display:none;">
+        <label>Username</label>
+        <input type="text" id="signupUsername" autocomplete="username" required>
+        <label>Password</label>
+        <input type="password" id="signupPassword" autocomplete="new-password" required>
+        <div class="modal-error" id="signupError"></div>
+        <button type="submit" class="modal-submit">Create account</button>
+      </form>
+    </div>
+
+    <div id="accountView" style="display:none;">
+      <h3 class="modal-title" id="accountName">Player</h3>
+      <p class="modal-sub">You're signed in on this device.</p>
+      <button class="modal-submit" id="logoutBtn">Log out</button>
+    </div>
   </div>
 </div>
 
@@ -155,8 +199,134 @@ document.getElementById('searchForm').addEventListener('submit', e => {
   }
 });
 
-document.getElementById('gamesBtn').addEventListener('click', () => {
-  document.getElementById('games').scrollIntoView({behavior:'smooth', block:'start'});
+/* ---------- Profile / account (guest by default) ---------- */
+const profileOverlay = document.getElementById('profileOverlay');
+const profileLabel = document.getElementById('profileLabel');
+const guestView = document.getElementById('guestView');
+const accountView = document.getElementById('accountView');
+const accountName = document.getElementById('accountName');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+const loginError = document.getElementById('loginError');
+const signupError = document.getElementById('signupError');
+const tabLogin = document.getElementById('tabLogin');
+const tabSignup = document.getElementById('tabSignup');
+
+function getUsers(){
+  try{ return JSON.parse(localStorage.getItem('ug_users') || '{}'); }
+  catch(e){ return {}; }
+}
+function saveUsers(users){
+  localStorage.setItem('ug_users', JSON.stringify(users));
+}
+function getCurrentUser(){
+  return localStorage.getItem('ug_current_user');
+}
+function setCurrentUser(username){
+  if(username) localStorage.setItem('ug_current_user', username);
+  else localStorage.removeItem('ug_current_user');
+}
+function hashPass(str){
+  let h = 0;
+  for(let i=0; i<str.length; i++){
+    h = (h << 5) - h + str.charCodeAt(i);
+    h |= 0;
+  }
+  return String(h);
+}
+
+function refreshProfileUI(){
+  const current = getCurrentUser();
+  if(current){
+    profileLabel.textContent = current;
+    guestView.style.display = 'none';
+    accountView.style.display = 'block';
+    accountName.textContent = current;
+  } else {
+    profileLabel.textContent = 'Guest';
+    guestView.style.display = 'block';
+    accountView.style.display = 'none';
+  }
+}
+
+function switchAuthTab(tab){
+  const isLogin = tab === 'login';
+  tabLogin.classList.toggle('active', isLogin);
+  tabSignup.classList.toggle('active', !isLogin);
+  loginForm.style.display = isLogin ? 'flex' : 'none';
+  signupForm.style.display = isLogin ? 'none' : 'flex';
+}
+tabLogin.addEventListener('click', () => switchAuthTab('login'));
+tabSignup.addEventListener('click', () => switchAuthTab('signup'));
+
+document.getElementById('profileBtn').addEventListener('click', () => {
+  profileOverlay.classList.add('open');
+  switchAuthTab('login');
+  loginError.textContent = '';
+  signupError.textContent = '';
+});
+document.getElementById('profileClose').addEventListener('click', () => {
+  profileOverlay.classList.remove('open');
+});
+profileOverlay.addEventListener('click', e => {
+  if(e.target === profileOverlay) profileOverlay.classList.remove('open');
+});
+
+signupForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const username = document.getElementById('signupUsername').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  signupError.textContent = '';
+  if(username.length < 3){
+    signupError.textContent = 'Username must be at least 3 characters.';
+    return;
+  }
+  if(password.length < 4){
+    signupError.textContent = 'Password must be at least 4 characters.';
+    return;
+  }
+  const users = getUsers();
+  if(users[username]){
+    signupError.textContent = 'That username is already taken.';
+    return;
+  }
+  users[username] = { pass: hashPass(password) };
+  saveUsers(users);
+  setCurrentUser(username);
+  refreshProfileUI();
+  profileOverlay.classList.remove('open');
+});
+
+loginForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  loginError.textContent = '';
+  const users = getUsers();
+  const record = users[username];
+  if(!record || record.pass !== hashPass(password)){
+    loginError.textContent = 'Incorrect username or password.';
+    return;
+  }
+  setCurrentUser(username);
+  refreshProfileUI();
+  profileOverlay.classList.remove('open');
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  setCurrentUser(null);
+  refreshProfileUI();
+});
+
+refreshProfileUI();
+
+document.querySelectorAll('.side-item[data-target]').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.side-item[data-target]').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    const target = document.getElementById(item.dataset.target);
+    if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+  });
 });
 
 /* Live clock */
