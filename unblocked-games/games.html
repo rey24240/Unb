@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COIN-OP Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <button class="menu-btn" id="menuBtn">☰</button>
+  <div class="logo">UNBLOCKED GAMES</div>
+  <div class="searchbar">
+    🔍 <input type="text" placeholder="Search games...">
+  </div>
+  <div class="nav-right" id="navRight">
+    <button class="nav-btn" id="loginBtn">Log in</button>
+    <button class="nav-btn accent" id="signupBtn">Sign up</button>
+  </div>
+</nav>
+
+<!-- Auth modal -->
+<div class="modal-overlay" id="authOverlay">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tabLogin">Log in</button>
+      <button class="modal-tab" id="tabSignup">Sign up</button>
+    </div>
+
+    <form id="loginForm" class="modal-form">
+      <label>Username</label>
+      <input type="text" id="loginUsername" autocomplete="username" required>
+      <label>Password</label>
+      <input type="password" id="loginPassword" autocomplete="current-password" required>
+      <div class="modal-error" id="loginError"></div>
+      <button type="submit" class="modal-submit">Log in</button>
+    </form>
+
+    <form id="signupForm" class="modal-form" style="display:none;">
+      <label>Username</label>
+      <input type="text" id="signupUsername" autocomplete="username" required>
+      <label>Password</label>
+      <input type="password" id="signupPassword" autocomplete="new-password" required>
+      <div class="modal-error" id="signupError"></div>
+      <button type="submit" class="modal-submit">Create account</button>
+    </form>
+  </div>
+</div>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-title">Discover</div>
+    <ul class="cat-list" id="discoverList"></ul>
+    <div class="sidebar-title">Categories</div>
+    <ul class="cat-list" id="catList"></ul>
+  </aside>
+
+  <main class="main">
+
+    <!-- Landing: centered title, search, games button -->
+    <section class="landing">
+      <h1 class="landing-title">UNBLOCKED GAMES</h1>
+      <div class="landing-search">
+        🔍 <input type="text" id="landingSearch" placeholder="Search games...">
+      </div>
+      <button class="games-btn" id="gamesBtn">Games</button>
+    </section>
+
+    <!-- Featured playable game -->
+    <section class="hero" id="heroSection">
+      <div class="hero-copy">
+        <div class="eyebrow">Featured Game</div>
+        <h2>Snake</h2>
+        <p>The one that started it all. Eat, grow, don't hit yourself. Arrow keys or WASD.</p>
+        <div class="hero-stats">
+          <div><strong id="heroScore">0</strong>Score</div>
+          <div><strong id="heroHi">0</strong>Best</div>
+          <div><strong>2.1M</strong>Plays</div>
+        </div>
+        <button class="play-btn" id="startBtn">▶ Play Now</button>
+      </div>
+      <div>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div class="score-row">
+          <div>Arrow keys / WASD · swipe on mobile</div>
+          <div><span id="statusText">Press Play</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="tabs" id="tabs"></div>
+
+    <div class="section-head">
+      <h2>Trending Now</h2>
+      <div class="see-all">See all</div>
+    </div>
+    <div class="grid" id="trendingGrid"></div>
+
+    <div class="section-head">
+      <h2>All Games</h2>
+      <div class="see-all"><span id="resultCount"></span></div>
+    </div>
+    <div class="grid" id="allGrid"></div>
+
+  </main>
+</div>
+
+<footer>
+  COIN-OP · drop your own HTML5 game files into a card to make it playable
+</footer>
+
+<script>
+/* ---------- Category + game data ---------- */
+const categories = [
+  {name:"Arcade", icon:"🕹️", color:"#4ade80", desc:"Fast, simple, one-more-try classics like Snake and Pong."},
+  {name:"Puzzle", icon:"🧩", color:"#86efac", desc:"Slower burn games that make you think — 2048, block stackers."},
+  {name:"Action", icon:"💥", color:"#22c55e", desc:"Reflex-heavy games — dodging, shooting, surviving waves."},
+  {name:"Retro", icon:"👾", color:"#4ade80", desc:"Old-school ports and remakes with that classic cabinet feel."},
+  {name:"Sports", icon:"⚽", color:"#86efac", desc:"Quick sports sims you can play in a few minutes."},
+  {name:"Multiplayer", icon:"👥", color:"#22c55e", desc:"Local or same-screen games for two players."},
+  {name:"2-Player", icon:"🎮", color:"#4ade80", desc:"Split-controls games built for one keyboard, two people."},
+  {name:"Random", icon:"🎲", color:"#86efac", desc:"Everything else that doesn't fit a tidy category."},
+];
+
+const discover = [
+  {name:"Home", icon:"🏠"},
+  {name:"Trending", icon:"🔥"},
+  {name:"New", icon:"✨"},
+  {name:"Multiplayer", icon:"👥"},
+];
+
+function renderList(el, items, withTooltip){
+  items.forEach(it => {
+    const li = document.createElement('li');
+    li.className = 'cat-item';
+    li.innerHTML = `
+      <button class="cat-btn" type="button" style="--c:${it.color||'var(--cyan)'}">
+        <span class="icon" style="color:${it.color||'var(--cyan)'}">${it.icon}</span>
+        ${it.name}
+      </button>
+      ${withTooltip ? `<div class="cat-tooltip">
+        <div class="t-label">${it.name}</div>
+        <div class="t-desc">${it.desc}</div>
+      </div>` : ''}
+    `;
+    el.appendChild(li);
+  });
+}
+renderList(document.getElementById('discoverList'), discover, false);
+renderList(document.getElementById('catList'), categories, true);
+
+document.getElementById('menuBtn').addEventListener('click', () => {
+  document.querySelector('.sidebar').classList.toggle('open');
+});
+
+document.getElementById('gamesBtn').addEventListener('click', () => {
+  document.getElementById('trendingGrid').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+document.getElementById('landingSearch').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  const cards = document.querySelectorAll('#allGrid .card');
+  let count = 0;
+  cards.forEach(c => {
+    const name = c.querySelector('.name').textContent.toLowerCase();
+    const show = name.includes(q);
+    c.style.display = show ? '' : 'none';
+    if(show) count++;
+  });
+  document.getElementById('resultCount').textContent = count + ' games';
+  if(q){
+    document.getElementById('trendingGrid').closest('div').style.display = '';
+  }
+});
+
+/* ---------- Auth (client-side only, stored in this browser) ---------- */
+const overlay = document.getElementById('authOverlay');
+const navRight = document.getElementById('navRight');
+const loginBtn = document.getElementById('loginBtn');
+const signupBtn = document.getElementById('signupBtn');
+const modalClose = document.getElementById('modalClose');
+const tabLogin = document.getElementById('tabLogin');
+const tabSignup = document.getElementById('tabSignup');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+const loginError = document.getElementById('loginError');
+const signupError = document.getElementById('signupError');
+
+function getUsers(){
+  try{ return JSON.parse(localStorage.getItem('ug_users') || '{}'); }
+  catch(e){ return {}; }
+}
+function saveUsers(users){
+  localStorage.setItem('ug_users', JSON.stringify(users));
+}
+function getCurrentUser(){
+  return localStorage.getItem('ug_current_user');
+}
+function setCurrentUser(username){
+  if(username) localStorage.setItem('ug_current_user', username);
+  else localStorage.removeItem('ug_current_user');
+}
+
+// simple non-cryptographic hash, fine for a client-only demo login
+function hashPass(str){
+  let h = 0;
+  for(let i=0; i<str.length; i++){
+    h = (h << 5) - h + str.charCodeAt(i);
+    h |= 0;
+  }
+  return String(h);
+}
+
+function openModal(tab){
+  overlay.classList.add('open');
+  switchTab(tab || 'login');
+  loginError.textContent = '';
+  signupError.textContent = '';
+}
+function closeModal(){
+  overlay.classList.remove('open');
+}
+function switchTab(tab){
+  const isLogin = tab === 'login';
+  tabLogin.classList.toggle('active', isLogin);
+  tabSignup.classList.toggle('active', !isLogin);
+  loginForm.style.display = isLogin ? 'flex' : 'none';
+  signupForm.style.display = isLogin ? 'none' : 'flex';
+}
+
+loginBtn.addEventListener('click', () => openModal('login'));
+signupBtn.addEventListener('click', () => openModal('signup'));
+modalClose.addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
+tabLogin.addEventListener('click', () => switchTab('login'));
+tabSignup.addEventListener('click', () => switchTab('signup'));
+
+signupForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const username = document.getElementById('signupUsername').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  signupError.textContent = '';
+
+  if(username.length < 3){
+    signupError.textContent = 'Username must be at least 3 characters.';
+    return;
+  }
+  if(password.length < 4){
+    signupError.textContent = 'Password must be at least 4 characters.';
+    return;
+  }
+
+  const users = getUsers();
+  if(users[username]){
+    signupError.textContent = 'That username is already taken.';
+    return;
+  }
+
+  users[username] = { pass: hashPass(password) };
+  saveUsers(users);
+  setCurrentUser(username);
+  closeModal();
+  renderAuthUI();
+});
+
+loginForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  loginError.textContent = '';
+
+  const users = getUsers();
+  const record = users[username];
+  if(!record || record.pass !== hashPass(password)){
+    loginError.textContent = 'Incorrect username or password.';
+    return;
+  }
+
+  setCurrentUser(username);
+  closeModal();
+  renderAuthUI();
+});
+
+function renderAuthUI(){
+  const current = getCurrentUser();
+  if(current){
+    navRight.innerHTML = `
+      <span class="user-chip">👤 ${current}</span>
+      <button class="nav-btn" id="logoutBtn">Log out</button>
+    `;
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      setCurrentUser(null);
+      renderAuthUI();
+    });
+  } else {
+    navRight.innerHTML = `
+      <button class="nav-btn" id="loginBtn">Log in</button>
+      <button class="nav-btn accent" id="signupBtn">Sign up</button>
+    `;
+    document.getElementById('loginBtn').addEventListener('click', () => openModal('login'));
+    document.getElementById('signupBtn').addEventListener('click', () => openModal('signup'));
+  }
+}
+renderAuthUI();
+
+/* ---------- Tabs ---------- */
+const tabNames = ["All", ...categories.map(c=>c.name)];
+const tabsEl = document.getElementById('tabs');
+tabNames.forEach((name, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'tab' + (i===0 ? ' active' : '');
+  btn.textContent = name;
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    filterGames(name);
+  });
+  tabsEl.appendChild(btn);
+});
+
+/* ---------- Game cards (placeholders, wire up real files later) ---------- */
+const games = [
+  {name:"Snake", cat:"Arcade", icon:"🐍", grad:"#1c2b20,#4ade80", badge:"LIVE"},
+  {name:"Breakout", cat:"Arcade", icon:"🧱", grad:"#20291f,#22c55e"},
+  {name:"Tetris", cat:"Puzzle", icon:"🟦", grad:"#232a26,#86efac"},
+  {name:"Pong", cat:"Retro", icon:"🏓", grad:"#1e2622,#4ade80"},
+  {name:"Asteroids", cat:"Action", icon:"☄️", grad:"#1a1f1c,#22c55e"},
+  {name:"2048", cat:"Puzzle", icon:"🔢", grad:"#242b25,#86efac"},
+  {name:"Flappy", cat:"Action", icon:"🐤", grad:"#1f2a22,#4ade80"},
+  {name:"Pac-Chase", cat:"Retro", icon:"👻", grad:"#212b24,#22c55e"},
+  {name:"Sock Soccer", cat:"Sports", icon:"⚽", grad:"#1c2620,#86efac"},
+  {name:"Duel Tanks", cat:"2-Player", icon:"🎯", grad:"#232928,#4ade80"},
+  {name:"Party Trivia", cat:"Multiplayer", icon:"🎉", grad:"#1e2724,#22c55e"},
+  {name:"Mystery Box", cat:"Random", icon:"🎲", grad:"#202823,#86efac"},
+];
+
+function cardHTML(g){
+  const [c1, c2] = g.grad.split(',');
+  return `
+    <div class="card" data-cat="${g.cat}">
+      <div class="thumb" style="background:linear-gradient(135deg, ${c1}, ${c2});">
+        ${g.badge ? `<span class="badge">${g.badge}</span>` : ''}
+        ${g.icon}
+      </div>
+      <div class="card-info">
+        <div class="name">${g.name}</div>
+        <div class="cat">${g.cat}</div>
+      </div>
+    </div>
+  `;
+}
+
+const trendingGrid = document.getElementById('trendingGrid');
+const allGrid = document.getElementById('allGrid');
+
+trendingGrid.innerHTML = games.slice(0,6).map(cardHTML).join('');
+allGrid.innerHTML = games.map(cardHTML).join('');
+document.getElementById('resultCount').textContent = games.length + ' games';
+
+function filterGames(cat){
+  const cards = allGrid.querySelectorAll('.card');
+  let count = 0;
+  cards.forEach(c => {
+    const show = cat === 'All' || c.dataset.cat === cat;
+    c.style.display = show ? '' : 'none';
+    if(show) count++;
+  });
+  document.getElementById('resultCount').textContent = count + ' games';
+}
+
+// clicking the Snake card scrolls up to the playable hero
+document.addEventListener('click', e => {
+  const card = e.target.closest('.card');
+  if(card && card.querySelector('.name').textContent === 'Snake'){
+    document.querySelector('.hero').scrollIntoView({behavior:'smooth', block:'center'});
+    startGame();
+  }
+});
+
+/* ---------- Snake game ---------- */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const GRID = 20;
+const CELLS = canvas.width / GRID;
+
+let snake, dir, nextDir, food, score, hiscore, loopId, running, paused;
+hiscore = 0;
+
+function resetGame(){
+  snake = [{x:8,y:10},{x:7,y:10},{x:6,y:10}];
+  dir = {x:1,y:0};
+  nextDir = {x:1,y:0};
+  score = 0;
+  placeFood();
+  updateScore();
+  draw();
+}
+
+function placeFood(){
+  let ok = false;
+  while(!ok){
+    food = {x: Math.floor(Math.random()*CELLS), y: Math.floor(Math.random()*CELLS)};
+    ok = !snake.some(s => s.x===food.x && s.y===food.y);
+  }
+}
+
+function updateScore(){
+  document.getElementById('heroScore').textContent = score;
+  document.getElementById('heroHi').textContent = hiscore;
+}
+
+function draw(){
+  ctx.fillStyle = '#050308';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.strokeStyle = 'rgba(51,246,224,0.05)';
+  for(let i=0;i<=CELLS;i++){
+    ctx.beginPath(); ctx.moveTo(i*GRID,0); ctx.lineTo(i*GRID,canvas.height); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,i*GRID); ctx.lineTo(canvas.width,i*GRID); ctx.stroke();
+  }
+
+  ctx.fillStyle = '#86efac';
+  ctx.shadowColor = '#86efac';
+  ctx.shadowBlur = 10;
+  ctx.fillRect(food.x*GRID+2, food.y*GRID+2, GRID-4, GRID-4);
+  ctx.shadowBlur = 0;
+
+  snake.forEach((seg, i) => {
+    ctx.fillStyle = i===0 ? '#4ade80' : '#22c55e';
+    ctx.shadowColor = i===0 ? '#4ade80' : '#22c55e';
+    ctx.shadowBlur = i===0 ? 12 : 4;
+    ctx.fillRect(seg.x*GRID+1, seg.y*GRID+1, GRID-2, GRID-2);
+  });
+  ctx.shadowBlur = 0;
+}
+
+function step(){
+  if(paused) return;
+  dir = nextDir;
+  const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+
+  if(head.x<0 || head.y<0 || head.x>=CELLS || head.y>=CELLS || snake.some(s=>s.x===head.x && s.y===head.y)){
+    gameOver();
+    return;
+  }
+
+  snake.unshift(head);
+
+  if(head.x===food.x && head.y===food.y){
+    score += 10;
+    if(score>hiscore) hiscore = score;
+    updateScore();
+    placeFood();
+  } else {
+    snake.pop();
+  }
+
+  draw();
+}
+
+function gameOver(){
+  running = false;
+  clearInterval(loopId);
+  document.getElementById('statusText').textContent = 'Game Over — press Play';
+  ctx.fillStyle = 'rgba(5,3,8,0.85)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#22c55e';
+  ctx.font = "bold 24px Rubik, sans-serif";
+  ctx.textAlign = 'center';
+  ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 10);
+  ctx.font = "14px Rubik, sans-serif";
+  ctx.fillStyle = '#4ade80';
+  ctx.fillText('press Play Now', canvas.width/2, canvas.height/2 + 20);
+}
+
+function startGame(){
+  if(running) return;
+  resetGame();
+  running = true;
+  paused = false;
+  document.getElementById('statusText').textContent = 'Playing';
+  clearInterval(loopId);
+  loopId = setInterval(step, 110);
+}
+
+document.getElementById('startBtn').addEventListener('click', startGame);
+
+window.addEventListener('keydown', e => {
+  const map = {
+    ArrowUp:{x:0,y:-1}, w:{x:0,y:-1}, W:{x:0,y:-1},
+    ArrowDown:{x:0,y:1}, s:{x:0,y:1}, S:{x:0,y:1},
+    ArrowLeft:{x:-1,y:0}, a:{x:-1,y:0}, A:{x:-1,y:0},
+    ArrowRight:{x:1,y:0}, d:{x:1,y:0}, D:{x:1,y:0},
+  };
+  const d = map[e.key];
+  if(!d) return;
+  e.preventDefault();
+  if(d.x === -dir.x && d.y === -dir.y) return;
+  nextDir = d;
+});
+
+let touchStart = null;
+canvas.addEventListener('touchstart', e => { touchStart = e.touches[0]; });
+canvas.addEventListener('touchend', e => {
+  if(!touchStart) return;
+  const dx = e.changedTouches[0].clientX - touchStart.clientX;
+  const dy = e.changedTouches[0].clientY - touchStart.clientY;
+  if(Math.abs(dx) > Math.abs(dy)){
+    nextDir = dx > 0 ? {x:1,y:0} : {x:-1,y:0};
+  } else {
+    nextDir = dy > 0 ? {x:0,y:1} : {x:0,y:-1};
+  }
+  touchStart = null;
+});
+
+resetGame();
+</script>
+
+</body>
+</html>
