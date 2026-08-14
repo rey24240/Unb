@@ -46,7 +46,18 @@
     <div class="section-head">
       <h2>Games</h2>
     </div>
-    <p class="empty-note">Nothing here yet — drop game files in and wire up cards to make this live.</p>
+
+    <div class="games-controls">
+      <div class="games-search">
+        🔍 <input type="text" id="gameSearch" placeholder="Search games...">
+      </div>
+      <select id="categorySelect" class="category-select">
+        <option value="All">All Categories</option>
+      </select>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <p class="empty-note" id="emptyNote" style="display:none;">No games match that search.</p>
   </section>
 </main>
 
@@ -59,12 +70,60 @@
   <div id="clockRow">--:--</div>
 </div>
 
+<!-- Settings / theme panel -->
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal">
+    <button class="modal-close" id="settingsClose">✕</button>
+    <h3 class="modal-title">Theme</h3>
+    <div class="theme-grid" id="themeGrid"></div>
+  </div>
+</div>
+
 <script>
 document.getElementById('infoBtn').addEventListener('click', () => {
   alert('Unblocked Games — a simple search page.');
 });
+
+/* ---------- Theme switcher ---------- */
+const themes = [
+  {id:"green",  name:"Grey / Green", swatch:"#4ade80"},
+  {id:"purple", name:"Nova Purple",  swatch:"#a879ff"},
+  {id:"blue",   name:"Ocean Blue",   swatch:"#38bdf8"},
+  {id:"red",    name:"Ember Red",    swatch:"#f87171"},
+  {id:"amber",  name:"Retro Amber",  swatch:"#fbbf24"},
+];
+
+const settingsOverlay = document.getElementById('settingsOverlay');
+const themeGrid = document.getElementById('themeGrid');
+
+function applyTheme(id){
+  document.documentElement.setAttribute('data-theme', id);
+  localStorage.setItem('ug_theme', id);
+  document.querySelectorAll('.theme-swatch').forEach(el => {
+    el.classList.toggle('selected', el.dataset.theme === id);
+  });
+}
+
+themes.forEach(t => {
+  const btn = document.createElement('button');
+  btn.className = 'theme-swatch';
+  btn.dataset.theme = t.id;
+  btn.innerHTML = `<span class="swatch-dot" style="background:${t.swatch}"></span>${t.name}`;
+  btn.addEventListener('click', () => applyTheme(t.id));
+  themeGrid.appendChild(btn);
+});
+
+const savedTheme = localStorage.getItem('ug_theme') || 'green';
+applyTheme(savedTheme);
+
 document.getElementById('settingsBtn').addEventListener('click', () => {
-  alert('No settings yet — this is just a placeholder button.');
+  settingsOverlay.classList.add('open');
+});
+document.getElementById('settingsClose').addEventListener('click', () => {
+  settingsOverlay.classList.remove('open');
+});
+settingsOverlay.addEventListener('click', e => {
+  if(e.target === settingsOverlay) settingsOverlay.classList.remove('open');
 });
 
 /* Rotating beta tag text */
@@ -128,6 +187,59 @@ function fpsLoop(now){
   requestAnimationFrame(fpsLoop);
 }
 requestAnimationFrame(fpsLoop);
+
+/* ---------- Games data ----------
+   Edit this list to match the game files you added.
+   file: the path to your game's HTML file (relative to this folder)
+   cat: category shown in the filter dropdown
+--------------------------------------------------- */
+const games = [
+  // Example — replace with your real files:
+  // {name:"Snake", cat:"Arcade", file:"games/snake.html", icon:"🐍"},
+  // {name:"Tetris", cat:"Puzzle", file:"games/tetris.html", icon:"🟦"},
+];
+
+const grid = document.getElementById('grid');
+const emptyNote = document.getElementById('emptyNote');
+const gameSearch = document.getElementById('gameSearch');
+const categorySelect = document.getElementById('categorySelect');
+
+function populateCategories(){
+  const cats = ["All", ...new Set(games.map(g => g.cat))];
+  categorySelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+function cardHTML(g){
+  return `
+    <a class="card" href="${g.file}">
+      <div class="thumb">${g.icon || '🎮'}</div>
+      <div class="card-info">
+        <div class="name">${g.name}</div>
+        <div class="cat">${g.cat}</div>
+      </div>
+    </a>
+  `;
+}
+
+function renderGrid(){
+  const query = gameSearch.value.trim().toLowerCase();
+  const cat = categorySelect.value;
+  const filtered = games.filter(g => {
+    const matchesQuery = g.name.toLowerCase().includes(query);
+    const matchesCat = cat === 'All' || g.cat === cat;
+    return matchesQuery && matchesCat;
+  });
+  grid.innerHTML = filtered.map(cardHTML).join('');
+  emptyNote.style.display = filtered.length === 0 ? 'block' : 'none';
+  emptyNote.textContent = games.length === 0
+    ? 'No games added yet — edit the games list in games.html to add yours.'
+    : 'No games match that search.';
+}
+
+populateCategories();
+renderGrid();
+gameSearch.addEventListener('input', renderGrid);
+categorySelect.addEventListener('change', renderGrid);
 </script>
 
 </body>

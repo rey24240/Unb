@@ -8,6 +8,45 @@
   --text:#e7ebee;
   --dim:#8a949c;
 }
+
+/* ---------- Themes (swap accent colors) ---------- */
+[data-theme="green"]{
+  --green:#4ade80;
+  --green-2:#22c55e;
+}
+[data-theme="purple"]{
+  --bg:#0b0714;
+  --panel:#17102a;
+  --panel-2:#1f1738;
+  --edge:#332a52;
+  --green:#a879ff;
+  --green-2:#7b5bff;
+}
+[data-theme="blue"]{
+  --bg:#0b1420;
+  --panel:#12202f;
+  --panel-2:#17283b;
+  --edge:#264257;
+  --green:#38bdf8;
+  --green-2:#0ea5e9;
+}
+[data-theme="red"]{
+  --bg:#180b0b;
+  --panel:#2a1414;
+  --panel-2:#341818;
+  --edge:#4a2323;
+  --green:#f87171;
+  --green-2:#ef4444;
+}
+[data-theme="amber"]{
+  --bg:#161208;
+  --panel:#261f10;
+  --panel-2:#302713;
+  --edge:#4a3a1a;
+  --green:#fbbf24;
+  --green-2:#f59e0b;
+}
+
 *{box-sizing:border-box;}
 html,body{
   margin:0; padding:0;
@@ -16,6 +55,7 @@ html,body{
   font-family:'Rubik', sans-serif;
   overflow-x:hidden;
   min-height:100vh;
+  transition:background 0.25s ease;
 }
 a{color:inherit; text-decoration:none;}
 
@@ -239,4 +279,159 @@ a{color:inherit; text-decoration:none;}
   .sidebar{ width:60px; }
   .sidebar:hover{ width:210px; }
   .main{ margin-left:92px; }
+}
+
+/* ---------- Games section controls ---------- */
+.games-section{
+  max-width:900px;
+  margin:0 auto;
+  padding:80px 24px 100px;
+}
+.games-section .section-head{
+  text-align:center;
+  margin-bottom:24px;
+}
+.games-section .section-head h2{
+  font-size:22px;
+  margin:0;
+}
+
+.games-controls{
+  display:flex;
+  gap:12px;
+  margin-bottom:28px;
+  flex-wrap:wrap;
+}
+.games-search{
+  flex:1;
+  min-width:200px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--panel);
+  border:1px solid var(--edge);
+  border-radius:12px;
+  padding:12px 16px;
+  color:var(--dim);
+}
+.games-search input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-family:'Rubik', sans-serif;
+  font-size:15px;
+}
+.category-select{
+  background:var(--panel);
+  border:1px solid var(--edge);
+  border-radius:12px;
+  padding:12px 16px;
+  color:var(--text);
+  font-family:'Rubik', sans-serif;
+  font-size:15px;
+  cursor:pointer;
+  outline:none;
+}
+
+.empty-note{
+  color:var(--dim);
+  font-size:15px;
+  text-align:center;
+  margin-top:20px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+  gap:16px;
+}
+.card{
+  position:relative;
+  border-radius:14px;
+  overflow:hidden;
+  cursor:pointer;
+  border:1px solid var(--edge);
+  background:var(--panel);
+  display:block;
+  transition:transform 0.15s ease, box-shadow 0.15s ease;
+}
+.card:hover{
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 12px 30px rgba(0,0,0,0.5);
+}
+.thumb{
+  aspect-ratio:4/3;
+  display:flex; align-items:center; justify-content:center;
+  font-size:34px;
+  background:linear-gradient(135deg, var(--panel-2), var(--edge));
+}
+.card-info{ padding:10px 12px 12px; }
+.card-info .name{ font-size:14px; font-weight:700; }
+.card-info .cat{ font-size:12px; color:var(--dim); }
+
+/* ---------- Settings modal / theme switcher ---------- */
+.modal-overlay{
+  display:none;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.65);
+  z-index:500;
+  align-items:center;
+  justify-content:center;
+}
+.modal-overlay.open{ display:flex; }
+
+.modal{
+  position:relative;
+  width:320px;
+  background:var(--panel);
+  border:1px solid var(--edge);
+  border-radius:18px;
+  padding:26px;
+}
+.modal-close{
+  position:absolute;
+  top:14px; right:14px;
+  background:transparent;
+  border:none;
+  color:var(--dim);
+  font-size:16px;
+  cursor:pointer;
+}
+.modal-title{
+  margin:0 0 18px;
+  font-size:16px;
+}
+
+.theme-grid{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.theme-swatch{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  text-align:left;
+  background:var(--panel-2);
+  border:1px solid var(--edge);
+  border-radius:12px;
+  padding:12px 14px;
+  color:var(--text);
+  font-family:'Rubik', sans-serif;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:border-color 0.15s ease;
+}
+.theme-swatch.selected{
+  border-color:var(--green);
+}
+.swatch-dot{
+  width:18px; height:18px;
+  border-radius:50%;
+  flex-shrink:0;
+  box-shadow:0 0 8px currentColor;
 }
