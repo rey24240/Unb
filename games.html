@@ -3,32 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nova Games</title>
+<title>Unblocked Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<canvas id="stars"></canvas>
-
 <nav class="sidebar" id="sidebar">
   <div class="side-item logo-item">
     <span class="side-icon">🎮</span>
-    <span class="side-label">Nova Games</span>
+    <span class="side-label">Unblocked Games</span>
   </div>
 
   <div class="side-item active" data-target="home">
     <span class="side-icon">🏠</span>
     <span class="side-label">Home</span>
-  </div>
-  <div class="side-item" data-target="allGames">
-    <span class="side-icon">🟪</span>
-    <span class="side-label">All Games</span>
-  </div>
-  <div class="side-item" data-target="allGames">
-    <span class="side-icon">🕹️</span>
-    <span class="side-label">Arcade</span>
   </div>
   <div class="side-item" id="infoBtn">
     <span class="side-icon">ℹ️</span>
@@ -41,99 +31,22 @@
 </nav>
 
 <main class="main" id="home">
-
   <section class="hero-center">
-    <h1 class="brand-title">NOVA GAMES</h1>
-    <div class="beta-tag">Beta</div>
+    <h1 class="brand-title">UNBLOCKED GAMES</h1>
 
     <form class="search-bar" id="searchForm">
       <input type="text" id="searchInput" placeholder="Search Google or Enter a Link" autocomplete="off">
     </form>
   </section>
-
-  <section class="games-section" id="allGames">
-    <div class="section-head">
-      <h2>Featured</h2>
-    </div>
-
-    <div class="hero-card">
-      <div class="hero-copy">
-        <div class="eyebrow">Play Now</div>
-        <h2>Snake</h2>
-        <p>Eat, grow, don't hit yourself. Arrow keys, WASD, or swipe.</p>
-        <div class="hero-stats">
-          <div><strong id="heroScore">0</strong>Score</div>
-          <div><strong id="heroHi">0</strong>Best</div>
-        </div>
-        <button class="play-btn" id="startBtn">▶ Play</button>
-      </div>
-      <div>
-        <canvas id="gameCanvas" width="380" height="380"></canvas>
-        <div class="score-row">
-          <span id="statusText">Press Play</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-head">
-      <h2>All Games</h2>
-    </div>
-    <div class="grid" id="grid"></div>
-  </section>
-
 </main>
-
-<div class="status-widget">
-  <div id="fpsRow">FPS: <span id="fpsVal">60</span></div>
-  <div id="clockRow">--:--</div>
-</div>
 
 <a class="github-pill" href="https://github.com/rey24240/Unblocked-games-" target="_blank" rel="noopener">
   ⭐ GitHub
 </a>
 
 <script>
-const canvas = document.getElementById('stars');
-const sctx = canvas.getContext('2d');
-let stars = [];
-
-function resizeStars(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const count = Math.floor((canvas.width * canvas.height) / 9000);
-  stars = Array.from({length: count}, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 1.4 + 0.3,
-    tw: Math.random() * Math.PI * 2,
-    speed: Math.random() * 0.02 + 0.005,
-  }));
-}
-function drawStars(t){
-  sctx.clearRect(0, 0, canvas.width, canvas.height);
-  stars.forEach(s => {
-    const alpha = 0.4 + 0.6 * Math.abs(Math.sin(s.tw + t * s.speed));
-    sctx.beginPath();
-    sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    sctx.fillStyle = `rgba(210,190,255,${alpha})`;
-    sctx.fill();
-  });
-  requestAnimationFrame(drawStars);
-}
-resizeStars();
-window.addEventListener('resize', resizeStars);
-requestAnimationFrame(drawStars);
-
-document.querySelectorAll('.side-item[data-target]').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.side-item').forEach(i => i.classList.remove('active'));
-    item.classList.add('active');
-    const target = document.getElementById(item.dataset.target);
-    if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
-  });
-});
 document.getElementById('infoBtn').addEventListener('click', () => {
-  alert('Nova Games — a small hosted arcade. Drop your own HTML5 game files into a card to make them playable.');
+  alert('Unblocked Games — a simple search page.');
 });
 document.getElementById('settingsBtn').addEventListener('click', () => {
   alert('No settings yet — this is just a placeholder button.');
@@ -150,190 +63,6 @@ document.getElementById('searchForm').addEventListener('submit', e => {
     window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(val);
   }
 });
-
-let lastFrame = performance.now();
-let frames = 0;
-let fpsAcc = 0;
-function fpsLoop(now){
-  frames++;
-  fpsAcc += now - lastFrame;
-  lastFrame = now;
-  if(fpsAcc > 500){
-    document.getElementById('fpsVal').textContent = Math.round((frames * 1000) / fpsAcc);
-    frames = 0;
-    fpsAcc = 0;
-  }
-  requestAnimationFrame(fpsLoop);
-}
-requestAnimationFrame(fpsLoop);
-
-function updateClock(){
-  const d = new Date();
-  let h = d.getHours();
-  const m = String(d.getMinutes()).padStart(2,'0');
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  h = h % 12 || 12;
-  document.getElementById('clockRow').textContent = `${h}:${m} ${ampm}`;
-}
-updateClock();
-setInterval(updateClock, 1000 * 15);
-
-const games = [
-  {name:"Snake", cat:"Arcade", icon:"🐍", grad:"#241a3a,#a879ff", badge:"LIVE"},
-  {name:"Breakout", cat:"Arcade", icon:"🧱", grad:"#2a1f3f,#7b5bff"},
-  {name:"Tetris", cat:"Puzzle", icon:"🟦", grad:"#221934,#9d7bff"},
-  {name:"Pong", cat:"Retro", icon:"🏓", grad:"#2b1f45,#a879ff"},
-  {name:"Asteroids", cat:"Action", icon:"☄️", grad:"#1e1730,#7b5bff"},
-  {name:"2048", cat:"Puzzle", icon:"🔢", grad:"#291d40,#9d7bff"},
-  {name:"Flappy", cat:"Action", icon:"🐤", grad:"#241a3a,#a879ff"},
-  {name:"Mystery Box", cat:"Random", icon:"🎲", grad:"#241a3a,#7b5bff"},
-];
-
-function cardHTML(g){
-  const [c1, c2] = g.grad.split(',');
-  return `
-    <div class="card">
-      <div class="thumb" style="background:linear-gradient(135deg, ${c1}, ${c2});">
-        ${g.badge ? `<span class="badge">${g.badge}</span>` : ''}
-        ${g.icon}
-      </div>
-      <div class="card-info">
-        <div class="name">${g.name}</div>
-        <div class="cat">${g.cat}</div>
-      </div>
-    </div>
-  `;
-}
-document.getElementById('grid').innerHTML = games.map(cardHTML).join('');
-
-document.addEventListener('click', e => {
-  const card = e.target.closest('.card');
-  if(card && card.querySelector('.name').textContent === 'Snake'){
-    document.querySelector('.hero-card').scrollIntoView({behavior:'smooth', block:'center'});
-    startGame();
-  }
-});
-
-const gcanvas = document.getElementById('gameCanvas');
-const ctx = gcanvas.getContext('2d');
-const GRID = 19;
-const CELLS = Math.floor(gcanvas.width / GRID);
-
-let snake, dir, nextDir, food, score, hiscore, loopId, running, paused;
-hiscore = 0;
-
-function resetGame(){
-  snake = [{x:8,y:10},{x:7,y:10},{x:6,y:10}];
-  dir = {x:1,y:0};
-  nextDir = {x:1,y:0};
-  score = 0;
-  placeFood();
-  updateScore();
-  draw();
-}
-function placeFood(){
-  let ok = false;
-  while(!ok){
-    food = {x: Math.floor(Math.random()*CELLS), y: Math.floor(Math.random()*CELLS)};
-    ok = !snake.some(s => s.x===food.x && s.y===food.y);
-  }
-}
-function updateScore(){
-  document.getElementById('heroScore').textContent = score;
-  document.getElementById('heroHi').textContent = hiscore;
-}
-function draw(){
-  ctx.fillStyle = '#0b0714';
-  ctx.fillRect(0,0,gcanvas.width,gcanvas.height);
-  ctx.strokeStyle = 'rgba(168,121,255,0.06)';
-  for(let i=0;i<=CELLS;i++){
-    ctx.beginPath(); ctx.moveTo(i*GRID,0); ctx.lineTo(i*GRID,gcanvas.height); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0,i*GRID); ctx.lineTo(gcanvas.width,i*GRID); ctx.stroke();
-  }
-  ctx.fillStyle = '#ffd23f';
-  ctx.shadowColor = '#ffd23f';
-  ctx.shadowBlur = 10;
-  ctx.fillRect(food.x*GRID+2, food.y*GRID+2, GRID-4, GRID-4);
-  ctx.shadowBlur = 0;
-  snake.forEach((seg, i) => {
-    ctx.fillStyle = i===0 ? '#a879ff' : '#7b5bff';
-    ctx.shadowColor = i===0 ? '#a879ff' : '#7b5bff';
-    ctx.shadowBlur = i===0 ? 12 : 4;
-    ctx.fillRect(seg.x*GRID+1, seg.y*GRID+1, GRID-2, GRID-2);
-  });
-  ctx.shadowBlur = 0;
-}
-function step(){
-  if(paused) return;
-  dir = nextDir;
-  const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
-  if(head.x<0 || head.y<0 || head.x>=CELLS || head.y>=CELLS || snake.some(s=>s.x===head.x && s.y===head.y)){
-    gameOver();
-    return;
-  }
-  snake.unshift(head);
-  if(head.x===food.x && head.y===food.y){
-    score += 10;
-    if(score>hiscore) hiscore = score;
-    updateScore();
-    placeFood();
-  } else {
-    snake.pop();
-  }
-  draw();
-}
-function gameOver(){
-  running = false;
-  clearInterval(loopId);
-  document.getElementById('statusText').textContent = 'Game Over — press Play';
-  ctx.fillStyle = 'rgba(11,7,20,0.85)';
-  ctx.fillRect(0,0,gcanvas.width,gcanvas.height);
-  ctx.fillStyle = '#a879ff';
-  ctx.font = "bold 22px Rubik, sans-serif";
-  ctx.textAlign = 'center';
-  ctx.fillText('GAME OVER', gcanvas.width/2, gcanvas.height/2 - 8);
-}
-function startGame(){
-  if(running) return;
-  resetGame();
-  running = true;
-  paused = false;
-  document.getElementById('statusText').textContent = 'Playing';
-  clearInterval(loopId);
-  loopId = setInterval(step, 110);
-}
-document.getElementById('startBtn').addEventListener('click', startGame);
-
-window.addEventListener('keydown', e => {
-  const map = {
-    ArrowUp:{x:0,y:-1}, w:{x:0,y:-1}, W:{x:0,y:-1},
-    ArrowDown:{x:0,y:1}, s:{x:0,y:1}, S:{x:0,y:1},
-    ArrowLeft:{x:-1,y:0}, a:{x:-1,y:0}, A:{x:-1,y:0},
-    ArrowRight:{x:1,y:0}, d:{x:1,y:0}, D:{x:1,y:0},
-  };
-  const d = map[e.key];
-  if(!d) return;
-  if(document.activeElement === document.getElementById('searchInput')) return;
-  e.preventDefault();
-  if(d.x === -dir.x && d.y === -dir.y) return;
-  nextDir = d;
-});
-
-let touchStart = null;
-gcanvas.addEventListener('touchstart', e => { touchStart = e.touches[0]; });
-gcanvas.addEventListener('touchend', e => {
-  if(!touchStart) return;
-  const dx = e.changedTouches[0].clientX - touchStart.clientX;
-  const dy = e.changedTouches[0].clientY - touchStart.clientY;
-  if(Math.abs(dx) > Math.abs(dy)){
-    nextDir = dx > 0 ? {x:1,y:0} : {x:-1,y:0};
-  } else {
-    nextDir = dy > 0 ? {x:0,y:1} : {x:0,y:-1};
-  }
-  touchStart = null;
-});
-
-resetGame();
 </script>
 
 </body>
