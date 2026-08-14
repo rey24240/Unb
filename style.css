@@ -9,40 +9,24 @@
   --dim:#8a949c;
 }
 
-/* ---------- Themes (swap accent colors) ---------- */
+/* ---------- Themes (accent color only — base stays the same) ---------- */
 [data-theme="green"]{
   --green:#4ade80;
   --green-2:#22c55e;
 }
 [data-theme="purple"]{
-  --bg:#0b0714;
-  --panel:#17102a;
-  --panel-2:#1f1738;
-  --edge:#332a52;
   --green:#a879ff;
   --green-2:#7b5bff;
 }
 [data-theme="blue"]{
-  --bg:#0b1420;
-  --panel:#12202f;
-  --panel-2:#17283b;
-  --edge:#264257;
   --green:#38bdf8;
   --green-2:#0ea5e9;
 }
 [data-theme="red"]{
-  --bg:#180b0b;
-  --panel:#2a1414;
-  --panel-2:#341818;
-  --edge:#4a2323;
   --green:#f87171;
   --green-2:#ef4444;
 }
 [data-theme="amber"]{
-  --bg:#161208;
-  --panel:#261f10;
-  --panel-2:#302713;
-  --edge:#4a3a1a;
   --green:#fbbf24;
   --green-2:#f59e0b;
 }
@@ -117,19 +101,25 @@ a{color:inherit; text-decoration:none;}
   opacity:1;
 }
 
-.logo-item{
-  cursor:default;
+.avatar-item{
   margin-bottom:18px;
   padding-bottom:18px;
   border-bottom:1px solid var(--edge);
 }
-.logo-item .side-label{
-  font-family:'Press Start 2P', monospace;
-  font-size:11px;
-  color:var(--green);
+.avatar-icon{
+  background:var(--panel-2);
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  min-width:34px;
 }
-.logo-item:hover{
-  background:transparent;
+.avatar-item .side-label{
+  font-weight:700;
+  color:var(--text);
 }
 
 /* ---------- Main ---------- */
@@ -158,8 +148,7 @@ a{color:inherit; text-decoration:none;}
   color:var(--bg);
   -webkit-text-stroke:2px var(--green);
   text-stroke:2px var(--green);
-  text-shadow:
-    0 0 16px rgba(74,222,128,0.5);
+  filter:drop-shadow(0 0 12px var(--green));
   margin:0 0 18px;
   letter-spacing:2px;
 }
@@ -203,30 +192,10 @@ a{color:inherit; text-decoration:none;}
   box-shadow:0 0 24px rgba(74,222,128,0.25);
 }
 
-.games-btn{
-  margin-top:20px;
-  font-family:'Rubik', sans-serif;
-  font-weight:800;
-  font-size:15px;
-  padding:13px 36px;
-  border-radius:999px;
-  border:none;
-  color:#0b0f0d;
-  background:linear-gradient(135deg, var(--green), var(--green-2));
-  cursor:pointer;
-  box-shadow:0 0 24px rgba(74,222,128,0.3);
-  transition:transform 0.15s ease, box-shadow 0.15s ease;
-}
-.games-btn:hover{
-  transform:translateY(-2px);
-  box-shadow:0 0 32px rgba(74,222,128,0.45);
-}
-
 .games-section{
-  max-width:800px;
+  max-width:900px;
   margin:0 auto;
   padding:80px 24px 100px;
-  text-align:center;
 }
 .games-section .section-head h2{
   font-size:22px;
@@ -235,6 +204,10 @@ a{color:inherit; text-decoration:none;}
 .empty-note{
   color:var(--dim);
   font-size:15px;
+}
+
+.games-main{
+  align-items:flex-start !important;
 }
 
 /* ---------- Status widget ---------- */
@@ -253,9 +226,7 @@ a{color:inherit; text-decoration:none;}
   box-shadow:0 8px 24px rgba(0,0,0,0.4);
 }
 
-@media (max-width:820px){
-  .status-widget{ left:76px; }
-}
+/* mobile overrides live in the dedicated mobile block at the end of this file */
 
 /* ---------- GitHub pill ---------- */
 .github-pill{
@@ -275,25 +246,10 @@ a{color:inherit; text-decoration:none;}
   border-color:var(--green);
 }
 
-@media (max-width:820px){
-  .sidebar{ width:60px; }
-  .sidebar:hover{ width:210px; }
-  .main{ margin-left:92px; }
-}
-
 /* ---------- Games section controls ---------- */
-.games-section{
-  max-width:900px;
-  margin:0 auto;
-  padding:80px 24px 100px;
-}
 .games-section .section-head{
   text-align:center;
   margin-bottom:24px;
-}
-.games-section .section-head h2{
-  font-size:22px;
-  margin:0;
 }
 
 .games-controls{
@@ -504,4 +460,111 @@ a{color:inherit; text-decoration:none;}
   font-weight:800;
   font-size:14px;
   cursor:pointer;
+}
+
+/* =========================================================
+   MOBILE-ONLY OVERRIDES (phones/small screens)
+   Everything above stays untouched on desktop/tablet.
+   ========================================================= */
+@media (max-width:600px){
+
+  /* Sidebar becomes a compact icon rail, no hover-expand
+     (hover doesn't really work well with touch) */
+  .sidebar{
+    top:10px; left:10px; bottom:10px;
+    width:56px;
+    border-radius:18px;
+    padding:12px 0;
+  }
+  .sidebar:hover{
+    width:56px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.45);
+  }
+  .side-item{
+    padding:12px 0;
+    margin:2px 6px;
+    justify-content:center;
+    gap:0;
+  }
+  .side-label{
+    display:none;
+  }
+  .avatar-item{
+    margin-bottom:10px;
+    padding-bottom:10px;
+  }
+  .avatar-icon{
+    width:30px;
+    height:30px;
+    font-size:15px;
+    min-width:30px;
+  }
+  .side-icon{
+    font-size:19px;
+    min-width:auto;
+  }
+
+  /* Main content fits beside the slim rail */
+  .main{
+    margin-left:76px;
+    padding:0 14px;
+    align-items:flex-start;
+    padding-top:60px;
+  }
+  .games-main{
+    padding-top:24px;
+  }
+
+  .hero-center{
+    padding:20px 6px;
+    width:100%;
+  }
+  .brand-title{
+    font-size:22px;
+    letter-spacing:1px;
+    margin-bottom:12px;
+  }
+  .beta-tag{
+    font-size:12px;
+    margin-bottom:22px;
+  }
+  .search-bar input{
+    padding:14px 18px;
+    font-size:15px;
+  }
+
+  /* Games page controls stack on small screens */
+  .games-section{
+    padding:24px 6px 100px;
+  }
+  .games-controls{
+    flex-direction:column;
+  }
+  .category-select{
+    width:100%;
+  }
+  .grid{
+    grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));
+    gap:12px;
+  }
+
+  /* Status widget + GitHub pill stop overlapping content */
+  .status-widget{
+    left:76px;
+    bottom:10px;
+    font-size:9px;
+    padding:8px 10px;
+  }
+  .github-pill{
+    bottom:auto;
+    top:10px;
+    right:10px;
+    padding:8px 14px;
+    font-size:12px;
+  }
+
+  .modal{
+    width:88vw;
+    padding:20px;
+  }
 }

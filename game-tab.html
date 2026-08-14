@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unblocked Games</title>
+<title>Games — Unblocked Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -16,11 +16,11 @@
     <span class="side-label" id="profileLabel">Guest</span>
   </div>
 
-  <div class="side-item active" data-target="home">
+  <a class="side-item" href="games.html">
     <span class="side-icon">🏠</span>
     <span class="side-label">Home</span>
-  </div>
-  <a class="side-item" href="game-tab.html">
+  </a>
+  <a class="side-item active" href="game-tab.html">
     <span class="side-icon">🕹️</span>
     <span class="side-label">Games</span>
   </a>
@@ -34,14 +34,23 @@
   </div>
 </nav>
 
-<main class="main" id="home">
-  <section class="hero-center">
-    <h1 class="brand-title">UNBLOCKED GAMES</h1>
-    <div class="beta-tag" id="betaTag">Beta</div>
+<main class="main games-main">
+  <section class="games-section">
+    <div class="section-head">
+      <h2>Games</h2>
+    </div>
 
-    <form class="search-bar" id="searchForm">
-      <input type="text" id="searchInput" placeholder="Search Google or Enter a Link" autocomplete="off">
-    </form>
+    <div class="games-controls">
+      <div class="games-search">
+        🔍 <input type="text" id="gameSearch" placeholder="Search games...">
+      </div>
+      <select id="categorySelect" class="category-select">
+        <option value="All">All Categories</option>
+      </select>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <p class="empty-note" id="emptyNote" style="display:none;">No games match that search.</p>
   </section>
 </main>
 
@@ -146,35 +155,6 @@ document.getElementById('settingsClose').addEventListener('click', () => {
 });
 settingsOverlay.addEventListener('click', e => {
   if(e.target === settingsOverlay) settingsOverlay.classList.remove('open');
-});
-
-/* Rotating beta tag text */
-const betaPhrases = [
-  "Beta", "v0.2 Beta", "Early Access", "Work in Progress",
-  "Beta Build", "Testing Phase", "Under Construction", "Still Cooking"
-];
-const betaTag = document.getElementById('betaTag');
-function rotateBeta(){
-  const next = betaPhrases[Math.floor(Math.random() * betaPhrases.length)];
-  betaTag.style.opacity = 0;
-  setTimeout(() => {
-    betaTag.textContent = next;
-    betaTag.style.opacity = 1;
-  }, 250);
-}
-rotateBeta();
-setInterval(rotateBeta, 4000);
-
-document.getElementById('searchForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const val = document.getElementById('searchInput').value.trim();
-  if(!val) return;
-  const looksLikeUrl = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+(\/\S*)?$/i.test(val);
-  if(looksLikeUrl){
-    window.location.href = val.startsWith('http') ? val : 'https://' + val;
-  } else {
-    window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(val);
-  }
 });
 
 /* ---------- Profile / account (guest by default) ---------- */
@@ -298,15 +278,6 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 refreshProfileUI();
 
-document.querySelectorAll('.side-item[data-target]').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.side-item[data-target]').forEach(i => i.classList.remove('active'));
-    item.classList.add('active');
-    const target = document.getElementById(item.dataset.target);
-    if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
-  });
-});
-
 /* Live clock */
 function updateClock(){
   const d = new Date();
@@ -335,6 +306,59 @@ function fpsLoop(now){
   requestAnimationFrame(fpsLoop);
 }
 requestAnimationFrame(fpsLoop);
+
+/* ---------- Games data ----------
+   Edit this list to match the game files you added.
+   file: the path to your game's HTML file (relative to this folder)
+   cat: category shown in the filter dropdown
+--------------------------------------------------- */
+const games = [
+  // Example — replace with your real files:
+  // {name:"Snake", cat:"Arcade", file:"snake.html", icon:"🐍"},
+  // {name:"Tetris", cat:"Puzzle", file:"tetris.html", icon:"🟦"},
+];
+
+const grid = document.getElementById('grid');
+const emptyNote = document.getElementById('emptyNote');
+const gameSearch = document.getElementById('gameSearch');
+const categorySelect = document.getElementById('categorySelect');
+
+function populateCategories(){
+  const cats = ["All", ...new Set(games.map(g => g.cat))];
+  categorySelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+function cardHTML(g){
+  return `
+    <a class="card" href="${g.file}">
+      <div class="thumb">${g.icon || '🎮'}</div>
+      <div class="card-info">
+        <div class="name">${g.name}</div>
+        <div class="cat">${g.cat}</div>
+      </div>
+    </a>
+  `;
+}
+
+function renderGrid(){
+  const query = gameSearch.value.trim().toLowerCase();
+  const cat = categorySelect.value;
+  const filtered = games.filter(g => {
+    const matchesQuery = g.name.toLowerCase().includes(query);
+    const matchesCat = cat === 'All' || g.cat === cat;
+    return matchesQuery && matchesCat;
+  });
+  grid.innerHTML = filtered.map(cardHTML).join('');
+  emptyNote.style.display = filtered.length === 0 ? 'block' : 'none';
+  emptyNote.textContent = games.length === 0
+    ? 'No games added yet — edit the games list in game-tab.html to add yours.'
+    : 'No games match that search.';
+}
+
+populateCategories();
+renderGrid();
+gameSearch.addEventListener('input', renderGrid);
+categorySelect.addEventListener('change', renderGrid);
 </script>
 
 </body>
