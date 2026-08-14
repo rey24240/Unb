@@ -33,16 +33,31 @@
 <main class="main" id="home">
   <section class="hero-center">
     <h1 class="brand-title">UNBLOCKED GAMES</h1>
+    <div class="beta-tag" id="betaTag">Beta</div>
 
     <form class="search-bar" id="searchForm">
       <input type="text" id="searchInput" placeholder="Search Google or Enter a Link" autocomplete="off">
     </form>
+
+    <button class="games-btn" id="gamesBtn">Games</button>
+  </section>
+
+  <section class="games-section" id="games">
+    <div class="section-head">
+      <h2>Games</h2>
+    </div>
+    <p class="empty-note">Nothing here yet — drop game files in and wire up cards to make this live.</p>
   </section>
 </main>
 
 <a class="github-pill" href="https://github.com/rey24240/Unblocked-games-" target="_blank" rel="noopener">
   ⭐ GitHub
 </a>
+
+<div class="status-widget">
+  <div>FPS: <span id="fpsVal">60</span></div>
+  <div id="clockRow">--:--</div>
+</div>
 
 <script>
 document.getElementById('infoBtn').addEventListener('click', () => {
@@ -51,6 +66,23 @@ document.getElementById('infoBtn').addEventListener('click', () => {
 document.getElementById('settingsBtn').addEventListener('click', () => {
   alert('No settings yet — this is just a placeholder button.');
 });
+
+/* Rotating beta tag text */
+const betaPhrases = [
+  "Beta", "v0.2 Beta", "Early Access", "Work in Progress",
+  "Beta Build", "Testing Phase", "Under Construction", "Still Cooking"
+];
+const betaTag = document.getElementById('betaTag');
+function rotateBeta(){
+  const next = betaPhrases[Math.floor(Math.random() * betaPhrases.length)];
+  betaTag.style.opacity = 0;
+  setTimeout(() => {
+    betaTag.textContent = next;
+    betaTag.style.opacity = 1;
+  }, 250);
+}
+rotateBeta();
+setInterval(rotateBeta, 4000);
 
 document.getElementById('searchForm').addEventListener('submit', e => {
   e.preventDefault();
@@ -63,6 +95,39 @@ document.getElementById('searchForm').addEventListener('submit', e => {
     window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(val);
   }
 });
+
+document.getElementById('gamesBtn').addEventListener('click', () => {
+  document.getElementById('games').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+/* Live clock */
+function updateClock(){
+  const d = new Date();
+  let h = d.getHours();
+  const m = String(d.getMinutes()).padStart(2,'0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('clockRow').textContent = `${h}:${m} ${ampm}`;
+}
+updateClock();
+setInterval(updateClock, 1000 * 15);
+
+/* FPS counter */
+let lastFrame = performance.now();
+let frames = 0;
+let fpsAcc = 0;
+function fpsLoop(now){
+  frames++;
+  fpsAcc += now - lastFrame;
+  lastFrame = now;
+  if(fpsAcc > 500){
+    document.getElementById('fpsVal').textContent = Math.round((frames * 1000) / fpsAcc);
+    frames = 0;
+    fpsAcc = 0;
+  }
+  requestAnimationFrame(fpsLoop);
+}
+requestAnimationFrame(fpsLoop);
 </script>
 
 </body>
