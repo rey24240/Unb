@@ -76,5 +76,6 @@ categorySelect.addEventListener('change', renderGrid);
 grid.addEventListener('click', e => {
   const card = e.target.closest('.card');
   if(!card) return;
-  openAboutBlank(card.dataset.url, card.dataset.name);
+  const others = games.filter(g => g.url !== card.dataset.url);
+  openAboutBlank(card.dataset.url, card.dataset.name, others);
 });
