@@ -77,5 +77,6 @@ grid.addEventListener('click', e => {
   const card = e.target.closest('.card');
   if(!card) return;
   const others = games.filter(g => g.url !== card.dataset.url);
-  openAboutBlank(card.dataset.url, card.dataset.name, others);
+  const currentUser = localStorage.getItem('ug_current_user');
+  openAboutBlank(card.dataset.url, card.dataset.name, others, currentUser);
 });

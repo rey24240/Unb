@@ -206,10 +206,10 @@ document.getElementById('searchForm').addEventListener('submit', e => {
   const looksLikeUrl = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+(\/\S*)?$/i.test(val);
   if(looksLikeUrl){
     const target = val.startsWith('http') ? val : 'https://' + val;
-    openAboutBlank(target, val);
+    window.open(target, '_blank', 'noopener');
   } else {
-    const searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(val);
-    openAboutBlank(searchUrl, 'Search: ' + val);
+    const searchUrl = 'https://duckduckgo.com/?q=' + encodeURIComponent(val);
+    window.open(searchUrl, '_blank', 'noopener');
   }
 });
 

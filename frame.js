@@ -1,10 +1,12 @@
-/* ---------- Shared: open any URL via about:blank popup ----------
+/* ---------- Shared: open any game via about:blank popup ----------
    Opens a new tab at about:blank, then writes a styled player card into
    it — the address bar shows about:blank instead of the real domain.
    sideGames (optional): the full games list, used to show random
    suggestions down each side of the frame.
+   currentUser (optional): username string if signed in, otherwise null/undefined.
+   Comments are only postable when currentUser is provided.
 --------------------------------------------------------------------- */
-function openAboutBlank(url, title, sideGames){
+function openAboutBlank(url, title, sideGames, currentUser){
   const win = window.open('about:blank', '_blank');
   if(!win){
     window.open(url, '_blank', 'noopener');
@@ -17,7 +19,7 @@ function openAboutBlank(url, title, sideGames){
   const rightGames = shuffled.slice(4, 8);
 
   function favicon(u){
-    try{ return `https://www.google.com/s2/favicons?sz=64&domain=${new URL(u).hostname}`; }
+    try{ return `https://www.google.com/s2/favicons?sz=128&domain=${new URL(u).hostname}`; }
     catch(e){ return ''; }
   }
 
@@ -25,12 +27,32 @@ function openAboutBlank(url, title, sideGames){
     return list.map(g => `
       <div class="side-thumb" onclick="loadGame('${g.url.replace(/'/g,"\\'")}', '${(g.name||'').replace(/'/g,"\\'")}')">
         <img src="${favicon(g.url)}" alt="">
-        <span>${g.name}</span>
+        <span class="side-thumb-label">${g.name}</span>
       </div>
     `).join('');
   }
 
   const mainFavicon = favicon(url);
+  const loggedIn = !!currentUser;
+
+  // absolute links back to the main site, computed from this window's own location
+  const baseHref = location.href;
+  function siteLink(path){
+    try{ return new URL(path, baseHref).href; }
+    catch(e){ return path; }
+  }
+
+  const commentAreaHTML = loggedIn
+    ? `
+      <textarea id="commentInput" placeholder="Leave a comment about this game..."></textarea>
+      <br>
+      <button class="post-btn" onclick="postComment()">Post as ${currentUser}</button>
+    `
+    : `
+      <div class="comment-locked">
+        <i class="bi bi-lock-fill"></i> Log in to leave a comment.
+      </div>
+    `;
 
   win.document.open();
   win.document.write(`
@@ -48,42 +70,85 @@ function openAboutBlank(url, title, sideGames){
           background:linear-gradient(160deg, #3a4a63, #29354a);
           font-family:'Segoe UI', Rubik, sans-serif;
         }
+
+        .mini-nav{
+          position:fixed;
+          top:16px; left:16px; bottom:16px;
+          width:56px;
+          background:rgba(15,18,24,0.85);
+          backdrop-filter:blur(10px);
+          border:2px solid #4ade80;
+          border-radius:20px;
+          z-index:200;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          gap:6px;
+          padding:14px 0;
+        }
+        .mini-nav a, .mini-nav button{
+          width:36px; height:36px;
+          border-radius:12px;
+          display:flex; align-items:center; justify-content:center;
+          color:#c7ccd6;
+          text-decoration:none;
+          background:transparent;
+          border:none;
+          cursor:pointer;
+          font-size:16px;
+        }
+        .mini-nav a:hover, .mini-nav button:hover{
+          background:rgba(74,222,128,0.15);
+          color:#fff;
+        }
+        .mini-nav .avatar{
+          width:32px; height:32px;
+          border-radius:50%;
+          background:#252b2f;
+          margin-bottom:8px;
+        }
+
         .layout{
           display:flex;
           align-items:flex-start;
           justify-content:center;
           gap:16px;
-          padding:24px 16px;
+          padding:24px 16px 24px 90px;
           min-height:100vh;
         }
         .side-rail{
           display:flex;
           flex-direction:column;
           gap:12px;
-          width:110px;
+          width:130px;
           flex-shrink:0;
         }
         .side-thumb{
-          background:rgba(255,255,255,0.06);
-          border:1px solid rgba(255,255,255,0.1);
-          border-radius:12px;
-          padding:10px;
-          display:flex;
-          flex-direction:column;
-          align-items:center;
-          gap:6px;
+          position:relative;
+          aspect-ratio:1/1;
+          border-radius:14px;
+          overflow:hidden;
           cursor:pointer;
-          transition:background 0.15s ease, transform 0.15s ease;
+          border:1px solid rgba(255,255,255,0.12);
+          transition:transform 0.15s ease;
         }
         .side-thumb:hover{
-          background:rgba(255,255,255,0.12);
-          transform:translateY(-2px);
+          transform:translateY(-2px) scale(1.03);
         }
         .side-thumb img{
-          width:32px; height:32px; border-radius:8px; object-fit:contain;
+          width:100%; height:100%;
+          object-fit:cover;
+          display:block;
         }
-        .side-thumb span{
-          font-size:11px; color:#e8ecf3; text-align:center; line-height:1.2;
+        .side-thumb-label{
+          position:absolute;
+          left:0; right:0; bottom:0;
+          padding:6px 8px;
+          background:linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+          color:#fff;
+          font-size:11px;
+          font-weight:600;
+          line-height:1.2;
         }
 
         .center-col{
@@ -99,11 +164,24 @@ function openAboutBlank(url, title, sideGames){
           border-radius:18px;
           overflow:hidden;
           box-shadow:0 20px 50px rgba(0,0,0,0.4);
+          display:flex;
+          flex-direction:column;
         }
+        .frame-wrap{
+          position:relative;
+          width:100%;
+          aspect-ratio:16/9;
+          background:#000;
+          border-radius:18px 18px 0 0;
+          overflow:hidden;
+        }
+        iframe { width:100%; height:100%; border:none; display:block; }
+
         .bar {
           display:flex; align-items:center; justify-content:space-between;
           padding:10px 16px; background:#e9e9ec;
           font-size:13px;
+          border-radius:0 0 18px 18px;
         }
         .bar-left{
           display:flex; align-items:center; gap:10px;
@@ -119,13 +197,6 @@ function openAboutBlank(url, title, sideGames){
           background:transparent; border:none; color:#3c3c43;
           cursor:pointer; font-size:16px; padding:4px;
         }
-        .frame-wrap{
-          position:relative;
-          width:100%;
-          aspect-ratio:16/9;
-          background:#000;
-        }
-        iframe { width:100%; height:100%; border:none; display:block; }
 
         .loading-overlay{
           position:absolute;
@@ -209,6 +280,16 @@ function openAboutBlank(url, title, sideGames){
           font-size:13px;
           cursor:pointer;
         }
+        .comment-locked{
+          display:flex;
+          align-items:center;
+          gap:8px;
+          font-size:13px;
+          color:#a9b2c3;
+          background:rgba(0,0,0,0.2);
+          border-radius:10px;
+          padding:12px;
+        }
         .comment-list{
           margin-top:14px;
           display:flex;
@@ -231,17 +312,34 @@ function openAboutBlank(url, title, sideGames){
           color:#a9b2c3;
         }
 
-        @media (max-width:820px){
+        @media (max-width:900px){
           .side-rail{ display:none; }
+        }
+        @media (max-width:600px){
+          .mini-nav{ width:46px; }
+          .layout{ padding-left:66px; }
         }
       </style>
     </head>
     <body>
+      <nav class="mini-nav">
+        <div class="avatar"></div>
+        <a href="${siteLink('games.html')}" title="Home"><i class="bi bi-house-fill"></i></a>
+        <a href="${siteLink('game-tab.html')}" title="Games"><i class="bi bi-controller"></i></a>
+      </nav>
+
       <div class="layout">
         ${leftGames.length ? `<div class="side-rail">${sideThumbs(leftGames)}</div>` : ''}
 
         <div class="center-col">
           <div class="card">
+            <div class="frame-wrap">
+              <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <span>Loading game...</span>
+              </div>
+              <iframe id="gf" src="${url}" data-src="${url}" allowfullscreen onload="hideLoading()"></iframe>
+            </div>
             <div class="bar">
               <div class="bar-left">
                 <img src="${mainFavicon}" alt="">
@@ -255,22 +353,13 @@ function openAboutBlank(url, title, sideGames){
                 <button onclick="goFullscreen()" title="Fullscreen"><i class="bi bi-arrows-fullscreen"></i></button>
               </div>
             </div>
-            <div class="frame-wrap">
-              <div class="loading-overlay" id="loadingOverlay">
-                <div class="spinner"></div>
-                <span>Loading game...</span>
-              </div>
-              <iframe id="gf" src="${url}" data-src="${url}" allowfullscreen onload="hideLoading()"></iframe>
-            </div>
           </div>
 
           <div class="fps-overlay" id="fpsOverlay">FPS: <span id="fpsVal">60</span></div>
 
           <div class="comment-box">
             <h3>Comments</h3>
-            <textarea id="commentInput" placeholder="Leave a comment about this game..."></textarea>
-            <br>
-            <button class="post-btn" onclick="postComment()">Post</button>
+            ${commentAreaHTML}
             <div class="comment-list" id="commentList"></div>
           </div>
         </div>
@@ -279,6 +368,8 @@ function openAboutBlank(url, title, sideGames){
       </div>
 
       <script>
+        var isLoggedIn = ${loggedIn ? 'true' : 'false'};
+
         function refreshFrame(){
           var f = document.getElementById('gf');
           var u = f.getAttribute('data-src');
@@ -349,20 +440,21 @@ function openAboutBlank(url, title, sideGames){
           var list = getComments();
           var el = document.getElementById('commentList');
           if(list.length === 0){
-            el.innerHTML = '<div class="comment-empty">No comments yet — be the first.</div>';
+            el.innerHTML = '<div class="comment-empty">No comments yet' + (isLoggedIn ? ' — be the first.' : '.') + '</div>';
             return;
           }
           el.innerHTML = list.slice().reverse().map(function(c){
-            return '<div class="comment-item">' + c.text.replace(/</g,'&lt;') +
+            return '<div class="comment-item"><strong>' + (c.author || 'Anonymous') + ':</strong> ' + c.text.replace(/</g,'&lt;') +
               '<div class="meta">' + c.date + '</div></div>';
           }).join('');
         }
         function postComment(){
+          if(!isLoggedIn) return;
           var input = document.getElementById('commentInput');
           var text = input.value.trim();
           if(!text) return;
           var list = getComments();
-          list.push({ text: text, date: new Date().toLocaleString() });
+          list.push({ text: text, author: '${loggedIn ? currentUser.replace(/'/g,"\\'") : ''}', date: new Date().toLocaleString() });
           localStorage.setItem(commentKey(), JSON.stringify(list));
           input.value = '';
           renderComments();
