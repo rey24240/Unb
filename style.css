@@ -125,21 +125,23 @@ a{color:inherit; text-decoration:none;}
 /* ---------- Main ---------- */
 .main{
   position:relative;
-  margin-left:108px;
   min-height:100vh;
-  padding:0 24px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  width:100%;
 }
 
 .hero-center{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   text-align:center;
   padding:40px 20px;
+  width:100%;
+  max-width:700px;
 }
 
 .brand-title{
@@ -207,7 +209,8 @@ a{color:inherit; text-decoration:none;}
 }
 
 .games-main{
-  align-items:flex-start !important;
+  padding-left:112px;
+  padding-right:24px;
 }
 
 /* ---------- Status widget ---------- */
@@ -506,18 +509,22 @@ a{color:inherit; text-decoration:none;}
 
   /* Main content fits beside the slim rail */
   .main{
-    margin-left:76px;
-    padding:0 14px;
-    align-items:flex-start;
-    padding-top:60px;
+    padding-left:76px;
   }
   .games-main{
     padding-top:24px;
+    padding-left:76px;
+    padding-right:14px;
   }
 
   .hero-center{
+    position:absolute;
+    left:calc(50% + 38px);
+    top:50%;
+    transform:translate(-50%, -50%);
     padding:20px 6px;
-    width:100%;
+    width:calc(100% - 90px);
+    max-width:100%;
   }
   .brand-title{
     font-size:22px;
@@ -567,4 +574,44 @@ a{color:inherit; text-decoration:none;}
     width:88vw;
     padding:20px;
   }
+}
+
+/* ---------- Whole-site outline frame ---------- */
+.page-outline{
+  position:fixed;
+  inset:8px;
+  border:2px solid var(--edge);
+  border-radius:20px;
+  pointer-events:none;
+  z-index:400;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.02) inset;
+}
+
+/* ---------- Bootstrap Icons sizing ---------- */
+.side-icon i{
+  font-size:20px;
+  line-height:1;
+}
+.avatar-icon i{
+  font-size:16px;
+}
+.games-search i{
+  color:var(--dim);
+}
+.github-pill i{
+  font-size:15px;
+  vertical-align:-1px;
+}
+.visitor-count i{
+  color:var(--green);
+}
+
+/* ---------- Visitor counter ---------- */
+.visitor-count{
+  margin-top:22px;
+  font-size:13px;
+  color:var(--dim);
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
