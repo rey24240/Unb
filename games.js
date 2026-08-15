@@ -72,41 +72,9 @@ fetch('games.json')
 gameSearch.addEventListener('input', renderGrid);
 categorySelect.addEventListener('change', renderGrid);
 
-/* ---------- In-page game frame ---------- */
-const frameOverlay = document.getElementById('frameOverlay');
-const gameFrame = document.getElementById('gameFrame');
-const frameTitle = document.getElementById('frameTitle');
-const frameClose = document.getElementById('frameClose');
-const frameFullscreen = document.getElementById('frameFullscreen');
-const frameRefresh = document.getElementById('frameRefresh');
-
-let currentGameUrl = '';
-
+/* ---------- Open games via the shared about:blank popup (frame.js) ---------- */
 grid.addEventListener('click', e => {
   const card = e.target.closest('.card');
   if(!card) return;
-  currentGameUrl = card.dataset.url;
-  frameTitle.textContent = card.dataset.name;
-  gameFrame.src = currentGameUrl;
-  frameOverlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
-});
-
-function closeFrame(){
-  frameOverlay.classList.remove('open');
-  gameFrame.src = 'about:blank';
-  document.body.style.overflow = '';
-}
-frameClose.addEventListener('click', closeFrame);
-
-frameRefresh.addEventListener('click', () => {
-  gameFrame.src = currentGameUrl;
-});
-
-frameFullscreen.addEventListener('click', () => {
-  if(gameFrame.requestFullscreen){
-    gameFrame.requestFullscreen();
-  } else if(gameFrame.webkitRequestFullscreen){
-    gameFrame.webkitRequestFullscreen();
-  }
+  openAboutBlank(card.dataset.url, card.dataset.name);
 });

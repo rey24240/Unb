@@ -117,6 +117,8 @@
   </div>
 </div>
 
+<script src="frame.js"></script>
+<script src="meteors.js"></script>
 <script>
 document.getElementById('infoBtn').addEventListener('click', () => {
   alert('Unblocked Games — a simple search page.');
@@ -196,9 +198,11 @@ document.getElementById('searchForm').addEventListener('submit', e => {
   if(!val) return;
   const looksLikeUrl = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+(\/\S*)?$/i.test(val);
   if(looksLikeUrl){
-    window.location.href = val.startsWith('http') ? val : 'https://' + val;
+    const target = val.startsWith('http') ? val : 'https://' + val;
+    openAboutBlank(target, val);
   } else {
-    window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(val);
+    const searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(val);
+    openAboutBlank(searchUrl, 'Search: ' + val);
   }
 });
 
