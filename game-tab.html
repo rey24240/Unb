@@ -23,6 +23,10 @@
     <span class="side-icon"><i class="bi bi-house-fill"></i></span>
     <span class="side-label">Home</span>
   </a>
+  <div class="side-item" id="appsBtn">
+    <span class="side-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+    <span class="side-label">Apps</span>
+  </div>
   <a class="side-item active" href="game-tab.html">
     <span class="side-icon"><i class="bi bi-controller"></i></span>
     <span class="side-label">Games</span>
@@ -120,6 +124,9 @@
 <script>
 document.getElementById('infoBtn').addEventListener('click', () => {
   alert('Unblocked Games — a simple search page.');
+});
+document.getElementById('appsBtn').addEventListener('click', () => {
+  alert('Apps — coming soon.');
 });
 
 const sidebarToggle = document.getElementById('sidebarToggle');
