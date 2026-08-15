@@ -35,6 +35,10 @@
     <span class="side-icon"><i class="bi bi-gear-fill"></i></span>
     <span class="side-label">Settings</span>
   </div>
+
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Expand sidebar">
+    <i class="bi bi-chevron-right"></i>
+  </button>
 </nav>
 
 <main class="main" id="home">
@@ -45,6 +49,11 @@
     <form class="search-bar" id="searchForm">
       <input type="text" id="searchInput" placeholder="Search Google or Enter a Link" autocomplete="off">
     </form>
+
+    <div class="auth-buttons" id="authButtons">
+      <button class="auth-btn" id="loginQuickBtn">Log in</button>
+      <button class="auth-btn accent" id="signupQuickBtn">Sign up</button>
+    </div>
 
     <div class="visitor-count" id="visitorCount">
       <i class="bi bi-people-fill"></i> <span id="visitorNum">—</span> visits
@@ -111,6 +120,15 @@
 <script>
 document.getElementById('infoBtn').addEventListener('click', () => {
   alert('Unblocked Games — a simple search page.');
+});
+
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebarEl = document.getElementById('sidebar');
+sidebarToggle.addEventListener('click', () => {
+  sidebarEl.classList.toggle('expanded');
+  sidebarToggle.querySelector('i').className = sidebarEl.classList.contains('expanded')
+    ? 'bi bi-chevron-left'
+    : 'bi bi-chevron-right';
 });
 
 /* ---------- Theme switcher (accent color only) ---------- */
@@ -222,15 +240,18 @@ function hashPass(str){
 
 function refreshProfileUI(){
   const current = getCurrentUser();
+  const authButtons = document.getElementById('authButtons');
   if(current){
     profileLabel.textContent = current;
     guestView.style.display = 'none';
     accountView.style.display = 'block';
     accountName.textContent = current;
+    if(authButtons) authButtons.style.display = 'none';
   } else {
     profileLabel.textContent = 'Guest';
     guestView.style.display = 'block';
     accountView.style.display = 'none';
+    if(authButtons) authButtons.style.display = 'flex';
   }
 }
 
@@ -247,6 +268,18 @@ tabSignup.addEventListener('click', () => switchAuthTab('signup'));
 document.getElementById('profileBtn').addEventListener('click', () => {
   profileOverlay.classList.add('open');
   switchAuthTab('login');
+  loginError.textContent = '';
+  signupError.textContent = '';
+});
+document.getElementById('loginQuickBtn').addEventListener('click', () => {
+  profileOverlay.classList.add('open');
+  switchAuthTab('login');
+  loginError.textContent = '';
+  signupError.textContent = '';
+});
+document.getElementById('signupQuickBtn').addEventListener('click', () => {
+  profileOverlay.classList.add('open');
+  switchAuthTab('signup');
   loginError.textContent = '';
   signupError.textContent = '';
 });

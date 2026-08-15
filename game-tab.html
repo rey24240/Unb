@@ -51,7 +51,7 @@
       <div class="games-search">
         <i class="bi bi-search"></i> <input type="text" id="gameSearch" placeholder="Search games...">
       </div>
-      <select id="categorySelect" class="category-select">
+      <select id="categorySelect" class="category-select" autocomplete="off">
         <option value="All">All Categories</option>
       </select>
     </div>
@@ -60,6 +60,19 @@
     <p class="empty-note" id="emptyNote" style="display:none;">No games match that search.</p>
   </section>
 </main>
+
+<!-- In-page game frame -->
+<div class="frame-overlay" id="frameOverlay">
+  <div class="frame-bar">
+    <span class="frame-title" id="frameTitle">Game</span>
+    <div class="frame-actions">
+      <button class="frame-btn" id="frameRefresh" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
+      <button class="frame-btn" id="frameFullscreen" title="Fullscreen"><i class="bi bi-arrows-fullscreen"></i></button>
+      <button class="frame-btn frame-close" id="frameClose" title="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+  </div>
+  <iframe id="gameFrame" class="game-frame" allowfullscreen></iframe>
+</div>
 
 <a class="github-pill" href="https://github.com/rey24240/Unblocked-games-" target="_blank" rel="noopener">
   <i class="bi bi-github"></i> GitHub

@@ -29,7 +29,7 @@ function cardHTML(g){
   const badgeHtml = g.badge ? `<span class="badge">${g.badge}</span>` : '';
   const img = faviconFor(g.url);
   return `
-    <a class="card" href="${g.url}" target="_blank" rel="noopener">
+    <div class="card" data-url="${g.url}" data-name="${g.name}">
       <div class="thumb">
         ${badgeHtml}
         <img src="${img}" alt="${g.name}" loading="lazy" onerror="this.style.display='none'">
@@ -38,7 +38,7 @@ function cardHTML(g){
         <div class="name">${g.name}</div>
         <div class="cat">${(g.categories || []).join(', ') || '—'}</div>
       </div>
-    </a>
+    </div>
   `;
 }
 
@@ -61,6 +61,7 @@ fetch('games.json')
     games = data;
     gameSearch.placeholder = `Search through our ${games.length} games!`;
     populateCategories();
+    categorySelect.value = 'All';
     renderGrid();
   })
   .catch(() => {
@@ -70,3 +71,42 @@ fetch('games.json')
 
 gameSearch.addEventListener('input', renderGrid);
 categorySelect.addEventListener('change', renderGrid);
+
+/* ---------- In-page game frame ---------- */
+const frameOverlay = document.getElementById('frameOverlay');
+const gameFrame = document.getElementById('gameFrame');
+const frameTitle = document.getElementById('frameTitle');
+const frameClose = document.getElementById('frameClose');
+const frameFullscreen = document.getElementById('frameFullscreen');
+const frameRefresh = document.getElementById('frameRefresh');
+
+let currentGameUrl = '';
+
+grid.addEventListener('click', e => {
+  const card = e.target.closest('.card');
+  if(!card) return;
+  currentGameUrl = card.dataset.url;
+  frameTitle.textContent = card.dataset.name;
+  gameFrame.src = currentGameUrl;
+  frameOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+});
+
+function closeFrame(){
+  frameOverlay.classList.remove('open');
+  gameFrame.src = 'about:blank';
+  document.body.style.overflow = '';
+}
+frameClose.addEventListener('click', closeFrame);
+
+frameRefresh.addEventListener('click', () => {
+  gameFrame.src = currentGameUrl;
+});
+
+frameFullscreen.addEventListener('click', () => {
+  if(gameFrame.requestFullscreen){
+    gameFrame.requestFullscreen();
+  } else if(gameFrame.webkitRequestFullscreen){
+    gameFrame.webkitRequestFullscreen();
+  }
+});
