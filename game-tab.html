@@ -14,30 +14,32 @@
 <div class="page-outline"></div>
 
 <nav class="sidebar" id="sidebar">
-  <div class="side-item avatar-item" id="profileBtn">
-    <span class="side-icon avatar-icon"><i class="bi bi-person-fill"></i></span>
-    <span class="side-label" id="profileLabel">Guest</span>
-  </div>
+  <div class="nav-group">
+    <div class="side-item avatar-item" id="profileBtn">
+      <span class="side-icon avatar-icon"><i class="bi bi-person-fill"></i></span>
+      <span class="side-label" id="profileLabel">Guest</span>
+    </div>
 
-  <a class="side-item" href="games.html">
-    <span class="side-icon"><i class="bi bi-house-fill"></i></span>
-    <span class="side-label">Home</span>
-  </a>
-  <div class="side-item" id="appsBtn">
-    <span class="side-icon"><i class="bi bi-grid-1x2-fill"></i></span>
-    <span class="side-label">Apps</span>
-  </div>
-  <a class="side-item active" href="game-tab.html">
-    <span class="side-icon"><i class="bi bi-controller"></i></span>
-    <span class="side-label">Games</span>
-  </a>
-  <div class="side-item" id="infoBtn">
-    <span class="side-icon"><i class="bi bi-info-circle-fill"></i></span>
-    <span class="side-label">Info</span>
-  </div>
-  <div class="side-item" id="settingsBtn">
-    <span class="side-icon"><i class="bi bi-gear-fill"></i></span>
-    <span class="side-label">Settings</span>
+    <a class="side-item" href="games.html">
+      <span class="side-icon"><i class="bi bi-house-fill"></i></span>
+      <span class="side-label">Home</span>
+    </a>
+    <a class="side-item" href="apps.html">
+      <span class="side-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+      <span class="side-label">Apps</span>
+    </a>
+    <a class="side-item active" href="game-tab.html">
+      <span class="side-icon"><i class="bi bi-controller"></i></span>
+      <span class="side-label">Games</span>
+    </a>
+    <div class="side-item" id="infoBtn">
+      <span class="side-icon"><i class="bi bi-info-circle-fill"></i></span>
+      <span class="side-label">Info</span>
+    </div>
+    <div class="side-item" id="settingsBtn">
+      <span class="side-icon"><i class="bi bi-gear-fill"></i></span>
+      <span class="side-label">Settings</span>
+    </div>
   </div>
 
   <button class="sidebar-toggle" id="sidebarToggle" aria-label="Expand sidebar">
@@ -124,9 +126,6 @@
 <script>
 document.getElementById('infoBtn').addEventListener('click', () => {
   alert('Unblocked Games — a simple search page.');
-});
-document.getElementById('appsBtn').addEventListener('click', () => {
-  alert('Apps — coming soon.');
 });
 
 const sidebarToggle = document.getElementById('sidebarToggle');

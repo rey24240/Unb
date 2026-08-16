@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unblocked Games</title>
+<title>Apps — Unblocked Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -20,11 +20,11 @@
       <span class="side-label" id="profileLabel">Guest</span>
     </div>
 
-    <div class="side-item active" data-target="home">
+    <a class="side-item" href="games.html">
       <span class="side-icon"><i class="bi bi-house-fill"></i></span>
       <span class="side-label">Home</span>
-    </div>
-    <a class="side-item" href="apps.html">
+    </a>
+    <a class="side-item active" href="apps.html">
       <span class="side-icon"><i class="bi bi-grid-1x2-fill"></i></span>
       <span class="side-label">Apps</span>
     </a>
@@ -47,25 +47,23 @@
   </button>
 </nav>
 
-<div class="top-auth-bar" id="authButtons">
-  <button class="auth-btn" id="loginQuickBtn">Log in</button>
-  <button class="auth-btn accent" id="signupQuickBtn">Sign up</button>
-</div>
-
-<main class="main" id="home">
-  <section class="hero-center">
-    <h1 class="brand-title">UNBLOCKED GAMES</h1>
-    <div class="beta-tag" id="betaTag">Beta</div>
-
-    <form class="search-bar" id="searchForm">
-      <input type="text" id="searchInput" placeholder="Search Google or Enter a Link" autocomplete="off">
-    </form>
-
-    <div class="quick-links" id="quickLinks"></div>
-
-    <div class="visitor-count" id="visitorCount">
-      <i class="bi bi-people-fill"></i> <span id="visitorNum">—</span> visits
+<main class="main games-main">
+  <section class="games-section">
+    <div class="section-head">
+      <h2>Apps</h2>
     </div>
+
+    <div class="games-controls">
+      <div class="games-search">
+        <i class="bi bi-search"></i> <input type="text" id="gameSearch" placeholder="Search apps...">
+      </div>
+      <select id="categorySelect" class="category-select" autocomplete="off">
+        <option value="All">All Categories</option>
+      </select>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <p class="empty-note" id="emptyNote" style="display:none;">No apps match that search.</p>
   </section>
 </main>
 
@@ -125,8 +123,6 @@
   </div>
 </div>
 
-<script src="frame.js"></script>
-<script src="meteors.js"></script>
 <script>
 document.getElementById('infoBtn').addEventListener('click', () => {
   alert('Unblocked Games — a simple search page.');
@@ -183,38 +179,6 @@ settingsOverlay.addEventListener('click', e => {
   if(e.target === settingsOverlay) settingsOverlay.classList.remove('open');
 });
 
-/* Rotating beta tag text */
-const betaPhrases = [
-  "Beta", "v0.2 Beta", "Early Access", "Work in Progress",
-  "Beta Build", "Testing Phase", "Under Construction", "Still Cooking"
-];
-const betaTag = document.getElementById('betaTag');
-function rotateBeta(){
-  const next = betaPhrases[Math.floor(Math.random() * betaPhrases.length)];
-  betaTag.style.opacity = 0;
-  setTimeout(() => {
-    betaTag.textContent = next;
-    betaTag.style.opacity = 1;
-  }, 250);
-}
-rotateBeta();
-setInterval(rotateBeta, 4000);
-
-document.getElementById('searchForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const val = document.getElementById('searchInput').value.trim();
-  if(!val) return;
-  const currentUser = localStorage.getItem('ug_current_user');
-  const looksLikeUrl = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+(\/\S*)?$/i.test(val);
-  if(looksLikeUrl){
-    const target = val.startsWith('http') ? val : 'https://' + val;
-    openAboutBlank(target, val, [], currentUser);
-  } else {
-    const searchUrl = 'https://duckduckgo.com/?q=' + encodeURIComponent(val);
-    openAboutBlank(searchUrl, 'Search: ' + val, [], currentUser);
-  }
-});
-
 /* ---------- Profile / account (guest by default) ---------- */
 const profileOverlay = document.getElementById('profileOverlay');
 const profileLabel = document.getElementById('profileLabel');
@@ -253,18 +217,15 @@ function hashPass(str){
 
 function refreshProfileUI(){
   const current = getCurrentUser();
-  const authButtons = document.getElementById('authButtons');
   if(current){
     profileLabel.textContent = current;
     guestView.style.display = 'none';
     accountView.style.display = 'block';
     accountName.textContent = current;
-    if(authButtons) authButtons.style.display = 'none';
   } else {
     profileLabel.textContent = 'Guest';
     guestView.style.display = 'block';
     accountView.style.display = 'none';
-    if(authButtons) authButtons.style.display = 'flex';
   }
 }
 
@@ -281,18 +242,6 @@ tabSignup.addEventListener('click', () => switchAuthTab('signup'));
 document.getElementById('profileBtn').addEventListener('click', () => {
   profileOverlay.classList.add('open');
   switchAuthTab('login');
-  loginError.textContent = '';
-  signupError.textContent = '';
-});
-document.getElementById('loginQuickBtn').addEventListener('click', () => {
-  profileOverlay.classList.add('open');
-  switchAuthTab('login');
-  loginError.textContent = '';
-  signupError.textContent = '';
-});
-document.getElementById('signupQuickBtn').addEventListener('click', () => {
-  profileOverlay.classList.add('open');
-  switchAuthTab('signup');
   loginError.textContent = '';
   signupError.textContent = '';
 });
@@ -351,39 +300,6 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 refreshProfileUI();
 
-/* ---------- Quick-launch links ---------- */
-const quickLinks = [
-  {name:"CrazyGames", url:"https://www.crazygames.com", icon:"🐱"},
-  {name:"YouTube", url:"https://www.youtube.com", icon:"▶️"},
-  {name:"GitHub", url:"https://github.com", icon:"🐙"},
-  {name:"Discord", url:"https://discord.com", icon:"🎮"},
-  {name:"now.gg", url:"https://now.gg", icon:"📱"},
-];
-
-const quickLinksEl = document.getElementById('quickLinks');
-quickLinksEl.innerHTML = quickLinks.map(q => `
-  <button class="quick-link" data-url="${q.url}" data-name="${q.name}">
-    <span class="quick-link-icon">${q.icon}</span>
-    <span>${q.name}</span>
-  </button>
-`).join('');
-
-quickLinksEl.addEventListener('click', e => {
-  const btn = e.target.closest('.quick-link');
-  if(!btn) return;
-  const currentUser = localStorage.getItem('ug_current_user');
-  openAboutBlank(btn.dataset.url, btn.dataset.name, [], currentUser);
-});
-
-document.querySelectorAll('.side-item[data-target]').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.side-item[data-target]').forEach(i => i.classList.remove('active'));
-    item.classList.add('active');
-    const target = document.getElementById(item.dataset.target);
-    if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
-  });
-});
-
 /* Live clock */
 function updateClock(){
   const d = new Date();
@@ -412,21 +328,10 @@ function fpsLoop(now){
   requestAnimationFrame(fpsLoop);
 }
 requestAnimationFrame(fpsLoop);
-
-/* ---------- Visitor counter (real, shared across everyone) ----------
-   Uses the free public CountAPI service — no backend needed.
-   Counts page loads, not concurrent users (a live "currently online"
-   counter needs a real server, which a static GitHub Pages site doesn't have).
-------------------------------------------------------------------- */
-fetch('https://api.countapi.xyz/hit/unblocked-games-rey24240/visits')
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById('visitorNum').textContent = data.value.toLocaleString();
-  })
-  .catch(() => {
-    document.getElementById('visitorNum').textContent = '—';
-  });
 </script>
+<script src="frame.js"></script>
+<script src="meteors.js"></script>
+<script src="apps.js"></script>
 
 </body>
 </html>
