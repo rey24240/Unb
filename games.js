@@ -27,16 +27,26 @@ function populateCategories(){
 
 function cardHTML(g){
   const badgeHtml = g.badge ? `<span class="badge">${g.badge}</span>` : '';
-  const img = faviconFor(g.url);
+  const img = g.thumbnail || faviconFor(g.url);
+  const category = (g.categories || []).join(', ') || 'Game';
+  const description = g.description || `Play ${category.toLowerCase()} game`;
   return `
-    <div class="card" data-url="${g.url}" data-name="${g.name}">
+    <div class="card" data-url="${g.url}" data-name="${g.name}" tabindex="0" role="button" aria-label="Play ${g.name}">
       <div class="thumb">
         ${badgeHtml}
         <img src="${img}" alt="${g.name}" loading="lazy" onerror="this.style.display='none'">
+        <div class="thumb-overlay"><i class="bi bi-play-fill"></i></div>
       </div>
       <div class="card-info">
-        <div class="name">${g.name}</div>
-        <div class="cat">${(g.categories || []).join(', ') || '—'}</div>
+        <div class="name-row">
+          <div class="name" title="${g.name}">${g.name}</div>
+          <i class="bi bi-three-dots-vertical card-menu" aria-hidden="true"></i>
+        </div>
+        <div class="description" title="${description}">${description}</div>
+        <div class="card-meta">
+          <span class="rating"><i class="bi bi-hand-thumbs-up-fill"></i> 100%</span>
+          <span class="dislike"><i class="bi bi-hand-thumbs-down"></i></span>
+        </div>
       </div>
     </div>
   `;
@@ -73,10 +83,21 @@ gameSearch.addEventListener('input', renderGrid);
 categorySelect.addEventListener('change', renderGrid);
 
 /* ---------- Open games via the shared about:blank popup (frame.js) ---------- */
-grid.addEventListener('click', e => {
-  const card = e.target.closest('.card');
-  if(!card) return;
+function openCard(card){
   const others = games.filter(g => g.url !== card.dataset.url);
   const currentUser = localStorage.getItem('ug_current_user');
   openAboutBlank(card.dataset.url, card.dataset.name, others, currentUser);
+}
+
+grid.addEventListener('click', e => {
+  const card = e.target.closest('.card');
+  if(!card) return;
+  openCard(card);
+});
+
+grid.addEventListener('keydown', e => {
+  const card = e.target.closest('.card');
+  if(!card || (e.key !== 'Enter' && e.key !== ' ')) return;
+  e.preventDefault();
+  openCard(card);
 });
