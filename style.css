@@ -935,33 +935,25 @@ a{color:inherit; text-decoration:none;}
   }
 }
 
-/* ---------- Sidebar icon centering fix ---------- */
-.side-item .side-icon{
-  width:34px;
-  min-width:34px;
-  height:34px;
-  display:flex;
+/* ---------- Game voting ---------- */
+.vote-card{
+  display:inline-flex;
   align-items:center;
   justify-content:center;
-  text-align:center;
-  flex:0 0 34px;
+  gap:4px;
+  min-width:38px;
+  height:28px;
+  padding:0 8px;
+  border:1px solid transparent;
+  border-radius:8px;
+  background:rgba(255,255,255,.045);
+  color:var(--dim);
+  font:600 11px 'Rubik',sans-serif;
+  cursor:pointer;
+  transition:.15s ease;
 }
-.side-item .side-icon i{
-  display:block;
-  line-height:1;
-  margin:0;
-}
-
-@media (max-width:600px){
-  .side-item .side-icon{
-    width:30px;
-    min-width:30px;
-    height:30px;
-    flex-basis:30px;
-  }
-  .avatar-icon{
-    width:30px;
-    min-width:30px;
-    height:30px;
-  }
-}
+.vote-card:hover{border-color:var(--edge);color:var(--text);transform:translateY(-1px);}
+.vote-card.active-like{color:#22c55e;background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.22);}
+.vote-card.active-dislike{color:#f87171;background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.2);}
+.vote-card i{font-size:12px;}
+.card-meta{gap:6px;}

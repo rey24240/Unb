@@ -67,45 +67,71 @@ function openAboutBlank(url, title, sideGames, currentUser){
         *{ box-sizing:border-box; }
         html, body {
           margin:0; min-height:100%; overflow-y:auto; overflow-x:hidden;
-          background:linear-gradient(160deg, #3a4a63, #29354a);
+          background:
+            radial-gradient(circle at 50% 10%, rgba(76,122,255,0.16), transparent 32%),
+            radial-gradient(circle at 15% 80%, rgba(168,121,255,0.12), transparent 30%),
+            linear-gradient(145deg, #101722 0%, #182437 45%, #293b54 100%);
+          background-attachment:fixed;
           font-family:'Segoe UI', Rubik, sans-serif;
         }
 
         .mini-nav{
           position:fixed;
           top:16px; left:16px; bottom:16px;
-          width:56px;
-          background:rgba(15,18,24,0.85);
-          backdrop-filter:blur(10px);
-          border:2px solid #4ade80;
-          border-radius:20px;
+          width:64px;
+          background:rgba(10,14,21,0.88);
+          backdrop-filter:blur(14px);
+          border:2px solid #a879ff;
+          border-radius:22px;
           z-index:200;
           display:flex;
           flex-direction:column;
           align-items:center;
-          gap:6px;
-          padding:14px 0;
+          gap:10px;
+          padding:16px 8px;
+          box-shadow:0 16px 45px rgba(0,0,0,.42), 0 0 24px rgba(168,121,255,.12);
         }
         .mini-nav a, .mini-nav button{
-          width:36px; height:36px;
-          border-radius:12px;
+          width:44px; height:44px;
+          flex:0 0 44px;
+          padding:0;
+          margin:0;
+          border-radius:14px;
           display:flex; align-items:center; justify-content:center;
-          color:#c7ccd6;
+          color:#aeb8c8;
           text-decoration:none;
           background:transparent;
-          border:none;
+          border:1px solid transparent;
           cursor:pointer;
-          font-size:16px;
+          font-size:19px;
+          line-height:1;
         }
         .mini-nav a:hover, .mini-nav button:hover{
-          background:rgba(74,222,128,0.15);
+          background:rgba(168,121,255,.15);
+          border-color:rgba(168,121,255,.28);
           color:#fff;
+          transform:translateY(-1px);
+        }
+        .mini-nav a.active{
+          background:linear-gradient(135deg,#a879ff,#7b5bff);
+          color:#10121a;
+          box-shadow:0 8px 22px rgba(123,91,255,.3);
+        }
+        .mini-nav a i{
+          display:block;
+          line-height:1;
+          transform:translateY(0);
         }
         .mini-nav .avatar{
-          width:32px; height:32px;
-          border-radius:50%;
-          background:#252b2f;
+          width:44px; height:44px;
+          flex:0 0 44px;
+          display:flex; align-items:center; justify-content:center;
+          border-radius:14px;
+          background:#202733;
+          border:1px solid rgba(255,255,255,.07);
           margin-bottom:8px;
+          color:#aeb8c8;
+          font-size:19px;
         }
 
         .layout{
@@ -113,7 +139,7 @@ function openAboutBlank(url, title, sideGames, currentUser){
           align-items:flex-start;
           justify-content:center;
           gap:16px;
-          padding:24px 16px 24px 90px;
+          padding:28px 18px 34px 98px;
           min-height:100vh;
         }
         .side-rail{
@@ -163,7 +189,7 @@ function openAboutBlank(url, title, sideGames, currentUser){
           background:#000;
           border-radius:18px;
           overflow:hidden;
-          box-shadow:0 20px 50px rgba(0,0,0,0.4);
+          box-shadow:0 24px 70px rgba(0,0,0,0.46), 0 0 0 1px rgba(168,121,255,.08);
           display:flex;
           flex-direction:column;
         }
@@ -179,7 +205,8 @@ function openAboutBlank(url, title, sideGames, currentUser){
 
         .bar {
           display:flex; align-items:center; justify-content:space-between;
-          padding:10px 16px; background:#e9e9ec;
+          gap:16px;
+          padding:12px 16px; background:#eef0f4;
           font-size:13px;
           border-radius:0 0 18px 18px;
         }
@@ -192,11 +219,24 @@ function openAboutBlank(url, title, sideGames, currentUser){
         .bar-left .titles{ display:flex; flex-direction:column; line-height:1.25; }
         .bar-left .titles .gname{ font-weight:700; color:#1c1c1e; font-size:13px; }
         .bar-left .titles .gsub{ color:#7c7c82; font-size:11px; }
-        .btns{ display:flex; gap:10px; }
-        .btns button {
-          background:transparent; border:none; color:#3c3c43;
-          cursor:pointer; font-size:16px; padding:4px;
+        .bar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+        .vote-group{display:flex;align-items:center;gap:6px;}
+        .vote-btn{
+          min-width:70px;height:36px;padding:0 11px;border-radius:10px;
+          border:1px solid #d5d7dc;background:#fff;color:#555b66;
+          display:flex;align-items:center;justify-content:center;gap:6px;
+          font:700 12px 'Segoe UI',sans-serif;cursor:pointer;transition:.15s ease;
         }
+        .vote-btn:hover{transform:translateY(-1px);border-color:#a879ff;}
+        .vote-btn.like.active{background:#e7fff1;border-color:#38c879;color:#13924f;}
+        .vote-btn.dislike.active{background:#fff0f0;border-color:#ef6464;color:#d33f3f;}
+        .btns{display:flex;gap:6px;}
+        .btns button {
+          width:36px;height:36px;border-radius:10px;
+          background:#fff;border:1px solid #d5d7dc;color:#3c3c43;
+          cursor:pointer;font-size:15px;padding:0;display:flex;align-items:center;justify-content:center;
+        }
+        .btns button:hover{border-color:#a879ff;color:#7b5bff;}
 
         .loading-overlay{
           position:absolute;
@@ -316,8 +356,10 @@ function openAboutBlank(url, title, sideGames, currentUser){
           .side-rail{ display:none; }
         }
         @media (max-width:600px){
-          .mini-nav{ width:46px; }
-          .layout{ padding-left:66px; }
+          .mini-nav{ width:54px; left:10px; top:10px; bottom:10px; padding:12px 5px; border-radius:18px; }
+          .mini-nav a, .mini-nav button{width:40px;height:40px;flex-basis:40px;font-size:17px;}
+          .mini-nav .avatar{width:40px;height:40px;flex-basis:40px;}
+          .layout{ padding:18px 10px 24px 76px; }
         }
       </style>
     </head>
@@ -325,7 +367,7 @@ function openAboutBlank(url, title, sideGames, currentUser){
       <nav class="mini-nav">
         <div class="avatar"></div>
         <a href="${siteLink('games.html')}" title="Home"><i class="bi bi-house-fill"></i></a>
-        <a href="${siteLink('game-tab.html')}" title="Games"><i class="bi bi-controller"></i></a>
+        <a class="active" href="${siteLink('game-tab.html')}" title="Games"><i class="bi bi-controller"></i></a>
       </nav>
 
       <div class="layout">
@@ -348,9 +390,15 @@ function openAboutBlank(url, title, sideGames, currentUser){
                   <span class="gsub">Hosted externally</span>
                 </div>
               </div>
-              <div class="btns">
-                <button onclick="refreshFrame()" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
-                <button onclick="goFullscreen()" title="Fullscreen"><i class="bi bi-arrows-fullscreen"></i></button>
+              <div class="bar-right">
+                <div class="vote-group" aria-label="Rate this game">
+                  <button class="vote-btn like" id="likeBtn" onclick="voteGame('like')" title="Like this game"><i class="bi bi-hand-thumbs-up-fill"></i><span id="likeCount">0</span></button>
+                  <button class="vote-btn dislike" id="dislikeBtn" onclick="voteGame('dislike')" title="Dislike this game"><i class="bi bi-hand-thumbs-down-fill"></i><span id="dislikeCount">0</span></button>
+                </div>
+                <div class="btns">
+                  <button onclick="refreshFrame()" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
+                  <button onclick="goFullscreen()" title="Fullscreen"><i class="bi bi-arrows-fullscreen"></i></button>
+                </div>
               </div>
             </div>
           </div>
@@ -389,6 +437,7 @@ function openAboutBlank(url, title, sideGames, currentUser){
           f.setAttribute('data-src', u);
           document.getElementById('gname').textContent = name;
           document.title = name;
+          renderVotes();
           renderComments();
         }
 
@@ -428,6 +477,37 @@ function openAboutBlank(url, title, sideGames, currentUser){
           fpsOverlay.classList.toggle('show', isFs);
         });
 
+        function voteStorageKey(u){ return 'ug_votes_' + encodeURIComponent(u); }
+        function voterKey(){ return localStorage.getItem('ug_current_user') || 'device'; }
+        function getVotes(){
+          var key = voteStorageKey(document.getElementById('gf').getAttribute('data-src'));
+          try{ return JSON.parse(localStorage.getItem(key) || '{"likes":0,"dislikes":0,"voters":{}}'); }
+          catch(e){ return {likes:0,dislikes:0,voters:{}}; }
+        }
+        function saveVotes(v){
+          var key = voteStorageKey(document.getElementById('gf').getAttribute('data-src'));
+          localStorage.setItem(key, JSON.stringify(v));
+        }
+        function renderVotes(){
+          var v=getVotes(), who=v.voters[voterKey()];
+          document.getElementById('likeCount').textContent=v.likes;
+          document.getElementById('dislikeCount').textContent=v.dislikes;
+          document.getElementById('likeBtn').classList.toggle('active', who==='like');
+          document.getElementById('dislikeBtn').classList.toggle('active', who==='dislike');
+        }
+        function voteGame(type){
+          var v=getVotes(), key=voterKey(), old=v.voters[key];
+          if(old===type){
+            v[type==='like'?'likes':'dislikes']=Math.max(0,v[type==='like'?'likes':'dislikes']-1);
+            delete v.voters[key];
+          }else{
+            if(old){ v[old==='like'?'likes':'dislikes']=Math.max(0,v[old==='like'?'likes':'dislikes']-1); }
+            v[type==='like'?'likes':'dislikes']++;
+            v.voters[key]=type;
+          }
+          saveVotes(v); renderVotes();
+        }
+
         function commentKey(){
           var f = document.getElementById('gf');
           return 'ug_comments_' + encodeURIComponent(f.getAttribute('data-src'));
@@ -459,6 +539,7 @@ function openAboutBlank(url, title, sideGames, currentUser){
           input.value = '';
           renderComments();
         }
+        renderVotes();
         renderComments();
       </script>
     </body>

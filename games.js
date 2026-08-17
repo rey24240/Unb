@@ -25,11 +25,32 @@ function populateCategories(){
   categorySelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
 }
 
+function voteKey(url){ return 'ug_votes_' + encodeURIComponent(url); }
+function getVotes(url){
+  try{ return JSON.parse(localStorage.getItem(voteKey(url)) || '{"likes":0,"dislikes":0,"voters":{}}'); }
+  catch(e){ return {likes:0,dislikes:0,voters:{}}; }
+}
+function voterKey(){ return localStorage.getItem('ug_current_user') || 'device'; }
+function voteGame(url, type){
+  const v=getVotes(url), key=voterKey(), old=v.voters[key];
+  if(old===type){
+    v[type==='like'?'likes':'dislikes']=Math.max(0,v[type==='like'?'likes':'dislikes']-1);
+    delete v.voters[key];
+  }else{
+    if(old) v[old==='like'?'likes':'dislikes']=Math.max(0,v[old==='like'?'likes':'dislikes']-1);
+    v[type==='like'?'likes':'dislikes']++;
+    v.voters[key]=type;
+  }
+  localStorage.setItem(voteKey(url), JSON.stringify(v));
+  renderGrid();
+}
+
 function cardHTML(g){
   const badgeHtml = g.badge ? `<span class="badge">${g.badge}</span>` : '';
   const img = g.thumbnail || faviconFor(g.url);
   const category = (g.categories || []).join(', ') || 'Game';
   const description = g.description || `Play ${category.toLowerCase()} game`;
+  const v=getVotes(g.url), who=v.voters[voterKey()];
   return `
     <div class="card" data-url="${g.url}" data-name="${g.name}" tabindex="0" role="button" aria-label="Play ${g.name}">
       <div class="thumb">
@@ -44,8 +65,8 @@ function cardHTML(g){
         </div>
         <div class="description" title="${description}">${description}</div>
         <div class="card-meta">
-          <span class="rating"><i class="bi bi-hand-thumbs-up-fill"></i> 100%</span>
-          <span class="dislike"><i class="bi bi-hand-thumbs-down"></i></span>
+          <button class="vote-card ${who==='like'?'active-like':''}" data-vote="like" title="Like"><i class="bi bi-hand-thumbs-up-fill"></i><span>${v.likes}</span></button>
+          <button class="vote-card ${who==='dislike'?'active-dislike':''}" data-vote="dislike" title="Dislike"><i class="bi bi-hand-thumbs-down-fill"></i><span>${v.dislikes}</span></button>
         </div>
       </div>
     </div>
@@ -90,6 +111,14 @@ function openCard(card){
 }
 
 grid.addEventListener('click', e => {
+  const vote = e.target.closest('.vote-card');
+  if(vote){
+    e.preventDefault();
+    e.stopPropagation();
+    const card = vote.closest('.card');
+    voteGame(card.dataset.url, vote.dataset.vote);
+    return;
+  }
   const card = e.target.closest('.card');
   if(!card) return;
   openCard(card);
