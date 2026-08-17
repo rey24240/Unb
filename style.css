@@ -934,3 +934,34 @@ a{color:inherit; text-decoration:none;}
     font-size:12px;
   }
 }
+
+/* ---------- Sidebar icon centering fix ---------- */
+.side-item .side-icon{
+  width:34px;
+  min-width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  flex:0 0 34px;
+}
+.side-item .side-icon i{
+  display:block;
+  line-height:1;
+  margin:0;
+}
+
+@media (max-width:600px){
+  .side-item .side-icon{
+    width:30px;
+    min-width:30px;
+    height:30px;
+    flex-basis:30px;
+  }
+  .avatar-icon{
+    width:30px;
+    min-width:30px;
+    height:30px;
+  }
+}
