@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apps — Unblocked Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="page-outline"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="nav-group">
+    <div class="side-item avatar-item" id="profileBtn">
+      <span class="side-icon avatar-icon"><i class="bi bi-person-fill"></i></span>
+      <span class="side-label" id="profileLabel">Guest</span>
+    </div>
+
+    <a class="side-item" href="games.html">
+      <span class="side-icon"><i class="bi bi-house-fill"></i></span>
+      <span class="side-label">Home</span>
+    </a>
+    <a class="side-item active" href="apps.html">
+      <span class="side-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+      <span class="side-label">Apps</span>
+    </a>
+    <a class="side-item" href="game-tab.html">
+      <span class="side-icon"><i class="bi bi-controller"></i></span>
+      <span class="side-label">Games</span>
+    </a>
+    <div class="side-item" id="infoBtn">
+      <span class="side-icon"><i class="bi bi-info-circle-fill"></i></span>
+      <span class="side-label">Info</span>
+    </div>
+    <div class="side-item" id="settingsBtn">
+      <span class="side-icon"><i class="bi bi-gear-fill"></i></span>
+      <span class="side-label">Settings</span>
+    </div>
+  </div>
+
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Expand sidebar">
+    <i class="bi bi-chevron-right"></i>
+  </button>
+</nav>
+
+<main class="main games-main">
+  <section class="games-section">
+    <div class="section-head">
+      <h2>Apps</h2>
+    </div>
+
+    <div class="games-controls">
+      <div class="games-search">
+        <i class="bi bi-search"></i> <input type="text" id="gameSearch" placeholder="Search apps...">
+      </div>
+      <select id="categorySelect" class="category-select" autocomplete="off">
+        <option value="All">All Categories</option>
+      </select>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <p class="empty-note" id="emptyNote" style="display:none;">No apps match that search.</p>
+  </section>
+</main>
+
+<a class="github-pill" href="https://github.com/rey24240/Unblocked-games-" target="_blank" rel="noopener">
+  <i class="bi bi-github"></i> GitHub
+</a>
+
+<div class="status-widget">
+  <div>FPS: <span id="fpsVal">60</span></div>
+  <div id="clockRow">--:--</div>
+</div>
+
+<!-- Settings / theme panel -->
+<div class="modal-overlay" id="settingsOverlay">
+  <div class="modal">
+    <button class="modal-close" id="settingsClose">✕</button>
+    <h3 class="modal-title">Settings</h3>
+    <div class="theme-grid" id="themeGrid"></div>
+  </div>
+</div>
+
+<!-- Profile / account panel -->
+<div class="modal-overlay" id="profileOverlay">
+  <div class="modal">
+    <button class="modal-close" id="profileClose">✕</button>
+
+    <div id="guestView">
+      <h3 class="modal-title">Guest</h3>
+      <p class="modal-sub">You're browsing as a guest. Sign in or create an account to save your name here.</p>
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tabLogin">Log in</button>
+        <button class="modal-tab" id="tabSignup">Sign up</button>
+      </div>
+      <form id="loginForm" class="modal-form">
+        <label>Username</label>
+        <input type="text" id="loginUsername" autocomplete="username" required>
+        <label>Password</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" required>
+        <div class="modal-error" id="loginError"></div>
+        <button type="submit" class="modal-submit">Log in</button>
+      </form>
+      <form id="signupForm" class="modal-form" style="display:none;">
+        <label>Username</label>
+        <input type="text" id="signupUsername" autocomplete="username" required>
+        <label>Password</label>
+        <input type="password" id="signupPassword" autocomplete="new-password" required>
+        <div class="modal-error" id="signupError"></div>
+        <button type="submit" class="modal-submit">Create account</button>
+      </form>
+    </div>
+
+    <div id="accountView" style="display:none;">
+      <h3 class="modal-title" id="accountName">Player</h3>
+      <p class="modal-sub">You're signed in on this device.</p>
+      <button class="modal-submit" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('infoBtn').addEventListener('click', () => {
+  alert('Unblocked Games — a simple search page.');
+});
+
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebarEl = document.getElementById('sidebar');
+sidebarToggle.addEventListener('click', () => {
+  sidebarEl.classList.toggle('expanded');
+  sidebarToggle.querySelector('i').className = sidebarEl.classList.contains('expanded')
+    ? 'bi bi-chevron-left'
+    : 'bi bi-chevron-right';
+});
+
+/* ---------- Theme switcher (accent color only) ---------- */
+const themes = [
+  {id:"green",  name:"Green",  swatch:"#4ade80"},
+  {id:"purple", name:"Purple", swatch:"#a879ff"},
+  {id:"blue",   name:"Blue",   swatch:"#38bdf8"},
+  {id:"red",    name:"Red",    swatch:"#f87171"},
+  {id:"amber",  name:"Amber",  swatch:"#fbbf24"},
+];
+
+const settingsOverlay = document.getElementById('settingsOverlay');
+const themeGrid = document.getElementById('themeGrid');
+
+function applyTheme(id){
+  document.documentElement.setAttribute('data-theme', id);
+  localStorage.setItem('ug_theme', id);
+  document.querySelectorAll('.theme-swatch').forEach(el => {
+    el.classList.toggle('selected', el.dataset.theme === id);
+  });
+}
+
+themes.forEach(t => {
+  const btn = document.createElement('button');
+  btn.className = 'theme-swatch';
+  btn.dataset.theme = t.id;
+  btn.innerHTML = `<span class="swatch-dot" style="background:${t.swatch}"></span>${t.name}`;
+  btn.addEventListener('click', () => applyTheme(t.id));
+  themeGrid.appendChild(btn);
+});
+
+const savedTheme = localStorage.getItem('ug_theme') || 'green';
+applyTheme(savedTheme);
+
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  settingsOverlay.classList.add('open');
+});
+document.getElementById('settingsClose').addEventListener('click', () => {
+  settingsOverlay.classList.remove('open');
+});
+settingsOverlay.addEventListener('click', e => {
+  if(e.target === settingsOverlay) settingsOverlay.classList.remove('open');
+});
+
+/* ---------- Profile / account (guest by default) ---------- */
+const profileOverlay = document.getElementById('profileOverlay');
+const profileLabel = document.getElementById('profileLabel');
+const guestView = document.getElementById('guestView');
+const accountView = document.getElementById('accountView');
+const accountName = document.getElementById('accountName');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+const loginError = document.getElementById('loginError');
+const signupError = document.getElementById('signupError');
+const tabLogin = document.getElementById('tabLogin');
+const tabSignup = document.getElementById('tabSignup');
+
+function getUsers(){
+  try{ return JSON.parse(localStorage.getItem('ug_users') || '{}'); }
+  catch(e){ return {}; }
+}
+function saveUsers(users){
+  localStorage.setItem('ug_users', JSON.stringify(users));
+}
+function getCurrentUser(){
+  return localStorage.getItem('ug_current_user');
+}
+function setCurrentUser(username){
+  if(username) localStorage.setItem('ug_current_user', username);
+  else localStorage.removeItem('ug_current_user');
+}
+function hashPass(str){
+  let h = 0;
+  for(let i=0; i<str.length; i++){
+    h = (h << 5) - h + str.charCodeAt(i);
+    h |= 0;
+  }
+  return String(h);
+}
+
+function refreshProfileUI(){
+  const current = getCurrentUser();
+  if(current){
+    profileLabel.textContent = current;
+    guestView.style.display = 'none';
+    accountView.style.display = 'block';
+    accountName.textContent = current;
+  } else {
+    profileLabel.textContent = 'Guest';
+    guestView.style.display = 'block';
+    accountView.style.display = 'none';
+  }
+}
+
+function switchAuthTab(tab){
+  const isLogin = tab === 'login';
+  tabLogin.classList.toggle('active', isLogin);
+  tabSignup.classList.toggle('active', !isLogin);
+  loginForm.style.display = isLogin ? 'flex' : 'none';
+  signupForm.style.display = isLogin ? 'none' : 'flex';
+}
+tabLogin.addEventListener('click', () => switchAuthTab('login'));
+tabSignup.addEventListener('click', () => switchAuthTab('signup'));
+
+document.getElementById('profileBtn').addEventListener('click', () => {
+  profileOverlay.classList.add('open');
+  switchAuthTab('login');
+  loginError.textContent = '';
+  signupError.textContent = '';
+});
+document.getElementById('profileClose').addEventListener('click', () => {
+  profileOverlay.classList.remove('open');
+});
+profileOverlay.addEventListener('click', e => {
+  if(e.target === profileOverlay) profileOverlay.classList.remove('open');
+});
+
+signupForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const username = document.getElementById('signupUsername').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  signupError.textContent = '';
+  if(username.length < 3){
+    signupError.textContent = 'Username must be at least 3 characters.';
+    return;
+  }
+  if(password.length < 4){
+    signupError.textContent = 'Password must be at least 4 characters.';
+    return;
+  }
+  const users = getUsers();
+  if(users[username]){
+    signupError.textContent = 'That username is already taken.';
+    return;
+  }
+  users[username] = { pass: hashPass(password) };
+  saveUsers(users);
+  setCurrentUser(username);
+  refreshProfileUI();
+  profileOverlay.classList.remove('open');
+});
+
+loginForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  loginError.textContent = '';
+  const users = getUsers();
+  const record = users[username];
+  if(!record || record.pass !== hashPass(password)){
+    loginError.textContent = 'Incorrect username or password.';
+    return;
+  }
+  setCurrentUser(username);
+  refreshProfileUI();
+  profileOverlay.classList.remove('open');
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  setCurrentUser(null);
+  refreshProfileUI();
+});
+
+refreshProfileUI();
+
+/* Live clock */
+function updateClock(){
+  const d = new Date();
+  let h = d.getHours();
+  const m = String(d.getMinutes()).padStart(2,'0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('clockRow').textContent = `${h}:${m} ${ampm}`;
+}
+updateClock();
+setInterval(updateClock, 1000 * 15);
+
+/* FPS counter */
+let lastFrame = performance.now();
+let frames = 0;
+let fpsAcc = 0;
+function fpsLoop(now){
+  frames++;
+  fpsAcc += now - lastFrame;
+  lastFrame = now;
+  if(fpsAcc > 500){
+    document.getElementById('fpsVal').textContent = Math.round((frames * 1000) / fpsAcc);
+    frames = 0;
+    fpsAcc = 0;
+  }
+  requestAnimationFrame(fpsLoop);
+}
+requestAnimationFrame(fpsLoop);
+</script>
+<script src="web-search.js"></script>
+<script src="frame.js"></script>
+<script src="meteors.js"></script>
+<script src="apps.js"></script>
+
+<script src="settings-ui.js"></script>
+</body>
+</html>
