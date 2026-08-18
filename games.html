@@ -58,7 +58,7 @@
     <div class="beta-tag" id="betaTag">Beta</div>
 
     <form class="search-bar" id="searchForm">
-      <input type="text" id="searchInput" placeholder="Search Google or Enter a Link" autocomplete="off">
+      <input type="text" id="searchInput" placeholder="Search the web or enter a URL" autocomplete="off">
     </form>
 
     <div class="quick-links" id="quickLinks"></div>
@@ -125,6 +125,9 @@
   </div>
 </div>
 
+<script src="uv/uv.bundle.js"></script>
+<script src="uv/uv.config.js"></script>
+<script src="uv-search.js"></script>
 <script src="frame.js"></script>
 <script src="meteors.js"></script>
 <script>
@@ -199,21 +202,6 @@ function rotateBeta(){
 }
 rotateBeta();
 setInterval(rotateBeta, 4000);
-
-document.getElementById('searchForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const val = document.getElementById('searchInput').value.trim();
-  if(!val) return;
-  const currentUser = localStorage.getItem('ug_current_user');
-  const looksLikeUrl = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+(\/\S*)?$/i.test(val);
-  if(looksLikeUrl){
-    const target = val.startsWith('http') ? val : 'https://' + val;
-    openAboutBlank(target, val, [], currentUser);
-  } else {
-    const searchUrl = 'https://duckduckgo.com/?q=' + encodeURIComponent(val);
-    openAboutBlank(searchUrl, 'Search: ' + val, [], currentUser);
-  }
-});
 
 /* ---------- Profile / account (guest by default) ---------- */
 const profileOverlay = document.getElementById('profileOverlay');
