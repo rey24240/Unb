@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="calculator.css">
+</head>
+<body>
+
+<div class="calc">
+  <div class="display" id="display">0</div>
+  <div class="pad">
+    <button class="fn" data-action="clear">AC</button>
+    <button class="fn" data-action="sign">+/-</button>
+    <button class="fn" data-action="percent">%</button>
+    <button class="op" data-action="op" data-value="/">÷</button>
+
+    <button data-action="num" data-value="7">7</button>
+    <button data-action="num" data-value="8">8</button>
+    <button data-action="num" data-value="9">9</button>
+    <button class="op" data-action="op" data-value="*">×</button>
+
+    <button data-action="num" data-value="4">4</button>
+    <button data-action="num" data-value="5">5</button>
+    <button data-action="num" data-value="6">6</button>
+    <button class="op" data-action="op" data-value="-">−</button>
+
+    <button data-action="num" data-value="1">1</button>
+    <button data-action="num" data-value="2">2</button>
+    <button data-action="num" data-value="3">3</button>
+    <button class="op" data-action="op" data-value="+">+</button>
+
+    <button class="zero" data-action="num" data-value="0">0</button>
+    <button data-action="decimal">.</button>
+    <button class="op" data-action="equals">=</button>
+  </div>
+</div>
+
+<script>
+/*
+  Disguised entry point.
+  Type the SECRET expression below and press "=" to be taken to the game site.
+  Change SECRET_EXPRESSION and DESTINATION to whatever you like.
+  The expression is matched with all spaces removed, so "10 + 10" and "10+10" both work.
+*/
+const SECRET_EXPRESSION = "10+10";
+const DESTINATION = "games.html";
+
+const display = document.getElementById('display');
+let current = "0";
+let expression = "";
+let justEvaluated = false;
+
+function render(){
+  display.textContent = current;
+}
+
+function inputNum(n){
+  if(justEvaluated){
+    current = "0";
+    expression = "";
+    justEvaluated = false;
+  }
+  current = current === "0" ? n : current + n;
+  render();
+}
+
+function inputDecimal(){
+  if(justEvaluated){
+    current = "0";
+    expression = "";
+    justEvaluated = false;
+  }
+  if(!current.includes(".")) current += ".";
+  render();
+}
+
+function inputOp(op){
+  justEvaluated = false;
+  expression += current + op;
+  current = "0";
+}
+
+function clearAll(){
+  current = "0";
+  expression = "";
+  justEvaluated = false;
+  render();
+}
+
+function toggleSign(){
+  current = String(parseFloat(current) * -1);
+  render();
+}
+
+function percent(){
+  current = String(parseFloat(current) / 100);
+  render();
+}
+
+function safeEval(str){
+  // only allow digits, operators, decimal points and parentheses
+  if(!/^[0-9+\-*/.() ]*$/.test(str)) return NaN;
+  try{
+    // eslint-disable-next-line no-new-func
+    return Function('"use strict"; return (' + str + ')')();
+  }catch(e){
+    return NaN;
+  }
+}
+
+function equals(){
+  const fullExpr = expression + current;
+  const cleaned = fullExpr.replace(/\s+/g, "");
+
+  const result = safeEval(fullExpr);
+  current = isNaN(result) ? "Error" : String(result);
+  expression = "";
+  justEvaluated = true;
+  render();
+
+  if(cleaned === SECRET_EXPRESSION.replace(/\s+/g, "")){
+    setTimeout(() => {
+      window.location.href = DESTINATION;
+    }, 500);
+  }
+}
+
+document.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.dataset.action;
+    const value = btn.dataset.value;
+    if(action === "num") inputNum(value);
+    else if(action === "decimal") inputDecimal();
+    else if(action === "op") inputOp(value);
+    else if(action === "equals") equals();
+    else if(action === "clear") clearAll();
+    else if(action === "sign") toggleSign();
+    else if(action === "percent") percent();
+  });
+});
+
+window.addEventListener('keydown', e => {
+  if(/[0-9]/.test(e.key)) inputNum(e.key);
+  else if(e.key === ".") inputDecimal();
+  else if(["+","-","*","/"].includes(e.key)) inputOp(e.key);
+  else if(e.key === "Enter" || e.key === "=") equals();
+  else if(e.key === "Escape") clearAll();
+});
+</script>
+
+</body>
+</html>
