@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Web Browser</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="browser.css">
+</head>
+<body>
+<div class="browser-shell">
+  <div class="browser-toolbar">
+    <button class="tool-btn" id="backBtn" title="Back"><i class="bi bi-chevron-left"></i></button>
+    <button class="tool-btn" id="reloadBtn" title="Reload"><i class="bi bi-arrow-clockwise"></i></button>
+    <button class="tool-btn" id="forwardBtn" title="Forward"><i class="bi bi-chevron-right"></i></button>
+    <form class="address-wrap" id="addressForm">
+      <i class="bi bi-search"></i>
+      <input id="addressBar" autocomplete="off" spellcheck="false" placeholder="Search privately..">
+    </form>
+    <button class="tool-btn" id="newTabBtn" title="Open in new tab"><i class="bi bi-code-slash"></i></button>
+    <button class="tool-btn" id="fullscreenBtn" title="Fullscreen"><i class="bi bi-arrows-fullscreen"></i></button>
+    <button class="tool-btn" id="menuBtn" title="Menu"><i class="bi bi-three-dots-vertical"></i></button>
+  </div>
+  <div class="browser-divider"></div>
+  <div class="frame-wrap">
+    <div class="loading" id="loading"><div class="spinner"></div><span>Loading...</span></div>
+    <iframe id="webFrame" title="Web content" allow="fullscreen; autoplay; clipboard-read; clipboard-write" referrerpolicy="no-referrer"></iframe>
+  </div>
+</div>
+<div class="menu" id="menu">
+  <button id="homeBtn"><i class="bi bi-house"></i> Home</button>
+  <button id="openBtn"><i class="bi bi-box-arrow-up-right"></i> Open in new tab</button>
+  <button id="copyBtn"><i class="bi bi-link-45deg"></i> Copy address</button>
+</div>
+<script src="uv/uv.bundle.js"></script>
+<script src="uv/uv.config.js"></script>
+<script src="browser.js"></script>
+</body>
+</html>
