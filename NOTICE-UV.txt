@@ -1,0 +1,4 @@
+This distribution includes modified Ultraviolet components adapted from the Utopia project.
+Original project: Utopia — https://github.com/UtopiaUnblocker/Utopia
+The Utopia-derived components are licensed under the GNU Affero General Public License v3.0.
+See LICENSE-UTOPIA-AGPLv3.txt for the license text.
