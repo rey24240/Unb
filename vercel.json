@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/unblocked-games/index.html" },
+    { "source": "/", "destination": "/unblocked-games/site.html" },
     { "source": "/apps", "destination": "/unblocked-games/apps.html" },
     { "source": "/player", "destination": "/unblocked-games/!.html" },
     { "source": "/(.*)", "destination": "/unblocked-games/$1" }
