@@ -15,36 +15,31 @@
 
 <nav class="sidebar" id="sidebar">
   <div class="nav-group">
-    <div class="side-item avatar-item" id="profileBtn">
+    <div class="side-item avatar-item" id="profileBtn" data-tooltip="Profile" title="Profile">
       <span class="side-icon avatar-icon"><i class="bi bi-person-fill"></i></span>
       <span class="side-label" id="profileLabel">Guest</span>
     </div>
-
-    <a class="side-item" href="games.html">
+    <a class="side-item" href="site.html" data-tooltip="Home" title="Home">
       <span class="side-icon"><i class="bi bi-house-fill"></i></span>
       <span class="side-label">Home</span>
     </a>
-    <a class="side-item active" href="apps.html">
+    <a class="side-item active" href="apps.html" data-tooltip="Apps" title="Apps">
       <span class="side-icon"><i class="bi bi-grid-1x2-fill"></i></span>
       <span class="side-label">Apps</span>
     </a>
-    <a class="side-item" href="game-tab.html">
+    <a class="side-item " href="Gtab!.html" data-tooltip="Games" title="Games">
       <span class="side-icon"><i class="bi bi-controller"></i></span>
       <span class="side-label">Games</span>
     </a>
-    <div class="side-item" id="infoBtn">
+    <div class="side-item" id="infoBtn" data-tooltip="About" title="About">
       <span class="side-icon"><i class="bi bi-info-circle-fill"></i></span>
       <span class="side-label">Info</span>
     </div>
-    <div class="side-item" id="settingsBtn">
+    <div class="side-item" id="settingsBtn" data-tooltip="Settings" title="Settings">
       <span class="side-icon"><i class="bi bi-gear-fill"></i></span>
       <span class="side-label">Settings</span>
     </div>
   </div>
-
-  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Expand sidebar">
-    <i class="bi bi-chevron-right"></i>
-  </button>
 </nav>
 
 <main class="main games-main">
@@ -55,6 +50,7 @@
 
     <div class="games-controls">
       <div class="games-search">
+        <button class="web-search-btn" type="button" title="Open web search" aria-label="Open web search"><i class="bi bi-globe2"></i></button>
         <i class="bi bi-search"></i> <input type="text" id="gameSearch" placeholder="Search apps...">
       </div>
       <select id="categorySelect" class="category-select" autocomplete="off">
@@ -124,18 +120,7 @@
 </div>
 
 <script>
-document.getElementById('infoBtn').addEventListener('click', () => {
-  alert('Unblocked Games — a simple search page.');
-});
-
-const sidebarToggle = document.getElementById('sidebarToggle');
-const sidebarEl = document.getElementById('sidebar');
-sidebarToggle.addEventListener('click', () => {
-  sidebarEl.classList.toggle('expanded');
-  sidebarToggle.querySelector('i').className = sidebarEl.classList.contains('expanded')
-    ? 'bi bi-chevron-left'
-    : 'bi bi-chevron-right';
-});
+document.getElementById('infoBtn')?.addEventListener('click', () => alert('Unblocked Games — a simple search page.'));
 
 /* ---------- Theme switcher (accent color only) ---------- */
 const themes = [
@@ -179,127 +164,6 @@ settingsOverlay.addEventListener('click', e => {
   if(e.target === settingsOverlay) settingsOverlay.classList.remove('open');
 });
 
-/* ---------- Profile / account (guest by default) ---------- */
-const profileOverlay = document.getElementById('profileOverlay');
-const profileLabel = document.getElementById('profileLabel');
-const guestView = document.getElementById('guestView');
-const accountView = document.getElementById('accountView');
-const accountName = document.getElementById('accountName');
-const loginForm = document.getElementById('loginForm');
-const signupForm = document.getElementById('signupForm');
-const loginError = document.getElementById('loginError');
-const signupError = document.getElementById('signupError');
-const tabLogin = document.getElementById('tabLogin');
-const tabSignup = document.getElementById('tabSignup');
-
-function getUsers(){
-  try{ return JSON.parse(localStorage.getItem('ug_users') || '{}'); }
-  catch(e){ return {}; }
-}
-function saveUsers(users){
-  localStorage.setItem('ug_users', JSON.stringify(users));
-}
-function getCurrentUser(){
-  return localStorage.getItem('ug_current_user');
-}
-function setCurrentUser(username){
-  if(username) localStorage.setItem('ug_current_user', username);
-  else localStorage.removeItem('ug_current_user');
-}
-function hashPass(str){
-  let h = 0;
-  for(let i=0; i<str.length; i++){
-    h = (h << 5) - h + str.charCodeAt(i);
-    h |= 0;
-  }
-  return String(h);
-}
-
-function refreshProfileUI(){
-  const current = getCurrentUser();
-  if(current){
-    profileLabel.textContent = current;
-    guestView.style.display = 'none';
-    accountView.style.display = 'block';
-    accountName.textContent = current;
-  } else {
-    profileLabel.textContent = 'Guest';
-    guestView.style.display = 'block';
-    accountView.style.display = 'none';
-  }
-}
-
-function switchAuthTab(tab){
-  const isLogin = tab === 'login';
-  tabLogin.classList.toggle('active', isLogin);
-  tabSignup.classList.toggle('active', !isLogin);
-  loginForm.style.display = isLogin ? 'flex' : 'none';
-  signupForm.style.display = isLogin ? 'none' : 'flex';
-}
-tabLogin.addEventListener('click', () => switchAuthTab('login'));
-tabSignup.addEventListener('click', () => switchAuthTab('signup'));
-
-document.getElementById('profileBtn').addEventListener('click', () => {
-  profileOverlay.classList.add('open');
-  switchAuthTab('login');
-  loginError.textContent = '';
-  signupError.textContent = '';
-});
-document.getElementById('profileClose').addEventListener('click', () => {
-  profileOverlay.classList.remove('open');
-});
-profileOverlay.addEventListener('click', e => {
-  if(e.target === profileOverlay) profileOverlay.classList.remove('open');
-});
-
-signupForm.addEventListener('submit', e => {
-  e.preventDefault();
-  const username = document.getElementById('signupUsername').value.trim();
-  const password = document.getElementById('signupPassword').value;
-  signupError.textContent = '';
-  if(username.length < 3){
-    signupError.textContent = 'Username must be at least 3 characters.';
-    return;
-  }
-  if(password.length < 4){
-    signupError.textContent = 'Password must be at least 4 characters.';
-    return;
-  }
-  const users = getUsers();
-  if(users[username]){
-    signupError.textContent = 'That username is already taken.';
-    return;
-  }
-  users[username] = { pass: hashPass(password) };
-  saveUsers(users);
-  setCurrentUser(username);
-  refreshProfileUI();
-  profileOverlay.classList.remove('open');
-});
-
-loginForm.addEventListener('submit', e => {
-  e.preventDefault();
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  loginError.textContent = '';
-  const users = getUsers();
-  const record = users[username];
-  if(!record || record.pass !== hashPass(password)){
-    loginError.textContent = 'Incorrect username or password.';
-    return;
-  }
-  setCurrentUser(username);
-  refreshProfileUI();
-  profileOverlay.classList.remove('open');
-});
-
-document.getElementById('logoutBtn').addEventListener('click', () => {
-  setCurrentUser(null);
-  refreshProfileUI();
-});
-
-refreshProfileUI();
-
 /* Live clock */
 function updateClock(){
   const d = new Date();
@@ -334,6 +198,7 @@ requestAnimationFrame(fpsLoop);
 <script src="meteors.js"></script>
 <script src="apps.js"></script>
 
+<script src="auth.js"></script>
 <script src="settings-ui.js"></script>
 </body>
 </html>

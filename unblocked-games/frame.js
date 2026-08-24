@@ -6,7 +6,7 @@
    currentUser (optional): username string if signed in, otherwise null/undefined.
    Comments are only postable when currentUser is provided.
 --------------------------------------------------------------------- */
-function openAboutBlank(url, title, sideGames, currentUser){
+function openAboutBlank(url, title, sideGames, currentUser, contentType='game'){
   const win = window.open('about:blank', '_blank');
   if(!win){
     window.open(url, '_blank', 'noopener');
@@ -14,29 +14,18 @@ function openAboutBlank(url, title, sideGames, currentUser){
   }
 
   const allGames = Array.isArray(sideGames) ? sideGames : [];
-  const shuffled = allGames.slice().sort(() => Math.random() - 0.5);
-  const leftGames = shuffled.slice(0, 4);
-  const rightGames = shuffled.slice(4, 8);
+  const isApp = contentType === 'app';
 
   function favicon(u){
     try{ return `https://www.google.com/s2/favicons?sz=128&domain=${new URL(u).hostname}`; }
     catch(e){ return ''; }
   }
 
-  function sideThumbs(list){
-    return list.map(g => `
-      <div class="side-thumb" onclick="loadGame('${g.url.replace(/'/g,"\\'")}', '${(g.name||'').replace(/'/g,"\\'")}')">
-        <img src="${favicon(g.url)}" alt="">
-        <span class="side-thumb-label">${g.name}</span>
-      </div>
-    `).join('');
-  }
-
   const mainFavicon = favicon(url);
   const loggedIn = !!currentUser;
 
   // absolute links back to the main site, computed from this window's own location
-  const baseHref = location.href;
+  const baseHref = (window.opener && window.opener.location) ? window.opener.location.href : location.href;
   function siteLink(path){
     try{ return new URL(path, baseHref).href; }
     catch(e){ return path; }
@@ -68,118 +57,48 @@ function openAboutBlank(url, title, sideGames, currentUser){
         html, body {
           margin:0; min-height:100%; overflow-y:auto; overflow-x:hidden;
           background:
-            radial-gradient(circle at 50% 10%, rgba(76,122,255,0.16), transparent 32%),
-            radial-gradient(circle at 15% 80%, rgba(168,121,255,0.12), transparent 30%),
+            radial-gradient(circle at 50% 10%, rgba(var(--accent-rgb),.14), transparent 32%),
+            radial-gradient(circle at 15% 80%, rgba(var(--accent-rgb),.10), transparent 30%),
             linear-gradient(145deg, #101722 0%, #182437 45%, #293b54 100%);
           background-attachment:fixed;
           font-family:'Segoe UI', Rubik, sans-serif;
+          --accent:#4ade80; --accent2:#22c55e; --accent-rgb:74,222,128;
         }
+        html[data-theme='purple']{--accent:#a879ff;--accent2:#7b5bff;--accent-rgb:168,121,255;}
+        html[data-theme='blue']{--accent:#38bdf8;--accent2:#0ea5e9;--accent-rgb:56,189,248;}
+        html[data-theme='red']{--accent:#f87171;--accent2:#ef4444;--accent-rgb:248,113,113;}
+        html[data-theme='amber']{--accent:#fbbf24;--accent2:#f59e0b;--accent-rgb:251,191,36;}
 
-        .mini-nav{
-          position:fixed;
-          top:16px; left:16px; bottom:16px;
-          width:64px;
-          background:rgba(10,14,21,0.88);
-          backdrop-filter:blur(14px);
-          border:2px solid #a879ff;
-          border-radius:22px;
-          z-index:200;
-          display:flex;
-          flex-direction:column;
-          align-items:center;
-          gap:10px;
-          padding:16px 8px;
-          box-shadow:0 16px 45px rgba(0,0,0,.42), 0 0 24px rgba(168,121,255,.12);
-        }
-        .mini-nav a, .mini-nav button{
-          width:44px; height:44px;
-          flex:0 0 44px;
-          padding:0;
-          margin:0;
-          border-radius:14px;
-          display:flex; align-items:center; justify-content:center;
-          color:#aeb8c8;
-          text-decoration:none;
-          background:transparent;
-          border:1px solid transparent;
-          cursor:pointer;
-          font-size:19px;
-          line-height:1;
-        }
-        .mini-nav a:hover, .mini-nav button:hover{
-          background:rgba(168,121,255,.15);
-          border-color:rgba(168,121,255,.28);
-          color:#fff;
-          transform:translateY(-1px);
-        }
-        .mini-nav a.active{
-          background:linear-gradient(135deg,#a879ff,#7b5bff);
-          color:#10121a;
-          box-shadow:0 8px 22px rgba(123,91,255,.3);
-        }
-        .mini-nav a i{
-          display:block;
-          line-height:1;
-          transform:translateY(0);
-        }
-        .mini-nav .avatar{
-          width:44px; height:44px;
-          flex:0 0 44px;
-          display:flex; align-items:center; justify-content:center;
-          border-radius:14px;
-          background:#202733;
-          border:1px solid rgba(255,255,255,.07);
-          margin-bottom:8px;
-          color:#aeb8c8;
-          font-size:19px;
-        }
-
+        .player-sidebar{position:fixed;left:16px;top:16px;bottom:16px;width:64px;z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;padding:10px 7px;border:2px solid var(--accent);border-radius:20px;background:rgba(12,16,22,.88);backdrop-filter:blur(12px);box-shadow:0 12px 40px rgba(0,0,0,.42),0 0 22px rgba(var(--accent-rgb),.16);}
+        .player-nav{width:100%;display:flex;flex-direction:column;gap:7px;height:100%;}
+        .player-nav a{width:100%;height:46px;border-radius:13px;display:grid;place-items:center;color:#aab4c4;text-decoration:none;border:1px solid transparent;transition:.15s ease;}
+        .side-profile,.player-action{width:100%;height:46px;border-radius:13px;display:grid;place-items:center;color:#aab4c4;background:transparent;border:1px solid transparent;cursor:pointer;font:inherit;transition:.15s ease;}
+        .side-profile{background:#252d3a;color:#d9e2ef;margin-bottom:2px;}
+        .player-action:hover{background:rgba(var(--accent-rgb),.13);color:#fff;border-color:rgba(var(--accent-rgb),.35);}
+        .player-nav a:hover,.player-nav a.active{background:rgba(var(--accent-rgb),.13);color:#fff;border-color:rgba(var(--accent-rgb),.35);}
+        .player-nav a.active{background:var(--accent);color:#0b0f0d;border-color:var(--accent);box-shadow:0 8px 20px rgba(var(--accent-rgb),.25);}
+        .player-nav a.settings{margin-top:auto;}
         .layout{
           display:flex;
           align-items:flex-start;
           justify-content:center;
           gap:16px;
-          padding:28px 18px 34px 98px;
+          padding:82px 18px 34px;
           min-height:100vh;
         }
-        .side-rail{
-          display:flex;
-          flex-direction:column;
-          gap:12px;
-          width:130px;
-          flex-shrink:0;
-        }
-        .side-thumb{
-          position:relative;
-          aspect-ratio:1/1;
-          border-radius:14px;
-          overflow:hidden;
-          cursor:pointer;
-          border:1px solid rgba(255,255,255,0.12);
-          transition:transform 0.15s ease;
-        }
-        .side-thumb:hover{
-          transform:translateY(-2px) scale(1.03);
-        }
-        .side-thumb img{
-          width:100%; height:100%;
-          object-fit:cover;
-          display:block;
-        }
-        .side-thumb-label{
-          position:absolute;
-          left:0; right:0; bottom:0;
-          padding:6px 8px;
-          background:linear-gradient(to top, rgba(0,0,0,0.85), transparent);
-          color:#fff;
-          font-size:11px;
-          font-weight:600;
-          line-height:1.2;
-        }
-
+        .player-shell{display:flex;align-items:flex-start;justify-content:center;gap:14px;width:100%;}
+        .side-games{width:178px;display:flex;flex-direction:column;gap:12px;flex:0 0 178px;}
+        .side-game{display:block;text-decoration:none;color:#fff;background:rgba(17,24,35,.88);border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.25);transition:.16s ease;}
+        .side-game:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 14px 32px rgba(var(--accent-rgb),.16);}
+        .side-game img{display:block;width:100%;height:104px;object-fit:cover;background:#0a0e14;}
+        .side-game span{display:block;padding:8px 9px 10px;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .app-layout .center-col{max-width:1180px;}
+        .app-layout .frame-wrap{aspect-ratio:16/9;min-height:76vh;}
+        .app-layout .card{width:100%;}
+        @media(max-width:1100px){.side-games{display:none}.center-col{max-width:1000px}}
         .center-col{
           width:100%;
-          max-width:760px;
+          max-width:1000px;
           display:flex;
           flex-direction:column;
           gap:16px;
@@ -227,7 +146,7 @@ function openAboutBlank(url, title, sideGames, currentUser){
           display:flex;align-items:center;justify-content:center;gap:6px;
           font:700 12px 'Segoe UI',sans-serif;cursor:pointer;transition:.15s ease;
         }
-        .vote-btn:hover{transform:translateY(-1px);border-color:#a879ff;}
+        .vote-btn:hover{transform:translateY(-1px);border-color:var(--accent);}
         .vote-btn.like.active{background:#e7fff1;border-color:#38c879;color:#13924f;}
         .vote-btn.dislike.active{background:#fff0f0;border-color:#ef6464;color:#d33f3f;}
         .btns{display:flex;gap:6px;}
@@ -236,7 +155,7 @@ function openAboutBlank(url, title, sideGames, currentUser){
           background:#fff;border:1px solid #d5d7dc;color:#3c3c43;
           cursor:pointer;font-size:15px;padding:0;display:flex;align-items:center;justify-content:center;
         }
-        .btns button:hover{border-color:#a879ff;color:#7b5bff;}
+        .btns button:hover{border-color:var(--accent);color:#7b5bff;}
 
         .loading-overlay{
           position:absolute;
@@ -257,7 +176,7 @@ function openAboutBlank(url, title, sideGames, currentUser){
         .spinner{
           width:38px; height:38px;
           border:3px solid rgba(255,255,255,0.15);
-          border-top-color:#4ade80;
+          border-top-color:var(--accent);
           border-radius:50%;
           animation:spin 0.8s linear infinite;
         }
@@ -275,10 +194,10 @@ function openAboutBlank(url, title, sideGames, currentUser){
           z-index:9999;
           display:none;
           background:rgba(0,0,0,0.6);
-          border:1px solid rgba(74,222,128,0.4);
+          border:1px solid rgba(var(--accent-rgb),.4);
           border-radius:8px;
           padding:6px 10px;
-          color:#4ade80;
+          color:var(--accent);
           font-family:monospace;
           font-size:12px;
         }
@@ -311,7 +230,7 @@ function openAboutBlank(url, title, sideGames, currentUser){
         }
         .comment-box .post-btn{
           margin-top:8px;
-          background:#4ade80;
+          background:var(--accent);
           color:#0b0f0d;
           border:none;
           border-radius:8px;
@@ -352,35 +271,49 @@ function openAboutBlank(url, title, sideGames, currentUser){
           color:#a9b2c3;
         }
 
+
+        .popup-overlay{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.62);backdrop-filter:blur(8px);padding:20px;}
+        .popup-overlay.open{display:flex;}
+        .popup-card{position:relative;width:min(440px,100%);background:#171c25;color:#eef2f8;border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:24px;box-shadow:0 24px 80px rgba(0,0,0,.55);}
+        .popup-card h2{margin:0 0 10px;font-size:22px;}
+        .popup-card p{color:#b9c2d0;line-height:1.5;font-size:14px;}
+        .popup-small{font-size:12px!important;color:#8792a3!important;}
+        .popup-close{position:absolute;top:10px;right:10px;width:34px;height:34px;border:0;border-radius:10px;background:#252c38;color:#fff;font-size:24px;cursor:pointer;}
+        .popup-label{display:block;margin:16px 0 7px;font-size:12px;color:#9da8b8;}
+        .popup-select{width:100%;padding:12px;border-radius:11px;border:1px solid #3c4655;background:#222936;color:#fff;outline:none;}
+
         @media (max-width:900px){
-          .side-rail{ display:none; }
         }
         @media (max-width:600px){
-          .mini-nav{ width:54px; left:10px; top:10px; bottom:10px; padding:12px 5px; border-radius:18px; }
-          .mini-nav a, .mini-nav button{width:40px;height:40px;flex-basis:40px;font-size:17px;}
-          .mini-nav .avatar{width:40px;height:40px;flex-basis:40px;}
-          .layout{ padding:18px 10px 24px 76px; }
+          .player-sidebar{left:8px;top:8px;bottom:8px;width:52px;padding:8px 5px;border-radius:16px;}
+          .player-nav a{height:42px;border-radius:11px;}
+          .layout{ padding:72px 10px 24px 70px; }
         }
       </style>
     </head>
     <body>
-      <nav class="mini-nav">
-        <div class="avatar"></div>
-        <a href="${siteLink('games.html')}" title="Home"><i class="bi bi-house-fill"></i></a>
-        <a class="active" href="${siteLink('game-tab.html')}" title="Games"><i class="bi bi-controller"></i></a>
+      <nav class="player-sidebar" aria-label="Player navigation">
+        <div class="player-nav">
+          <div class="side-profile" title="Profile"><i class="bi bi-person-fill"></i></div>
+          <a href="${siteLink('games.html')}" title="Home"><i class="bi bi-house-fill"></i></a>
+          <a href="${siteLink('apps.html')}" title="Apps" class="${isApp ? 'active' : ''}"><i class="bi bi-grid-1x2-fill"></i></a>
+          <a href="${siteLink('game-tab.html')}" title="Games" class="${!isApp ? 'active' : ''}"><i class="bi bi-controller"></i></a>
+          <button type="button" class="player-action" id="playerInfo" title="Info"><i class="bi bi-info-circle-fill"></i></button>
+          <button type="button" class="player-action settings" id="playerSettings" title="Settings"><i class="bi bi-gear-fill"></i></button>
+        </div>
       </nav>
 
-      <div class="layout">
-        ${leftGames.length ? `<div class="side-rail">${sideThumbs(leftGames)}</div>` : ''}
-
-        <div class="center-col">
+      <div class="layout ${isApp ? 'app-layout' : 'game-layout'}">
+        <div class="player-shell">
+          ${!isApp ? `<aside class="side-games" id="sideGames"></aside>` : ''}
+          <div class="center-col">
           <div class="card">
             <div class="frame-wrap">
               <div class="loading-overlay" id="loadingOverlay">
                 <div class="spinner"></div>
                 <span>Loading game...</span>
               </div>
-              <iframe id="gf" src="${url}" data-src="${url}" allowfullscreen onload="hideLoading()"></iframe>
+              <iframe id="gf" src="${url}" data-src="${url}" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen onload="hideLoading()"></iframe>
             </div>
             <div class="bar">
               <div class="bar-left">
@@ -391,10 +324,10 @@ function openAboutBlank(url, title, sideGames, currentUser){
                 </div>
               </div>
               <div class="bar-right">
-                <div class="vote-group" aria-label="Rate this game">
+                ${!isApp ? `<div class="vote-group" aria-label="Rate this game">
                   <button class="vote-btn like" id="likeBtn" onclick="voteGame('like')" title="Like this game"><i class="bi bi-hand-thumbs-up-fill"></i><span id="likeCount">0</span></button>
                   <button class="vote-btn dislike" id="dislikeBtn" onclick="voteGame('dislike')" title="Dislike this game"><i class="bi bi-hand-thumbs-down-fill"></i><span id="dislikeCount">0</span></button>
-                </div>
+                </div>` : ''}
                 <div class="btns">
                   <button onclick="refreshFrame()" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
                   <button onclick="goFullscreen()" title="Fullscreen"><i class="bi bi-arrows-fullscreen"></i></button>
@@ -405,18 +338,64 @@ function openAboutBlank(url, title, sideGames, currentUser){
 
           <div class="fps-overlay" id="fpsOverlay">FPS: <span id="fpsVal">60</span></div>
 
-          <div class="comment-box">
+          ${!isApp ? `<div class="comment-box">
             <h3>Comments</h3>
             ${commentAreaHTML}
             <div class="comment-list" id="commentList"></div>
+          </div>` : ''}
           </div>
+          ${!isApp ? `<aside class="side-games" id="sideGamesRight"></aside>` : ''}
         </div>
+      </div>
 
-        ${rightGames.length ? `<div class="side-rail">${sideThumbs(rightGames)}</div>` : ''}
+      <div class="popup-overlay" id="aboutPopup" onclick="if(event.target===this)closePopup('aboutPopup')">
+        <div class="popup-card">
+          <button class="popup-close" onclick="closePopup('aboutPopup')">×</button>
+          <h2>About</h2>
+          <p>This ${isApp ? 'app' : 'game'} is hosted externally. Use the controls below to refresh or enter fullscreen.</p>
+          <p class="popup-small">Powered by your Unblocked Games site.</p>
+        </div>
+      </div>
+      <div class="popup-overlay" id="settingsPopup" onclick="if(event.target===this)closePopup('settingsPopup')">
+        <div class="popup-card">
+          <button class="popup-close" onclick="closePopup('settingsPopup')">×</button>
+          <h2>Settings</h2>
+          <p>Use the main sidebar to change your account and theme settings.</p>
+        </div>
       </div>
 
       <script>
         var isLoggedIn = ${loggedIn ? 'true' : 'false'};
+        function applySavedTheme(){ document.documentElement.setAttribute('data-theme', localStorage.getItem('ug_theme') || 'green'); }
+        applySavedTheme();
+        window.addEventListener('storage', function(e){ if(e.key==='ug_theme') applySavedTheme(); });
+
+        var API_BASE=''; try{ API_BASE=(window.opener&&window.opener.location&&window.opener.location.origin)||location.origin; }catch(e){ API_BASE=location.origin; }
+        function showAbout(){ document.getElementById('aboutPopup').classList.add('open'); }
+        function showSettings(){
+          document.getElementById('settingsPopup').classList.add('open');
+        }
+        function closePopup(id){ document.getElementById(id).classList.remove('open'); }
+
+        document.getElementById('playerInfo').addEventListener('click', showAbout);
+        document.getElementById('playerSettings').addEventListener('click', showSettings);
+        function buildSideGames(){
+          var host=document.getElementById('sideGames');
+          var right=document.getElementById('sideGamesRight');
+          if(!host || !right) return;
+          var items=${JSON.stringify(allGames)}.slice ? ${JSON.stringify(allGames)} : [];
+          var shuffled=items.slice().sort(function(){return Math.random()-.5;}).slice(0,8);
+          var left=shuffled.slice(0,4), rr=shuffled.slice(4,8);
+          function card(g){
+            var img=g.thumbnail || '';
+            if(!img){ try{img='https://www.google.com/s2/favicons?sz=128&domain='+new URL(g.url).hostname;}catch(e){} }
+            return '<a class="side-game" href="javascript:void(0)" data-side-url="'+escapeHTML(g.url)+'" data-side-name="'+escapeHTML(g.name)+'"><img src="'+escapeHTML(img)+'" alt=""><span>'+escapeHTML(g.name)+'</span></a>';
+          }
+          host.innerHTML=left.map(card).join(''); right.innerHTML=rr.map(card).join('');
+          [host,right].forEach(function(el){el.addEventListener('click',function(e){var a=e.target.closest('.side-game');if(!a)return;setTimeout(function(){location.href=a.dataset.sideUrl;},0);});});
+        }
+        function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];}); }
+        if(!isApp) buildSideGames();
 
         function refreshFrame(){
           var f = document.getElementById('gf');
@@ -430,16 +409,7 @@ function openAboutBlank(url, title, sideGames, currentUser){
           if(f.requestFullscreen) f.requestFullscreen();
           else if(f.webkitRequestFullscreen) f.webkitRequestFullscreen();
         }
-        function loadGame(u, name){
-          var f = document.getElementById('gf');
-          showLoading();
-          f.src = u;
-          f.setAttribute('data-src', u);
-          document.getElementById('gname').textContent = name;
-          document.title = name;
-          renderVotes();
-          renderComments();
-        }
+        function loadGame(u, name){ var f=document.getElementById('gf'); f.src=u; f.setAttribute('data-src',u); document.getElementById('gname').textContent=name||'App'; document.title=name||'App'; if(!isApp){ renderVotes(); renderComments(); } }
 
         function showLoading(){
           document.getElementById('loadingOverlay').classList.remove('hidden');
@@ -495,52 +465,61 @@ function openAboutBlank(url, title, sideGames, currentUser){
           document.getElementById('likeBtn').classList.toggle('active', who==='like');
           document.getElementById('dislikeBtn').classList.toggle('active', who==='dislike');
         }
-        function voteGame(type){
-          var v=getVotes(), key=voterKey(), old=v.voters[key];
-          if(old===type){
-            v[type==='like'?'likes':'dislikes']=Math.max(0,v[type==='like'?'likes':'dislikes']-1);
-            delete v.voters[key];
-          }else{
-            if(old){ v[old==='like'?'likes':'dislikes']=Math.max(0,v[old==='like'?'likes':'dislikes']-1); }
-            v[type==='like'?'likes':'dislikes']++;
-            v.voters[key]=type;
+        async function voteGame(type){
+          var user = null;
+          try{ user = window.opener && window.opener.UGAuth && window.opener.UGAuth.getUser ? window.opener.UGAuth.getUser() : null; }catch(_){}
+          if(user && !user.local){
+            try{
+              var res=await fetch(API_BASE+'/api/vote',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:document.getElementById('gf').getAttribute('data-src'),type:type})});
+              var data=await res.json();
+              if(!res.ok) throw new Error(data.error||'Vote failed');
+              document.getElementById('likeCount').textContent=data.vote.likes||0;
+              document.getElementById('dislikeCount').textContent=data.vote.dislikes||0;
+              document.getElementById('likeBtn').classList.toggle('active',data.vote.myVote==='like');
+              document.getElementById('dislikeBtn').classList.toggle('active',data.vote.myVote==='dislike');
+              return;
+            }catch(e){}
           }
+          var v=getVotes(), key=voterKey(), old=v.voters[key];
+          if(old===type){ v[type==='like'?'likes':'dislikes']=Math.max(0,v[type==='like'?'likes':'dislikes']-1); delete v.voters[key]; }
+          else{ if(old){v[old==='like'?'likes':'dislikes']=Math.max(0,v[old==='like'?'likes':'dislikes']-1);} v[type==='like'?'likes':'dislikes']++; v.voters[key]=type; }
           saveVotes(v); renderVotes();
         }
 
         function commentKey(){
-          var f = document.getElementById('gf');
-          return 'ug_comments_' + encodeURIComponent(f.getAttribute('data-src'));
+          return 'ug_comments_' + encodeURIComponent(currentFrameUrl());
         }
-        function getComments(){
+        function getLocalComments(){
           try{ return JSON.parse(localStorage.getItem(commentKey()) || '[]'); }
           catch(e){ return []; }
         }
-        function renderComments(){
-          var list = getComments();
-          var el = document.getElementById('commentList');
-          if(list.length === 0){
-            el.innerHTML = '<div class="comment-empty">No comments yet' + (isLoggedIn ? ' — be the first.' : '.') + '</div>';
-            return;
-          }
-          el.innerHTML = list.slice().reverse().map(function(c){
-            return '<div class="comment-item"><strong>' + (c.author || 'Anonymous') + ':</strong> ' + c.text.replace(/</g,'&lt;') +
-              '<div class="meta">' + c.date + '</div></div>';
-          }).join('');
+        function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'})[c]}); }
+        async function renderComments(){
+          var el=document.getElementById('commentList'); if(!el) return;
+          var list=[];
+          try{
+            var res=await fetch(API_BASE+'/api/comments?url='+encodeURIComponent(currentFrameUrl()),{credentials:'include'});
+            if(res.ok){ var data=await res.json(); list=data.comments||[]; } else throw new Error();
+          }catch(e){ list=getLocalComments(); }
+          if(list.length===0){ el.innerHTML='<div class="comment-empty">No comments yet' + (isLoggedIn?' — be the first.':'.') + '</div>'; return; }
+          el.innerHTML=list.slice().reverse().map(function(c){return '<div class="comment-item"><strong>'+escapeHTML(c.author||'Anonymous')+':</strong> '+escapeHTML(c.text)+'<div class="meta">'+escapeHTML(c.date||'')+'</div></div>';}).join('');
         }
-        function postComment(){
+        async function postComment(){
           if(!isLoggedIn) return;
-          var input = document.getElementById('commentInput');
-          var text = input.value.trim();
-          if(!text) return;
-          var list = getComments();
-          list.push({ text: text, author: '${loggedIn ? currentUser.replace(/'/g,"\\'") : ''}', date: new Date().toLocaleString() });
-          localStorage.setItem(commentKey(), JSON.stringify(list));
-          input.value = '';
-          renderComments();
+          var input=document.getElementById('commentInput'); if(!input) return;
+          var text=input.value.trim(); if(!text) return;
+          var game=currentFrameUrl();
+          try{
+            var res=await fetch(API_BASE+'/api/comments',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:game,text:text})});
+            var data=await res.json();
+            if(!res.ok) throw new Error(data.error||'Could not post comment.');
+            input.value=''; await renderComments(); return;
+          }catch(e){
+            var list=getLocalComments(); list.push({text:text,author:${JSON.stringify(currentUser || 'Player')},date:new Date().toLocaleString()});
+            localStorage.setItem(commentKey(),JSON.stringify(list)); input.value=''; await renderComments();
+          }
         }
-        renderVotes();
-        renderComments();
+        if(!isApp){ renderVotes(); renderComments(); }
       </script>
     </body>
     </html>

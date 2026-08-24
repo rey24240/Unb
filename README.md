@@ -20,3 +20,9 @@ npm start
 ```
 
 The server listens on `PORT` when supplied, otherwise `8080`.
+
+
+Persistence: accounts, long-lived login sessions, votes, and comments are stored in `data/data.json` and restored when the Node server restarts. Comments are no longer capped at 200. Keep the `data/` directory on persistent storage/backups if you want the data to survive redeployments or container replacement.
+
+## Save Data
+The Settings panel includes a **Save Data** button. When logged in, it explicitly flushes the persistent server database and syncs the user's theme/browser preferences to their account. Account sessions, votes, comments, and synced settings are stored under `data/data.json` and survive normal server restarts. Keep the `data/` directory on persistent storage and back it up when deploying.
