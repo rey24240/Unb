@@ -1,4 +1,4 @@
 git status
 git add .
-git commit -m "Describe your changes"
+git commit -m "test"
 git push
