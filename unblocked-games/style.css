@@ -1138,3 +1138,107 @@ a{color:inherit; text-decoration:none;}
 .side-icon{font-size:18px}
 .games-main{padding-left:84px}
 @media(max-width:600px){.sidebar{width:54px;padding:8px 6px;border-radius:16px}.side-item{height:42px;min-height:42px}.avatar-item{height:48px;min-height:48px}.side-icon{font-size:17px}.games-main{padding-left:70px}}
+
+
+/* ---------- Supplied game thumbnail sizing ---------- */
+/* Game buttons use the same 299x168 (16:9) shape as the supplied 1v1.lol image. */
+.grid{
+  grid-template-columns:repeat(auto-fill,minmax(260px,299px));
+  justify-content:start;
+  gap:20px 18px;
+}
+.card{
+  width:299px;
+  max-width:100%;
+}
+.thumb{
+  width:100%;
+  aspect-ratio:299 / 168;
+  border-radius:14px;
+}
+.thumb img{
+  object-fit:cover;
+}
+@media(max-width:1100px) and (min-width:601px){
+  .grid{grid-template-columns:repeat(3,minmax(0,299px));}
+}
+@media(max-width:900px) and (min-width:601px){
+  .grid{grid-template-columns:repeat(2,minmax(0,299px));}
+}
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr;justify-items:stretch;}
+  .card{width:min(299px,100%);}
+}
+
+/* ---------- Games redesign: favorites + image hover titles ---------- */
+.games-section{max-width:1280px;padding-top:48px}
+.section-head{margin-bottom:18px!important}
+.game-tabs{display:flex;align-items:center;justify-content:center;gap:0;border-bottom:1px solid var(--edge);width:min(680px,100%);margin:0 auto 24px}
+.game-tab{position:relative;border:0;background:transparent;color:var(--dim);padding:12px 22px 13px;font:700 14px 'Rubik',sans-serif;cursor:pointer}
+.game-tab + .game-tab{border-left:1px solid var(--edge)}
+.game-tab.active{color:var(--text)}
+.game-tab.active::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:3px;border-radius:3px;background:var(--green);box-shadow:0 0 12px color-mix(in srgb,var(--green) 45%,transparent)}
+.game-tab i{margin-right:6px}
+.favorite-count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;margin-left:5px;border-radius:999px;background:rgba(255,255,255,.08);font-size:10px;color:var(--dim)}
+.game-tab.active .favorite-count{color:#0b0f0d;background:var(--green)}
+.grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:20px 18px}
+.card{border-radius:16px;background:linear-gradient(180deg,rgba(29,34,38,.75),rgba(20,23,26,.92));border:1px solid rgba(255,255,255,.06);padding:8px;box-shadow:0 10px 28px rgba(0,0,0,.22);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--green) 50%,transparent);box-shadow:0 14px 34px rgba(0,0,0,.35),0 0 20px color-mix(in srgb,var(--green) 12%,transparent)}
+.thumb{aspect-ratio:16/9;border-radius:11px;overflow:hidden;background:#0c0f11;box-shadow:none}
+.thumb img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .25s ease,filter .25s ease}
+.card:hover .thumb img{transform:scale(1.045);filter:brightness(.72)}
+.thumb-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:space-between;padding:12px;opacity:0;background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,.82));transition:opacity .18s ease;color:#fff;font-weight:800}
+.card:hover .thumb-overlay{opacity:1}
+.thumb-overlay span{max-width:82%;font-size:15px;text-shadow:0 2px 8px rgba(0,0,0,.7)}
+.thumb-overlay i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#0b0f0d;font-size:16px}
+.badge{position:absolute;z-index:2;top:9px;left:9px;background:var(--green);color:#08100b;border-radius:8px;padding:5px 8px;font-size:9px;font-weight:900;text-transform:uppercase}
+.favorite-card{position:absolute;z-index:3;top:9px;right:9px;width:32px;height:32px;border:1px solid rgba(255,255,255,.16);border-radius:9px;background:rgba(10,12,14,.7);backdrop-filter:blur(8px);color:#fff;cursor:pointer;opacity:0;transition:.18s ease}
+.card:hover .favorite-card,.favorite-card.active{opacity:1}
+.favorite-card.active{color:var(--green);border-color:color-mix(in srgb,var(--green) 45%,transparent)}
+.card-info{padding:8px 3px 2px}
+.name-row{display:flex;align-items:center;gap:8px}.name{font-weight:800;font-size:14px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.description{color:var(--dim);font-size:11px;margin:4px 0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.card-menu{color:var(--dim)}
+.card-meta{display:flex;gap:6px}.vote-card{background:rgba(255,255,255,.055);height:27px;border-radius:8px}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.games-main{padding-left:74px;padding-right:12px}.games-section{padding:32px 8px 70px}.game-tab{padding:11px 13px;font-size:12px}.favorite-card{opacity:1}}
+@media(max-width:480px){.grid{grid-template-columns:1fr}.game-tabs{justify-content:flex-start;overflow:auto}.games-search{min-width:100%}.category-select{width:100%}}
+
+/* Home page: games replace the old search box. */
+.home-games-section{width:min(1180px,calc(100vw - 140px));margin:10px auto 0;text-align:left;padding:18px 0 40px}
+.home-games-section .section-head{justify-content:center}
+.home-games-section .game-tabs{margin:0 auto 12px;max-width:620px}
+.home-games-controls{display:flex;justify-content:flex-end;margin-bottom:14px}
+.home-games-section .grid{justify-content:center}
+@media(max-width:720px){.home-games-section{width:calc(100vw - 92px);margin-left:70px}.home-games-controls{justify-content:stretch}.home-games-controls .category-select{width:100%}}
+.app-icon-fallback{position:absolute;inset:0;display:grid;place-items:center;font-size:52px;font-weight:800;color:#fff;background:linear-gradient(135deg,rgba(80,80,100,.95),rgba(35,38,45,.95));z-index:0}
+.apps-page .thumb img,.card .thumb img{position:relative;z-index:1}
+
+/* Compact settings panel: keep the full settings UI visible without a long scroll. */
+.settings-modal{
+  max-height:min(760px,calc(100vh - 24px));
+  overflow:hidden;
+  padding:18px;
+}
+.settings-modal .modal-title{font-size:21px;margin-bottom:3px}
+.settings-intro{display:none}
+.settings-section{margin-top:8px;padding:10px;border-radius:13px}
+.settings-section-title{font-size:13px;margin-bottom:2px}
+.settings-section-sub{font-size:10px;margin-bottom:7px}
+.settings-section .theme-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.theme-swatch{min-height:38px;padding:7px 6px;font-size:10px;gap:5px}
+.swatch-dot{width:16px;height:16px}
+.settings-field{margin-top:7px;gap:4px}
+.settings-field>span{font-size:10px}
+.settings-field select{padding:8px 9px;font-size:11px}
+.settings-help{margin:6px 0 0;font-size:9px;line-height:1.35}
+.settings-check{padding:7px 0;gap:8px}
+.settings-check input{width:17px;height:17px}
+.settings-check b{font-size:11px}
+.settings-check small{font-size:9px}
+.settings-actions{margin-top:9px;gap:7px}
+.settings-save-data,.settings-reset{padding:8px 9px;font-size:10px}
+.settings-saved{font-size:9px}
+@media(max-width:600px){
+  .settings-modal{width:calc(100vw - 16px);max-height:calc(100vh - 16px);padding:14px}
+  .settings-section .theme-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .settings-actions{flex-wrap:wrap}
+}

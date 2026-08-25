@@ -15,6 +15,7 @@
     <button class="tool-btn" id="reloadBtn" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
     <button class="tool-btn" id="homeBtn" title="Home"><i class="bi bi-house-fill"></i></button>
     <button class="tool-btn" id="fullscreenBtn" title="Fullscreen"><i class="bi bi-arrows-fullscreen"></i></button>
+    <button class="tool-btn save-tool" id="saveBtn" title="Save Data"><i class="bi bi-floppy-fill"></i></button>
   </div>
   <div class="browser-divider"></div>
   <div class="frame-wrap">
@@ -23,8 +24,20 @@
   </div>
 </div>
 
+<div class="save-panel" id="savePanel" aria-hidden="true">
+  <div class="save-card">
+    <div class="save-head"><div><strong>Save Data</strong><small id="saveStatus">Saved data stays on this device.</small></div><button id="saveClose" class="save-close" aria-label="Close">×</button></div>
+    <button id="saveNow" class="save-action"><i class="bi bi-floppy-fill"></i> Save Now</button>
+    <button id="loadSave" class="save-action"><i class="bi bi-arrow-counterclockwise"></i> Load Save</button>
+    <div class="save-row"><button id="exportSave" class="save-action secondary"><i class="bi bi-download"></i> Export</button><button id="importSave" class="save-action secondary"><i class="bi bi-upload"></i> Import</button><input id="saveFile" type="file" accept="application/json,.json" hidden></div>
+    <button id="deleteSave" class="save-action danger"><i class="bi bi-trash3"></i> Delete Save</button>
+    <p class="save-note">Automatic saving is enabled. This works for games whose save data is stored in browser storage and can be accessed through the same-origin proxy.</p>
+  </div>
+</div>
+
 <script src="uv/uv.bundle.js"></script>
 <script src="uv/uv.config.js"></script>
 <script src="browser.js"></script>
+<script src="save-data.js"></script>
 </body>
 </html>

@@ -188,23 +188,6 @@ function openAboutBlank(url, title, sideGames, currentUser, contentType='game'){
           font-size:12px;
         }
 
-        .fps-overlay{
-          position:fixed;
-          top:14px; right:14px;
-          z-index:9999;
-          display:none;
-          background:rgba(0,0,0,0.6);
-          border:1px solid rgba(var(--accent-rgb),.4);
-          border-radius:8px;
-          padding:6px 10px;
-          color:var(--accent);
-          font-family:monospace;
-          font-size:12px;
-        }
-        .fps-overlay.show{
-          display:block;
-        }
-
         .comment-box{
           background:rgba(255,255,255,0.06);
           border:1px solid rgba(255,255,255,0.1);
@@ -336,8 +319,6 @@ function openAboutBlank(url, title, sideGames, currentUser, contentType='game'){
             </div>
           </div>
 
-          <div class="fps-overlay" id="fpsOverlay">FPS: <span id="fpsVal">60</span></div>
-
           ${!isApp ? `<div class="comment-box">
             <h3>Comments</h3>
             ${commentAreaHTML}
@@ -417,35 +398,8 @@ function openAboutBlank(url, title, sideGames, currentUser, contentType='game'){
         function hideLoading(){
           document.getElementById('loadingOverlay').classList.add('hidden');
         }
-
-        /* FPS counter — only shown while the frame is fullscreen.
-           Measures this popup's own render loop (a game running
-           cross-origin inside the iframe can't be measured directly). */
-        var fpsOverlay = document.getElementById('fpsOverlay');
-        var lastFrame = performance.now();
-        var frames = 0;
-        var fpsAcc = 0;
-        function fpsLoop(now){
-          frames++;
-          fpsAcc += now - lastFrame;
-          lastFrame = now;
-          if(fpsAcc > 500){
-            document.getElementById('fpsVal').textContent = Math.round((frames * 1000) / fpsAcc);
-            frames = 0;
-            fpsAcc = 0;
-          }
-          requestAnimationFrame(fpsLoop);
         }
         requestAnimationFrame(fpsLoop);
-
-        document.addEventListener('fullscreenchange', function(){
-          var isFs = !!document.fullscreenElement;
-          fpsOverlay.classList.toggle('show', isFs);
-        });
-        document.addEventListener('webkitfullscreenchange', function(){
-          var isFs = !!document.webkitFullscreenElement;
-          fpsOverlay.classList.toggle('show', isFs);
-        });
 
         function voteStorageKey(u){ return 'ug_votes_' + encodeURIComponent(u); }
         function voterKey(){ return localStorage.getItem('ug_current_user') || 'device'; }

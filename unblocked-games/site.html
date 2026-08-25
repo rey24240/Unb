@@ -24,11 +24,11 @@
       <span class="side-icon"><i class="bi bi-house-fill"></i></span>
       <span class="side-label">Home</span>
     </div>
-    <a class="side-item" href="apps.html" data-tooltip="Apps" title="Apps">
+    <a class="side-item" href="/apps" data-tooltip="Apps" title="Apps">
       <span class="side-icon"><i class="bi bi-grid-1x2-fill"></i></span>
       <span class="side-label">Apps</span>
     </a>
-    <a class="side-item" href="apps1.html" data-tooltip="Games" title="Games">
+    <a class="side-item" href="/games" data-tooltip="Games" title="Games">
       <span class="side-icon"><i class="bi bi-controller"></i></span>
       <span class="side-label">Games</span>
     </a>
@@ -52,12 +52,7 @@
   <section class="hero-center">
     <h1 class="brand-title">UNBLOCKED GAMES</h1>
     <div class="beta-tag" id="betaTag">Beta</div>
-
-    <form class="search-bar" id="searchForm">
-      <input type="text" id="searchInput" placeholder="Search Google or Enter a Link" autocomplete="off">
-    </form>
-
-    <div class="quick-links" id="quickLinks"></div>
+<div class="quick-links" id="quickLinks"></div>
 
     <div class="visitor-count" id="visitorCount">
       <i class="bi bi-people-fill"></i> <span id="visitorNum">—</span> visits
@@ -125,7 +120,7 @@
 <script src="meteors.js"></script>
 <script>
 document.getElementById('infoBtn').addEventListener('click', () => {
-  alert('Unblocked Games — a simple search page.');
+  alert('Unblocked Games — home page.');
 });
 
 
@@ -187,14 +182,6 @@ function rotateBeta(){
 }
 rotateBeta();
 setInterval(rotateBeta, 4000);
-
-document.getElementById('searchForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const val = document.getElementById('searchInput').value.trim();
-  if(!val) return;
-  window.location.href = 'browser.html?url=' + encodeURIComponent(val);
-});
-
 /* ---------- Quick-launch links ---------- */
 const quickLinks = [
   {name:"CrazyGames", url:"https://www.crazygames.com", icon:"🐱"},
@@ -215,7 +202,7 @@ quickLinksEl.innerHTML = quickLinks.map(q => `
 quickLinksEl.addEventListener('click', e => {
   const btn = e.target.closest('.quick-link');
   if(!btn) return;
-  window.location.href = 'browser.html?url=' + encodeURIComponent(btn.dataset.url);
+  window.location.href = '/browser?url=' + encodeURIComponent(btn.dataset.url);
 });
 
 document.querySelectorAll('.side-item[data-target]').forEach(item => {

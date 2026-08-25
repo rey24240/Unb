@@ -19,17 +19,13 @@
       <span class="side-icon avatar-icon"><i class="bi bi-person-fill"></i></span>
       <span class="side-label" id="profileLabel">Guest</span>
     </div>
-    <a class="side-item" href="site.html" data-tooltip="Home" title="Home">
+    <a class="side-item" href="/" data-tooltip="Home" title="Home">
       <span class="side-icon"><i class="bi bi-house-fill"></i></span>
       <span class="side-label">Home</span>
     </a>
-    <a class="side-item active" href="apps.html" data-tooltip="Apps" title="Apps">
+    <a class="side-item active" href="/apps" data-tooltip="Apps" title="Apps">
       <span class="side-icon"><i class="bi bi-grid-1x2-fill"></i></span>
       <span class="side-label">Apps</span>
-    </a>
-    <a class="side-item " href="Gtab!.html" data-tooltip="Games" title="Games">
-      <span class="side-icon"><i class="bi bi-controller"></i></span>
-      <span class="side-label">Games</span>
     </a>
     <div class="side-item" id="infoBtn" data-tooltip="About" title="About">
       <span class="side-icon"><i class="bi bi-info-circle-fill"></i></span>
@@ -63,14 +59,7 @@
   </section>
 </main>
 
-<a class="github-pill" href="https://github.com/rey24240/Unblocked-games-" target="_blank" rel="noopener">
-  <i class="bi bi-github"></i> GitHub
-</a>
 
-<div class="status-widget">
-  <div>FPS: <span id="fpsVal">60</span></div>
-  <div id="clockRow">--:--</div>
-</div>
 
 <!-- Settings / theme panel -->
 <div class="modal-overlay" id="settingsOverlay">
@@ -164,37 +153,9 @@ settingsOverlay.addEventListener('click', e => {
   if(e.target === settingsOverlay) settingsOverlay.classList.remove('open');
 });
 
-/* Live clock */
-function updateClock(){
-  const d = new Date();
-  let h = d.getHours();
-  const m = String(d.getMinutes()).padStart(2,'0');
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  h = h % 12 || 12;
-  document.getElementById('clockRow').textContent = `${h}:${m} ${ampm}`;
-}
-updateClock();
-setInterval(updateClock, 1000 * 15);
 
-/* FPS counter */
-let lastFrame = performance.now();
-let frames = 0;
-let fpsAcc = 0;
-function fpsLoop(now){
-  frames++;
-  fpsAcc += now - lastFrame;
-  lastFrame = now;
-  if(fpsAcc > 500){
-    document.getElementById('fpsVal').textContent = Math.round((frames * 1000) / fpsAcc);
-    frames = 0;
-    fpsAcc = 0;
-  }
-  requestAnimationFrame(fpsLoop);
-}
-requestAnimationFrame(fpsLoop);
 </script>
 <script src="web-search.js"></script>
-<script src="frame.js"></script>
 <script src="meteors.js"></script>
 <script src="apps.js"></script>
 

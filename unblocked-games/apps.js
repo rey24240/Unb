@@ -13,9 +13,11 @@ function faviconFor(url){
   try{
     const domain = new URL(url).hostname;
     return `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
-  }catch(e){
-    return '';
-  }
+  }catch(e){ return ''; }
+}
+function appIconData(name){
+  const letter=(name||'A').trim().slice(0,1).toUpperCase();
+  return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" rx="44" fill="#20252b"/><text x="128" y="165" text-anchor="middle" font-family="Arial,sans-serif" font-size="132" font-weight="700" fill="#9aa5b1">${letter}</text></svg>`);
 }
 
 function populateCategories(){
@@ -27,12 +29,14 @@ function populateCategories(){
 
 function cardHTML(g){
   const badgeHtml = g.badge ? `<span class="badge">${g.badge}</span>` : '';
-  const img = faviconFor(g.url);
+  const img = g.thumbnail || faviconFor(g.url) || appIconData(g.name);
+  const initial = g.name.trim().slice(0,1).toUpperCase();
   return `
     <div class="card" data-url="${g.url}" data-name="${g.name}" tabindex="0" role="button" aria-label="Open ${g.name}">
       <div class="thumb">
         ${badgeHtml}
-        <img src="${img}" alt="${g.name}" loading="lazy" onerror="this.style.display='none'">
+        <div class="app-icon-fallback" aria-hidden="true">${initial}</div>
+        <img src="${img}" alt="${g.name}" loading="lazy" onerror="this.onerror=null;this.src=appIconData('${g.name.replace(/'/g,"\\'")}')">
       </div>
       <div class="card-info">
         <div class="name">${g.name}</div>
@@ -43,7 +47,7 @@ function cardHTML(g){
 }
 
 function renderGrid(){
-  const query = gameSearch.value.trim().toLowerCase();
+  const query = gameSearch?.value?.trim().toLowerCase() || '';
   const cat = categorySelect.value;
   const filtered = apps.filter(g => {
     const matchesQuery = g.name.toLowerCase().includes(query);
@@ -55,11 +59,11 @@ function renderGrid(){
   emptyNote.textContent = 'No apps match that search.';
 }
 
-fetch('apps.json')
+fetch('/unblocked-games/apps.json')
   .then(res => res.json())
   .then(data => {
     apps = data;
-    gameSearch.placeholder = `Search through our ${apps.length} apps!`;
+    if(gameSearch) gameSearch.placeholder = `Search through our ${apps.length} apps!`;
     populateCategories();
     categorySelect.value = 'All';
     renderGrid();
@@ -69,10 +73,10 @@ fetch('apps.json')
     emptyNote.textContent = 'Could not load apps.json.';
   });
 
-gameSearch.addEventListener('input', renderGrid);
+gameSearch?.addEventListener('input', renderGrid);
 categorySelect.addEventListener('change', renderGrid);
 
 /* ---------- Open apps in the same-origin player so the proxy can control the iframe ---------- */
-function openSelectedApp(card){ if(!card)return; location.href=`/player?type=app&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`; }
+function openSelectedApp(card){ if(!card)return; location.href=`/browser?type=app&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`; }
 grid.addEventListener('click',e=>openSelectedApp(e.target.closest('.card')));
 grid.addEventListener('keydown',e=>{const card=e.target.closest('.card');if(card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSelectedApp(card)}});
