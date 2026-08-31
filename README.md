@@ -3,7 +3,7 @@
 This build adds a Utopia-style browser page with an iframe and browser toolbar, plus persistent proxy/search-engine settings.
 
 ## Features
-- Games and Apps search bars: press Enter or the globe button to open `browser.html`.
+- Games and Apps search bars: press Enter or the globe button to open `/browser`.
 - Browser toolbar: back, reload, forward, address/search, open in new tab, fullscreen, and menu.
 - Proxy setting: **Utopia • Ultraviolet** or **Direct / No proxy**.
 - Search engine setting: Google, Bing, DuckDuckGo, or Brave Search.

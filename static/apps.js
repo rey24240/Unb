@@ -77,6 +77,6 @@ gameSearch?.addEventListener('input', renderGrid);
 categorySelect.addEventListener('change', renderGrid);
 
 /* ---------- Open apps in the same-origin player so the proxy can control the iframe ---------- */
-function openSelectedApp(card){ if(!card)return; location.href=`/static/player.html?type=app&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`; }
+function openSelectedApp(card){ if(!card)return; location.href=`/player?type=app&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`; }
 grid.addEventListener('click',e=>openSelectedApp(e.target.closest('.card')));
 grid.addEventListener('keydown',e=>{const card=e.target.closest('.card');if(card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSelectedApp(card)}});

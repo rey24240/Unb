@@ -6,7 +6,7 @@
     const q = input.value.trim();
     if(!q) return;
     e.preventDefault();
-    window.location.href = `browser.html?url=${encodeURIComponent(q)}`;
+    window.location.href = `/browser?url=${encodeURIComponent(q)}`;
   });
   const wrap = input.closest('.games-search');
   if(wrap && !wrap.querySelector('.web-search-btn')){
@@ -17,7 +17,7 @@
     btn.innerHTML='<i class="bi bi-globe2"></i>';
     btn.addEventListener('click',()=>{
       const q=input.value.trim();
-      if(q) window.location.href=`browser.html?url=${encodeURIComponent(q)}`;
+      if(q) window.location.href=`/browser?url=${encodeURIComponent(q)}`;
     });
     wrap.appendChild(btn);
   }
