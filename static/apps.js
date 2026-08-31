@@ -59,7 +59,7 @@ function renderGrid(){
   emptyNote.textContent = 'No apps match that search.';
 }
 
-fetch('/unblocked-games/apps.json')
+fetch('/static/apps.json')
   .then(res => res.json())
   .then(data => {
     apps = data;
@@ -70,13 +70,13 @@ fetch('/unblocked-games/apps.json')
   })
   .catch(() => {
     emptyNote.style.display = 'block';
-    emptyNote.textContent = 'Could not load apps.json.';
+    emptyNote.textContent = 'Apps not found';
   });
 
 gameSearch?.addEventListener('input', renderGrid);
 categorySelect.addEventListener('change', renderGrid);
 
 /* ---------- Open apps in the same-origin player so the proxy can control the iframe ---------- */
-function openSelectedApp(card){ if(!card)return; location.href=`/browser?type=app&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`; }
+function openSelectedApp(card){ if(!card)return; location.href=`/static/player.html?type=app&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`; }
 grid.addEventListener('click',e=>openSelectedApp(e.target.closest('.card')));
 grid.addEventListener('keydown',e=>{const card=e.target.closest('.card');if(card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSelectedApp(card)}});

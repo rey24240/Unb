@@ -18,14 +18,18 @@
     <div class="side-item avatar-item" id="profileBtn" data-tooltip="Profile" title="Profile">
       <span class="side-icon avatar-icon"><i class="bi bi-person-fill"></i></span>
       <span class="side-label" id="profileLabel">Guest</span>
-    </div>
-    <a class="side-item" href="/" data-tooltip="Home" title="Home">
+   </div>
+    <a class="side-item" href="/static/site.html" data-tooltip="Home" title="Home">
       <span class="side-icon"><i class="bi bi-house-fill"></i></span>
       <span class="side-label">Home</span>
     </a>
-    <a class="side-item " href="/apps" data-tooltip="Apps" title="Apps">
+    <a class="side-item active" href="/static/apps.html" data-tooltip="Apps" title="Apps">
       <span class="side-icon"><i class="bi bi-grid-1x2-fill"></i></span>
       <span class="side-label">Apps</span>
+    </a>
+     <a class="side-item " href="/static/games.html" data-tooltip="Games" title="Games">
+      <span class="side-icon"><i class="bi bi-controller"></i></span>
+      <span class="side-label">Games</span>
     </a>
     <div class="side-item" id="infoBtn" data-tooltip="About" title="About">
       <span class="side-icon"><i class="bi bi-info-circle-fill"></i></span>
@@ -41,17 +45,13 @@
 <main class="main games-main">
   <section class="games-section">
     <div class="section-head">
-      <h2>Games</h2>
-      <div class="game-tabs" role="tablist" aria-label="Game categories">
-        <button class="game-tab active" id="allGamesTab" role="tab" aria-selected="true"><i class="bi bi-controller"></i> All Games</button>
-        <button class="game-tab" id="favoriteGamesTab" role="tab" aria-selected="false"><i class="bi bi-heart"></i> Favorite Games <span id="favoriteCount" class="favorite-count">0</span></button>
-      </div>
+      <h2>Apps</h2>
     </div>
 
     <div class="games-controls">
       <div class="games-search">
         <button class="web-search-btn" type="button" title="Open web search" aria-label="Open web search"><i class="bi bi-globe2"></i></button>
-        <i class="bi bi-search"></i> <input type="text" id="gameSearch" placeholder="Search games...">
+        <i class="bi bi-search"></i> <input type="text" id="gameSearch" placeholder="Search apps...">
       </div>
       <select id="categorySelect" class="category-select" autocomplete="off">
         <option value="All">All Categories</option>
@@ -59,9 +59,11 @@
     </div>
 
     <div class="grid" id="grid"></div>
-    <p class="empty-note" id="emptyNote" style="display:none;">No games match that search.</p>
+    <p class="empty-note" id="emptyNote" style="display:none;">No apps match that search.</p>
   </section>
 </main>
+
+
 
 <!-- Settings / theme panel -->
 <div class="modal-overlay" id="settingsOverlay">
@@ -154,11 +156,12 @@ document.getElementById('settingsClose').addEventListener('click', () => {
 settingsOverlay.addEventListener('click', e => {
   if(e.target === settingsOverlay) settingsOverlay.classList.remove('open');
 });
+
+
 </script>
 <script src="web-search.js"></script>
-<script src="frame.js"></script>
 <script src="meteors.js"></script>
-<script src="games.js"></script>
+<script src="apps.js"></script>
 
 <script src="auth.js"></script>
 <script src="settings-ui.js"></script>

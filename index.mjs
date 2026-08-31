@@ -10,9 +10,10 @@ const DATA_DIR = path.resolve('./data');
 const DATA_FILE = path.join(DATA_DIR,'data.json');
 fs.mkdirSync(DATA_DIR,{recursive:true});
 const bare = createServer('/bare/');
-const serve = new nodeStatic.Server('unblocked-games/');
+const serve = new nodeStatic.Server('static/');
 const rootServe = new nodeStatic.Server('./');
 const sessions = new Map();
+let db=loadData();
 function restoreSessions(){
   for(const [token,session] of Object.entries(db.sessions||{})){
     if(session && session.username && db.users[session.username]) sessions.set(token,session);
@@ -27,7 +28,6 @@ function loadData(){
     return d;
   }catch(_){return {users:{},votes:{},comments:{},sessions:{}}}
 }
-let db=loadData();
 function saveData(){
   const tmp=DATA_FILE+'.tmp';
   fs.writeFileSync(tmp,JSON.stringify(db,null,2));
