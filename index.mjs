@@ -10,10 +10,9 @@ const DATA_DIR = path.resolve('./data');
 const DATA_FILE = path.join(DATA_DIR,'data.json');
 fs.mkdirSync(DATA_DIR,{recursive:true});
 const bare = createServer('/bare/');
-const serve = new nodeStatic.Server('static/');
+const serve = new nodeStatic.Server('unblocked-games/');
 const rootServe = new nodeStatic.Server('./');
 const sessions = new Map();
-let db=loadData();
 function restoreSessions(){
   for(const [token,session] of Object.entries(db.sessions||{})){
     if(session && session.username && db.users[session.username]) sessions.set(token,session);
@@ -28,61 +27,11 @@ function loadData(){
     return d;
   }catch(_){return {users:{},votes:{},comments:{},sessions:{}}}
 }
+let db=loadData();
 function saveData(){
   const tmp=DATA_FILE+'.tmp';
   fs.writeFileSync(tmp,JSON.stringify(db,null,2));
   fs.renameSync(tmp,DATA_FILE);
-}
-function servePage(req,res,relativePath){
-  const safePath = String(relativePath || '').replace(/^\/?static\//,'').replace(/^\/+/, '');
-  const file = path.resolve(process.cwd(), 'static', safePath);
-
-  try {
-    const content = fs.readFileSync(file);
-    const ext = path.extname(file).toLowerCase();
-    const types = {
-      '.html': 'text/html; charset=utf-8',
-      '.css': 'text/css; charset=utf-8',
-      '.js': 'application/javascript; charset=utf-8',
-      '.json': 'application/json; charset=utf-8',
-      '.svg': 'image/svg+xml',
-      '.txt': 'text/plain; charset=utf-8'
-    };
-
-    res.writeHead(200, {
-      'Content-Type': types[ext] || 'application/octet-stream',
-      'Cache-Control': 'no-store'
-    });
-
-    if (req.method === 'HEAD') {
-      res.end();
-      return true;
-    }
-
-    res.end(content);
-    return true;
-  } catch (err) {
-    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-    res.end('Not found');
-    return true;
-  }
-}
-function rewriteCleanPath(url){
-  const pathname = url.pathname;
-  const withoutStatic = pathname.replace(/^\/static\//, '/');
-  const clean = withoutStatic.replace(/\/index\.html?$/,'/').replace(/\.html$/,'');
-  const routes = new Map([
-    ['/', '/static/site.html'],
-    ['/home', '/static/site.html'],
-    ['/site', '/static/site.html'],
-    ['/apps', '/static/apps.html'],
-    ['/games', '/static/games.html'],
-    ['/browser', '/static/player.html'],
-    ['/player', '/static/player.html']
-  ]);
-  const target = routes.get(clean) || routes.get(pathname) || routes.get(withoutStatic) || routes.get(pathname.replace(/\/$/, ''));
-  if(!target) return null;
-  return path.resolve(target);
 }
 function hashPassword(password,salt=crypto.randomBytes(16).toString('hex')){
   const hash=crypto.scryptSync(password,salt,64).toString('hex');
@@ -227,61 +176,7 @@ const server=http.createServer(async(req,res)=>{
   try{
     if(await api(req,res)) return;
     if(bare.shouldRoute(req)) return bare.routeRequest(req,res);
-
-    const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-    const pathname = url.pathname;
-
-    if (pathname === '/' || pathname === '/index' || pathname === '/index.html') {
-      if (pathname !== '/') {
-        res.writeHead(308, { Location: '/' });
-        res.end();
-        return;
-      }
-      return servePage(req,res,'/site.html');
-    }
-
-    if (pathname === '/home' || pathname === '/site') {
-      if (pathname === '/site') {
-        res.writeHead(308, { Location: '/home' });
-        res.end();
-        return;
-      }
-      return servePage(req,res,'/site.html');
-    }
-
-    if (pathname === '/apps' || pathname === '/games' || pathname === '/browser' || pathname === '/player') {
-      const target = {
-        '/apps': '/apps.html',
-        '/games': '/games.html',
-        '/browser': '/player.html',
-        '/player': '/player.html'
-      }[pathname];
-      return servePage(req,res,target);
-    }
-
-    if (pathname.startsWith('/static/') && pathname.endsWith('.html')) {
-      const clean = pathname.replace(/^\/static\//, '/').replace(/\.html$/, '');
-      const redirectTarget = clean === '/index' ? '/' : clean === '/site' ? '/home' : clean === '/browser' ? '/browser' : clean === '/player' ? '/player' : clean;
-      res.writeHead(308, { Location: redirectTarget || '/' });
-      res.end();
-      return;
-    }
-
-    if (pathname.endsWith('.html')) {
-      const clean = pathname.replace(/\.html$/, '');
-      const mapped = clean === '/index' ? '/' : clean === '/site' ? '/home' : clean === '/apps' ? '/apps' : clean === '/games' ? '/games' : clean === '/player' ? '/player' : clean === '/browser' ? '/browser' : clean;
-      const target = rewriteCleanPath(url);
-      if (target || mapped) {
-        res.writeHead(308, { Location: mapped || '/' });
-        res.end();
-        return;
-      }
-      res.writeHead(308, { Location: clean || '/' });
-      res.end();
-      return;
-    }
-
-    if (req.url.startsWith('/uv/') || req.url==='/sw.js') return rootServe.serve(req,res);
+    if(req.url.startsWith('/uv/') || req.url==='/sw.js') return rootServe.serve(req,res);
     serve.serve(req,res);
   }catch(err){
     if(!res.headersSent) send(res,500,{error:'Server error.'});

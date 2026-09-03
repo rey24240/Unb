@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unblocked Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+<div class="page-bg"></div>
+
+<header class="site-header">
+  <a class="brand" href="index.html" aria-label="Home">
+    <span class="brand-mark"><i class="bi bi-controller"></i></span>
+    <span>UNBLOCKED</span>
+  </a>
+  <div class="header-spacer"></div>
+  <button class="nav-icon-btn" id="settingsBtn" type="button" title="Settings" aria-label="Settings">
+    <i class="bi bi-gear-fill"></i>
+  </button>
+</header>
+
+<div class="settings-popover" id="settingsPopover" hidden>
+  <div class="settings-popover-head">
+    <div><strong>Settings</strong><small>Customize your site</small></div>
+    <button id="settingsClose" type="button" aria-label="Close settings"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <div class="settings-row">
+    <span><i class="bi bi-palette-fill"></i> Accent color</span>
+    <select id="accentSelect" aria-label="Accent color">
+      <option value="green">Green</option><option value="purple">Purple</option><option value="blue">Blue</option><option value="red">Red</option><option value="amber">Amber</option>
+    </select>
+  </div>
+  <button class="settings-link" id="homeSettingsBtn" type="button"><i class="bi bi-house-fill"></i> Home</button>
+</div>
+
+<main class="content">
+  <section class="hero">
+    <div>
+      <div class="eyebrow" id="eyebrow">GAMES</div>
+      <h1 id="pageTitle">Play Games</h1>
+      <p id="pageSubtitle">Find a game, search by category, or save your favorites.</p>
+    </div>
+    <div class="result-count"><span id="resultCount">0</span> results</div>
+  </section>
+
+  <section class="content-tabs" aria-label="Library views">
+    <button class="content-tab active" data-view="games" type="button"><i class="bi bi-controller"></i> All Games</button>
+    <button class="content-tab" data-view="favorites" type="button"><i class="bi bi-heart"></i> Favorite Games <span id="favoriteCount" class="favorite-count">0</span></button>
+    <button class="content-tab" data-view="apps" type="button"><i class="bi bi-grid-1x2-fill"></i> Apps</button>
+  </section>
+
+  <section class="catalog-tools" aria-label="Search and filters">
+    <div class="catalog-search">
+      <i class="bi bi-search"></i>
+      <input id="searchInput" type="search" placeholder="Search through games..." autocomplete="off">
+      <button id="clearSearch" class="clear-search" type="button" aria-label="Clear search" hidden><i class="bi bi-x-lg"></i></button>
+    </div>
+    <label class="category-wrap" title="Choose a category">
+      <i class="bi bi-funnel"></i>
+      <select id="categorySelect" aria-label="Category">
+        <option value="All">All Categories</option>
+      </select>
+    </label>
+  </section>
+
+  <section id="grid" class="card-grid" aria-live="polite"></section>
+  <div id="emptyState" class="empty-state" hidden>
+    <i class="bi bi-search"></i>
+    <h2>Nothing found</h2>
+    <p>Try another search or category.</p>
+  </div>
+</main>
+
+<script>
+const state = { games: [], apps: [], view: 'games', favorites: new Set() };
+const grid = document.getElementById('grid');
+const searchInput = document.getElementById('searchInput');
+const clearSearch = document.getElementById('clearSearch');
+const categorySelect = document.getElementById('categorySelect');
+const resultCount = document.getElementById('resultCount');
+const favoriteCount = document.getElementById('favoriteCount');
+const emptyState = document.getElementById('emptyState');
+const pageTitle = document.getElementById('pageTitle');
+const pageSubtitle = document.getElementById('pageSubtitle');
+const eyebrow = document.getElementById('eyebrow');
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsPopover = document.getElementById('settingsPopover');
+const settingsClose = document.getElementById('settingsClose');
+const accentSelect = document.getElementById('accentSelect');
+const homeSettingsBtn = document.getElementById('homeSettingsBtn');
+
+function escapeHTML(value='') {
+  return String(value).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+}
+function faviconFor(url) {
+  try { return `https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(new URL(url).hostname)}`; }
+  catch (_) { return ''; }
+}
+function loadFavorites() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('ug_favorites') || '[]');
+    state.favorites = new Set(Array.isArray(saved) ? saved : []);
+  } catch (_) { state.favorites = new Set(); }
+  updateFavoriteCount();
+}
+function saveFavorites() {
+  localStorage.setItem('ug_favorites', JSON.stringify([...state.favorites]));
+  updateFavoriteCount();
+}
+function updateFavoriteCount() { favoriteCount.textContent = state.favorites.size; }
+function currentItems() { return state.view === 'apps' ? state.apps : state.games; }
+function populateCategories() {
+  const values = new Set();
+  [...state.games, ...state.apps].forEach(item => (item.categories || []).forEach(c => values.add(c)));
+  categorySelect.innerHTML = '<option value="All">All categories</option>' +
+    [...values].sort((a,b)=>a.localeCompare(b)).map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
+}
+function updateHeader() {
+  const favoriteMode = state.view === 'favorites';
+  const label = state.view === 'apps' ? 'APPS' : favoriteMode ? 'FAVORITES' : 'GAMES';
+  eyebrow.textContent = label;
+  pageTitle.textContent = state.view === 'apps' ? 'Browse Apps' : favoriteMode ? 'Your Favorites' : 'Play Games';
+  pageSubtitle.textContent = favoriteMode ? 'Your saved games and apps are right here.' : state.view === 'apps' ? 'Browse apps through the same unblocking player.' : 'Find a game, search by category, or save your favorites.';
+  searchInput.placeholder = state.view === 'apps' ? 'Search through apps...' : favoriteMode ? 'Search your favorites...' : 'Search through games...';
+  categorySelect.disabled = false;
+}
+function cardHTML(item, isApp) {
+  const url = escapeHTML(item.url || '');
+  const name = escapeHTML(item.name || 'Untitled');
+  const cats = (item.categories || []).join(' • ') || (isApp ? 'App' : 'Game');
+  const image = escapeHTML(item.thumbnail || faviconFor(item.url));
+  const favorite = state.favorites.has(item.url);
+  return `<article class="game-card" data-url="${url}" data-name="${name}" tabindex="0" role="button">
+    <div class="card-image">
+      <img src="${image}" alt="${name}" loading="lazy" onerror="this.style.display='none'">
+      <div class="play-overlay"><i class="bi bi-play-fill"></i></div>
+      <button class="favorite-btn ${favorite ? 'saved' : ''}" data-favorite="${url}" type="button" aria-label="${favorite ? 'Remove from favorites' : 'Add to favorites'}"><i class="bi ${favorite ? 'bi-star-fill' : 'bi-star'}"></i></button>
+    </div>
+    <div class="card-body">
+      <h2>${name}</h2>
+      <p>${escapeHTML(cats)}</p>
+    </div>
+  </article>`;
+}
+function render() {
+  updateHeader();
+  const query = searchInput.value.trim().toLowerCase();
+  let items = currentItems();
+  if (state.view === 'favorites') items = [...state.games, ...state.apps].filter(x => state.favorites.has(x.url));
+  const category = categorySelect.value;
+  const filtered = items.filter(item => {
+    const text = `${item.name || ''} ${(item.categories || []).join(' ')}`.toLowerCase();
+    const matchesSearch = !query || text.includes(query);
+    const matchesCategory = state.view === 'favorites' || category === 'All' || (item.categories || []).includes(category);
+    return matchesSearch && matchesCategory;
+  });
+  grid.innerHTML = filtered.map(item => cardHTML(item, state.view === 'apps' || (state.view === 'favorites' && state.apps.some(a => a.url === item.url)))).join('');
+  resultCount.textContent = filtered.length;
+  emptyState.hidden = filtered.length !== 0;
+  clearSearch.hidden = !searchInput.value;
+  document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === state.view));
+}
+function openItem(card) {
+  const type = state.view === 'apps' || (state.view === 'favorites' && state.apps.some(a => a.url === card.dataset.url)) ? 'app' : 'game';
+  location.href = `player.html?type=${type}&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
+}
+
+document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.addEventListener('click', () => {
+  state.view = btn.dataset.view; window.history.replaceState(null, '', `#${state.view}`);
+  if (state.view !== 'favorites') categorySelect.value = 'All';
+  render();
+}));
+searchInput.addEventListener('input', render);
+clearSearch.addEventListener('click', () => { searchInput.value = ''; searchInput.focus(); render(); });
+categorySelect.addEventListener('change', render);
+
+grid.addEventListener('click', e => {
+  const fav = e.target.closest('[data-favorite]');
+  if (fav) {
+    e.preventDefault(); e.stopPropagation();
+    const url = fav.dataset.favorite;
+    state.favorites.has(url) ? state.favorites.delete(url) : state.favorites.add(url);
+    saveFavorites(); render(); return;
+  }
+  const card = e.target.closest('.game-card');
+  if (card) openItem(card);
+});
+grid.addEventListener('keydown', e => {
+  if (e.target.closest('[data-favorite]')) return;
+  const card = e.target.closest('.game-card');
+  if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openItem(card); }
+});
+
+const hashView = location.hash.replace('#','');
+if (['games','apps','favorites'].includes(hashView)) state.view = hashView;
+
+Promise.all([
+  fetch('games.json').then(r => r.ok ? r.json() : []).catch(() => []),
+  fetch('apps.json').then(r => r.ok ? r.json() : []).catch(() => [])
+]).then(([games, apps]) => {
+  state.games = Array.isArray(games) ? games : [];
+  state.apps = Array.isArray(apps) ? apps : [];
+  loadFavorites(); populateCategories(); render();
+});
+
+// Keep the selected accent color used by the rest of the site.
+const theme = localStorage.getItem('ug_theme') || 'green';
+document.documentElement.dataset.theme = theme;
+accentSelect.value = theme;
+settingsBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  settingsPopover.hidden = !settingsPopover.hidden;
+});
+settingsClose.addEventListener('click', () => { settingsPopover.hidden = true; });
+homeSettingsBtn.addEventListener('click', () => { state.view = 'games'; searchInput.value=''; categorySelect.value='All'; settingsPopover.hidden=true; render(); window.scrollTo({top:0,behavior:'smooth'}); });
+accentSelect.addEventListener('change', () => {
+  const value = accentSelect.value;
+  document.documentElement.dataset.theme = value;
+  localStorage.setItem('ug_theme', value);
+});
+document.addEventListener('click', (e) => {
+  if (!settingsPopover.hidden && !settingsPopover.contains(e.target) && e.target !== settingsBtn && !settingsBtn.contains(e.target)) settingsPopover.hidden = true;
+});
+</script>
+</body>
+</html>
