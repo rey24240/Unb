@@ -13,3 +13,27 @@
 /* Library navigation additions */
 @media(max-width:900px){.content-tabs{overflow-x:auto;justify-content:flex-start}.content-tab{white-space:nowrap}}
 .category-wrap[hidden]{display:none!important}
+
+/* Game card status badge */
+.card-badge{position:absolute;z-index:3;top:9px;left:9px;display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:8px;background:rgba(10,14,18,.9);color:var(--text);font-size:10px;font-weight:800;letter-spacing:.35px;text-transform:uppercase;border:1px solid var(--edge);backdrop-filter:blur(6px);box-shadow:0 5px 16px rgba(0,0,0,.28)}
+.card-badge i{font-size:11px;color:var(--green)}
+.card-badge.popular i{color:var(--green)}
+.card-badge.new i{color:var(--green)}
+
+/* ---------- Suggestion cards ---------- */
+.suggestion-area{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:24px}
+.suggestion-card{display:flex;align-items:center;gap:13px;padding:16px 18px;border:1px solid var(--edge);border-radius:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--green) 8%,var(--panel)),var(--panel));color:var(--text);text-decoration:none;transition:.16s}
+.suggestion-card:hover{transform:translateY(-2px);border-color:var(--green);box-shadow:0 12px 28px var(--shadow)}
+.suggestion-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:12px;background:color-mix(in srgb,var(--green) 15%,var(--panel2));color:var(--green);font-size:18px}
+.suggestion-card strong{display:block;font-size:14px}.suggestion-card small{display:block;margin-top:4px;color:var(--dim);font-size:12px}.suggestion-arrow{margin-left:auto;color:var(--dim)}
+
+/* ---------- Announcement popup ---------- */
+.announcement-overlay{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:rgba(4,7,11,.72);backdrop-filter:blur(8px)}
+.announcement-overlay[hidden]{display:none!important}
+.announcement-card{position:relative;width:min(520px,100%);padding:30px;border:1px solid color-mix(in srgb,var(--green) 35%,var(--edge));border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--green) 7%,var(--panel2)),var(--panel));box-shadow:0 28px 80px rgba(0,0,0,.55);text-align:center}
+.announcement-close{position:absolute;right:14px;top:14px;width:36px;height:36px;border:1px solid var(--edge);border-radius:10px;background:var(--panel2);color:var(--dim);cursor:pointer}.announcement-close:hover{color:var(--text);border-color:var(--green)}
+.announcement-icon{width:58px;height:58px;margin:0 auto 16px;display:grid;place-items:center;border-radius:17px;background:color-mix(in srgb,var(--green) 15%,var(--panel2));color:var(--green);font-size:25px}
+.announcement-card .eyebrow{margin-bottom:8px}.announcement-card h2{margin:0;font-size:25px}.announcement-card p{margin:10px auto 22px;max-width:430px;color:var(--dim);line-height:1.55}
+.announcement-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.announcement-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 15px;border:1px solid var(--edge);border-radius:11px;background:var(--panel2);color:var(--text);text-decoration:none;font:700 13px Rubik}.announcement-btn.primary{border-color:var(--green);background:var(--green);color:#07100a}.announcement-btn:hover{border-color:var(--green)}
+.announcement-dismiss{margin-top:15px;border:0;background:transparent;color:var(--dim);font:500 12px Rubik;cursor:pointer}.announcement-dismiss:hover{color:var(--text)}
+@media(max-width:700px){.suggestion-area{grid-template-columns:1fr}.announcement-card{padding:26px 20px}.announcement-card h2{font-size:21px}}
