@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="/unblocked-games/index.css">
 </head>
 <body>
 <div class="page-bg"></div>
@@ -49,6 +49,8 @@
 
   <section class="content-tabs" aria-label="Library views">
     <button class="content-tab active" data-view="games" type="button"><i class="bi bi-controller"></i> All Games</button>
+    <button class="content-tab" data-view="new" type="button"><i class="bi bi-stars"></i> New Games</button>
+    <button class="content-tab" data-view="popular" type="button"><i class="bi bi-fire"></i> Popular Games</button>
     <button class="content-tab" data-view="favorites" type="button"><i class="bi bi-heart"></i> Favorite Games <span id="favoriteCount" class="favorite-count">0</span></button>
     <button class="content-tab" data-view="apps" type="button"><i class="bi bi-grid-1x2-fill"></i> Apps</button>
   </section>
@@ -112,7 +114,13 @@ function saveFavorites() {
   updateFavoriteCount();
 }
 function updateFavoriteCount() { favoriteCount.textContent = state.favorites.size; }
-function currentItems() { return state.view === 'apps' ? state.apps : state.games; }
+function currentItems() {
+  if (state.view === 'apps') return state.apps;
+  if (state.view === 'favorites') return [...state.games, ...state.apps].filter(x => state.favorites.has(x.url));
+  if (state.view === 'new') return state.games.filter(x => String(x.badge || '').toLowerCase().includes('new') || String(x.badge || '').toLowerCase().includes('limited'));
+  if (state.view === 'popular') return state.games.filter(x => String(x.badge || '').toLowerCase().includes('popular')).concat(state.games.filter(x => !String(x.badge || '').toLowerCase().includes('popular')));
+  return state.games;
+}
 function populateCategories() {
   const values = new Set();
   [...state.games, ...state.apps].forEach(item => (item.categories || []).forEach(c => values.add(c)));
@@ -121,12 +129,15 @@ function populateCategories() {
 }
 function updateHeader() {
   const favoriteMode = state.view === 'favorites';
-  const label = state.view === 'apps' ? 'APPS' : favoriteMode ? 'FAVORITES' : 'GAMES';
+  const appMode = state.view === 'apps';
+  const label = appMode ? 'APPS' : favoriteMode ? 'FAVORITES' : 'GAMES';
   eyebrow.textContent = label;
-  pageTitle.textContent = state.view === 'apps' ? 'Browse Apps' : favoriteMode ? 'Your Favorites' : 'Play Games';
-  pageSubtitle.textContent = favoriteMode ? 'Your saved games and apps are right here.' : state.view === 'apps' ? 'Browse apps through the same unblocking player.' : 'Find a game, search by category, or save your favorites.';
-  searchInput.placeholder = state.view === 'apps' ? 'Search through apps...' : favoriteMode ? 'Search your favorites...' : 'Search through games...';
-  categorySelect.disabled = false;
+  pageTitle.textContent = appMode ? 'Browse Apps' : favoriteMode ? 'Your Favorites' : state.view === 'new' ? 'New Games' : state.view === 'popular' ? 'Popular Games' : 'Play Games';
+  pageSubtitle.textContent = favoriteMode ? 'Your saved games and apps are right here.' : appMode ? 'Browse apps through the same unblocking player.' : state.view === 'new' ? 'Check out the newest games in the collection.' : state.view === 'popular' ? 'Jump into the games marked as popular.' : 'Find a game, search by category, or save your favorites.';
+  searchInput.placeholder = appMode ? 'Search through apps...' : favoriteMode ? 'Search your favorites...' : 'Search through games...';
+  const hideCategory = appMode || favoriteMode;
+  document.querySelector('.category-wrap').hidden = hideCategory;
+  categorySelect.disabled = hideCategory;
 }
 function cardHTML(item, isApp) {
   const url = escapeHTML(item.url || '');
@@ -150,7 +161,6 @@ function render() {
   updateHeader();
   const query = searchInput.value.trim().toLowerCase();
   let items = currentItems();
-  if (state.view === 'favorites') items = [...state.games, ...state.apps].filter(x => state.favorites.has(x.url));
   const category = categorySelect.value;
   const filtered = items.filter(item => {
     const text = `${item.name || ''} ${(item.categories || []).join(' ')}`.toLowerCase();
@@ -166,12 +176,12 @@ function render() {
 }
 function openItem(card) {
   const type = state.view === 'apps' || (state.view === 'favorites' && state.apps.some(a => a.url === card.dataset.url)) ? 'app' : 'game';
-  location.href = `player.html?type=${type}&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
+  location.href = `/unblocked-games/player.html?type=${type}&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
 }
 
 document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.addEventListener('click', () => {
   state.view = btn.dataset.view; window.history.replaceState(null, '', `#${state.view}`);
-  if (state.view !== 'favorites') categorySelect.value = 'All';
+  if (state.view !== 'favorites' && state.view !== 'apps') categorySelect.value = 'All';
   render();
 }));
 searchInput.addEventListener('input', render);
@@ -196,11 +206,11 @@ grid.addEventListener('keydown', e => {
 });
 
 const hashView = location.hash.replace('#','');
-if (['games','apps','favorites'].includes(hashView)) state.view = hashView;
+if (['games','new','popular','apps','favorites'].includes(hashView)) state.view = hashView;
 
 Promise.all([
-  fetch('games.json').then(r => r.ok ? r.json() : []).catch(() => []),
-  fetch('apps.json').then(r => r.ok ? r.json() : []).catch(() => [])
+  fetch('/unblocked-games/games.json').then(r => r.ok ? r.json() : []).catch(() => []),
+  fetch('/unblocked-games/apps.json').then(r => r.ok ? r.json() : []).catch(() => [])
 ]).then(([games, apps]) => {
   state.games = Array.isArray(games) ? games : [];
   state.apps = Array.isArray(apps) ? apps : [];
