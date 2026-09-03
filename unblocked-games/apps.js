@@ -18,20 +18,14 @@ function faviconFor(url){
   }
 }
 
-function populateCategories(){
-  const allCats = new Set();
-  apps.forEach(g => (g.categories || []).forEach(c => allCats.add(c)));
-  const cats = ["All", ...Array.from(allCats).sort()];
-  categorySelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
-}
-
 function cardHTML(g){
   const badgeHtml = g.badge ? `<span class="badge">${g.badge}</span>` : '';
   const img = faviconFor(g.url);
+  const favorite = new Set(JSON.parse(localStorage.getItem('ug_favorites') || '[]')).has(g.url);
   return `
     <div class="card" data-url="${g.url}" data-name="${g.name}" tabindex="0" role="button" aria-label="Open ${g.name}">
       <div class="thumb">
-        ${badgeHtml}
+        ${badgeHtml}<button class="favorite-btn ${favorite ? 'saved' : ''}" data-favorite="${g.url}" type="button" aria-label="${favorite ? 'Remove from favorites' : 'Add to favorites'}"><i class="bi ${favorite ? 'bi-star-fill' : 'bi-star'}"></i></button>
         <img src="${img}" alt="${g.name}" loading="lazy" onerror="this.style.display='none'">
       </div>
       <div class="card-info">
@@ -44,12 +38,7 @@ function cardHTML(g){
 
 function renderGrid(){
   const query = gameSearch.value.trim().toLowerCase();
-  const cat = categorySelect.value;
-  const filtered = apps.filter(g => {
-    const matchesQuery = g.name.toLowerCase().includes(query);
-    const matchesCat = cat === 'All' || (g.categories || []).includes(cat);
-    return matchesQuery && matchesCat;
-  });
+  const filtered = apps.filter(g => g.name.toLowerCase().includes(query));
   grid.innerHTML = filtered.map(cardHTML).join('');
   emptyNote.style.display = filtered.length === 0 ? 'block' : 'none';
   emptyNote.textContent = 'No apps match that search.';
@@ -60,8 +49,6 @@ fetch('apps.json')
   .then(data => {
     apps = data;
     gameSearch.placeholder = `Search through our ${apps.length} apps!`;
-    populateCategories();
-    categorySelect.value = 'All';
     renderGrid();
   })
   .catch(() => {
@@ -70,9 +57,9 @@ fetch('apps.json')
   });
 
 gameSearch.addEventListener('input', renderGrid);
-categorySelect.addEventListener('change', renderGrid);
+
 
 /* ---------- Open apps in the same-origin player so the proxy can control the iframe ---------- */
 function openSelectedApp(card){ if(!card)return; location.href=`player.html?type=app&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`; }
-grid.addEventListener('click',e=>openSelectedApp(e.target.closest('.card')));
+grid.addEventListener('click',e=>{ const fav=e.target.closest('[data-favorite]'); if(fav){e.preventDefault();e.stopPropagation();const list=new Set(JSON.parse(localStorage.getItem('ug_favorites')||'[]'));const url=fav.dataset.favorite;list.has(url)?list.delete(url):list.add(url);localStorage.setItem('ug_favorites',JSON.stringify([...list]));renderGrid();return;} openSelectedApp(e.target.closest('.card')); });
 grid.addEventListener('keydown',e=>{const card=e.target.closest('.card');if(card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSelectedApp(card)}});

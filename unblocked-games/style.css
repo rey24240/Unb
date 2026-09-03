@@ -1138,3 +1138,5 @@ a{color:inherit; text-decoration:none;}
 .side-icon{font-size:18px}
 .games-main{padding-left:84px}
 @media(max-width:600px){.sidebar{width:54px;padding:8px 6px;border-radius:16px}.side-item{height:42px;min-height:42px}.avatar-item{height:48px;min-height:48px}.side-icon{font-size:17px}.games-main{padding-left:70px}}
+/* Favorite button used by legacy Games/Apps grids */
+.card-meta{display:flex;justify-content:flex-end;align-items:center}.card-meta .favorite-btn{position:static;width:34px;height:34px}.card-meta .favorite-btn.saved{color:var(--green);border-color:var(--green)}

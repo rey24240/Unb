@@ -90,8 +90,7 @@ function cardHTML(g){
         </div>
         <div class="description" title="${description}">${description}</div>
         <div class="card-meta">
-          <button class="vote-card ${who==='like'?'active-like':''}" data-vote="like" title="Like"><i class="bi bi-hand-thumbs-up-fill"></i><span>${v.likes}</span></button>
-          <button class="vote-card ${who==='dislike'?'active-dislike':''}" data-vote="dislike" title="Dislike"><i class="bi bi-hand-thumbs-down-fill"></i><span>${v.dislikes}</span></button>
+          <button class="favorite-btn" data-favorite="${g.url}" type="button" title="Favorite"><i class="bi bi-star"></i></button>
         </div>
       </div>
     </div>
@@ -138,8 +137,8 @@ function openCard(card){
 }
 
 grid.addEventListener('click', e => {
-  const vote=e.target.closest('.vote-card');
-  if(vote){ e.preventDefault(); e.stopPropagation(); const card=vote.closest('.card'); voteGame(card.dataset.url,vote.dataset.vote); return; }
+  const favorite=e.target.closest('[data-favorite]');
+  if(favorite){ e.preventDefault(); e.stopPropagation(); const list=new Set(JSON.parse(localStorage.getItem('ug_favorites')||'[]')); const url=favorite.dataset.favorite; list.has(url)?list.delete(url):list.add(url); localStorage.setItem('ug_favorites',JSON.stringify([...list])); renderGrid(); return; }
   const card=e.target.closest('.card'); if(card) openCard(card);
 });
 grid.addEventListener('keydown',e=>{const card=e.target.closest('.card');if(card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openCard(card)}});
