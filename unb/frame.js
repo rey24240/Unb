@@ -353,7 +353,7 @@ function openAboutBlank(url, title, sideGames, currentUser, contentType='game'){
           <button class="popup-close" onclick="closePopup('aboutPopup')">×</button>
           <h2>About</h2>
           <p>This ${isApp ? 'app' : 'game'} is hosted externally. Use the controls below to refresh or enter fullscreen.</p>
-          <p class="popup-small">Powered by your Unblocked Games site.</p>
+          <p class="popup-small">Powered by your unb site.</p>
         </div>
       </div>
       <div class="popup-overlay" id="settingsPopup" onclick="if(event.target===this)closePopup('settingsPopup')">

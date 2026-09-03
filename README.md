@@ -1,4 +1,4 @@
-# Unblocked Games — Utopia browsing/search integration
+# unb — Utopia browsing/search integration
 
 This build adds a Utopia-style browser page with an iframe and browser toolbar, plus persistent proxy/search-engine settings.
 

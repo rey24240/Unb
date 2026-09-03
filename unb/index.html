@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="unblocked-games/index.css">
+<link rel="stylesheet" href="index.css">
 </head>
 <body>
 <div class="page-bg"></div>
@@ -15,7 +15,7 @@
 <header class="site-header">
   <a class="brand" href="index.html" aria-label="Home">
     <span class="brand-mark"><i class="bi bi-controller"></i></span>
-    <span>UNBLOCKED</span>
+    <span>UNB</span>
   </a>
   <div class="header-spacer"></div>
   <button class="nav-icon-btn" id="settingsBtn" type="button" title="Settings" aria-label="Settings">
@@ -176,7 +176,7 @@ function render() {
 }
 function openItem(card) {
   const type = state.view === 'apps' || (state.view === 'favorites' && state.apps.some(a => a.url === card.dataset.url)) ? 'app' : 'game';
-  location.href = `unblocked-games/player.html?type=${type}&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
+  location.href = `player.html?type=${type}&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
 }
 
 document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.addEventListener('click', () => {
@@ -209,8 +209,8 @@ const hashView = location.hash.replace('#','');
 if (['games','new','popular','apps','favorites'].includes(hashView)) state.view = hashView;
 
 Promise.all([
-  fetch('unblocked-games/games.json').then(r => r.ok ? r.json() : []).catch(() => []),
-  fetch('unblocked-games/apps.json').then(r => r.ok ? r.json() : []).catch(() => [])
+  fetch('games.json').then(r => r.ok ? r.json() : []).catch(() => []),
+  fetch('apps.json').then(r => r.ok ? r.json() : []).catch(() => [])
 ]).then(([games, apps]) => {
   state.games = Array.isArray(games) ? games : [];
   state.apps = Array.isArray(apps) ? apps : [];

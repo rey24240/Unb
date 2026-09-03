@@ -2,4 +2,4 @@ git add .
 git status
 git commit -m "test"
 git push
-i
+    git push --set-upstream origin Main

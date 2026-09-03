@@ -10,7 +10,7 @@ const DATA_DIR = path.resolve('./data');
 const DATA_FILE = path.join(DATA_DIR,'data.json');
 fs.mkdirSync(DATA_DIR,{recursive:true});
 const bare = createServer('/bare/');
-const serve = new nodeStatic.Server('unblocked-games/');
+const serve = new nodeStatic.Server('unb/');
 const rootServe = new nodeStatic.Server('./');
 const sessions = new Map();
 function restoreSessions(){
