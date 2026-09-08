@@ -7,15 +7,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="./unb/index.css">
 </head>
 <body>
 <div class="page-bg"></div>
 
 <header class="site-header">
-  <a class="brand" href="index.html" aria-label="Home">
+  <a class="brand" href="/index.html" aria-label="Home">
     <span class="brand-mark"><i class="bi bi-controller"></i></span>
-    <span>UNB</span>
+    <span>UNBLOCKED GAMES!!</span>
   </a>
   <div class="header-spacer"></div>
   <button class="nav-icon-btn" id="settingsBtn" type="button" title="Settings" aria-label="Settings">
@@ -41,7 +41,7 @@
   <section class="hero">
     <div>
       <div class="eyebrow" id="eyebrow">GAMES</div>
-      <h1 id="pageTitle">Play Games</h1>
+      <h1 id="pageTitle">Library</h1>
       <p id="pageSubtitle">Find a game, search by category, or save your favorites.</p>
     </div>
     <div class="result-count"><span id="resultCount">0</span> results</div>
@@ -49,8 +49,6 @@
 
   <section class="content-tabs" aria-label="Library views">
     <button class="content-tab active" data-view="games" type="button"><i class="bi bi-controller"></i> All Games</button>
-    <button class="content-tab" data-view="new" type="button"><i class="bi bi-stars"></i> New Games</button>
-    <button class="content-tab" data-view="popular" type="button"><i class="bi bi-fire"></i> Popular Games</button>
     <button class="content-tab" data-view="favorites" type="button"><i class="bi bi-heart"></i> Favorite Games <span id="favoriteCount" class="favorite-count">0</span></button>
     <button class="content-tab" data-view="apps" type="button"><i class="bi bi-grid-1x2-fill"></i> Apps</button>
   </section>
@@ -132,7 +130,7 @@ function updateHeader() {
   const appMode = state.view === 'apps';
   const label = appMode ? 'APPS' : favoriteMode ? 'FAVORITES' : 'GAMES';
   eyebrow.textContent = label;
-  pageTitle.textContent = appMode ? 'Browse Apps' : favoriteMode ? 'Your Favorites' : state.view === 'new' ? 'New Games' : state.view === 'popular' ? 'Popular Games' : 'Play Games';
+  if (pageTitle) pageTitle.textContent = appMode ? 'Browse Apps' : favoriteMode ? 'Your Favorites' : state.view === 'new' ? 'New Games' : state.view === 'popular' ? 'Popular Games' : 'Library';
   pageSubtitle.textContent = favoriteMode ? 'Your saved games and apps are right here.' : appMode ? 'Browse apps through the same unblocking player.' : state.view === 'new' ? 'Check out the newest games in the collection.' : state.view === 'popular' ? 'Jump into the games marked as popular.' : 'Find a game, search by category, or save your favorites.';
   searchInput.placeholder = appMode ? 'Search through apps...' : favoriteMode ? 'Search your favorites...' : 'Search through games...';
   const hideCategory = appMode || favoriteMode;
@@ -142,14 +140,17 @@ function updateHeader() {
 function cardHTML(item, isApp) {
   const url = escapeHTML(item.url || '');
   const name = escapeHTML(item.name || 'Untitled');
+  const useProxy = item.proxy === true || item.proxy === 'true' || item.proxy === undefined;
   const cats = (item.categories || []).join(' • ') || (isApp ? 'App' : 'Game');
-  const image = escapeHTML(item.thumbnail || faviconFor(item.url));
-  const favorite = state.favorites.has(item.url);
-  return `<article class="game-card" data-url="${url}" data-name="${name}" tabindex="0" role="button">
+  const image = escapeHTML(item.image || item.thumbnail || faviconFor(item.url));
+  const fallbackImage = escapeHTML(faviconFor(item.url.startsWith('http') ? item.url : `${location.origin}${item.url}`));
+  const badge = escapeHTML(item.badge || '');
+  const badgeTone = /popular/i.test(item.badge || '') ? 'popular' : /new|limited/i.test(item.badge || '') ? 'new' : '';
+  return `<article class="game-card" data-url="${url}" data-name="${name}" data-proxy="${useProxy}" tabindex="0" role="button">
     <div class="card-image">
-      <img src="${image}" alt="${name}" loading="lazy" onerror="this.style.display='none'">
+      <img src="${image}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackImage}'">
       <div class="play-overlay"><i class="bi bi-play-fill"></i></div>
-      <button class="favorite-btn ${favorite ? 'saved' : ''}" data-favorite="${url}" type="button" aria-label="${favorite ? 'Remove from favorites' : 'Add to favorites'}"><i class="bi ${favorite ? 'bi-star-fill' : 'bi-star'}"></i></button>
+      ${badge ? `<span class="card-badge ${badgeTone}">${badge}</span>` : ''}
     </div>
     <div class="card-body">
       <h2>${name}</h2>
@@ -175,8 +176,11 @@ function render() {
   document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === state.view));
 }
 function openItem(card) {
-  const type = state.view === 'apps' || (state.view === 'favorites' && state.apps.some(a => a.url === card.dataset.url)) ? 'app' : 'game';
-  location.href = `player.html?type=${type}&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
+  const isApp = state.view === 'apps' || (state.view === 'favorites' && state.apps.some(a => a.url === card.dataset.url));
+  const type = isApp ? 'app' : 'game';
+  const player = !isApp && card.dataset.proxy === 'false' ? 'player-file.html' : 'player.html';
+  const source = player === 'player-file.html' ? 'file' : 'url';
+  location.href = `${player}?type=${type}&${source}=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
 }
 
 document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.addEventListener('click', () => {
@@ -209,8 +213,8 @@ const hashView = location.hash.replace('#','');
 if (['games','new','popular','apps','favorites'].includes(hashView)) state.view = hashView;
 
 Promise.all([
-  fetch('games.json').then(r => r.ok ? r.json() : []).catch(() => []),
-  fetch('apps.json').then(r => r.ok ? r.json() : []).catch(() => [])
+  fetch('./unb/miscG.json').then(r => r.ok ? r.json() : []).catch(() => []),
+  fetch('./unb/apps.json').then(r => r.ok ? r.json() : []).catch(() => [])
 ]).then(([games, apps]) => {
   state.games = Array.isArray(games) ? games : [];
   state.apps = Array.isArray(apps) ? apps : [];

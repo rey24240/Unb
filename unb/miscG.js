@@ -1,5 +1,5 @@
 /* ---------- Games data ----------
-   Loaded from games.json (edit that file to add/remove games).
+  Loaded from miscG.json (edit that file to add/remove games).
    Thumbnails are pulled live from each game's own favicon.
 --------------------------------------------------- */
 let games = [];
@@ -72,7 +72,7 @@ async function voteGame(url,type){
 }
 function cardHTML(g){
   const badgeHtml = g.badge ? `<span class="badge">${g.badge}</span>` : '';
-  const img = g.thumbnail || faviconFor(g.url);
+  const img = g.image || g.thumbnail || faviconFor(g.url);
   const category = (g.categories || []).join(', ') || 'Game';
   const description = g.description || `Play ${category.toLowerCase()} game`;
   const v=getVotes(g.url), who=v.myVote || v.voters?.[voterKey()] || null;
@@ -110,7 +110,7 @@ function renderGrid(){
   emptyNote.textContent = 'No games match that search.';
 }
 
-fetch('games.json')
+fetch('miscG.json')
   .then(res => res.json())
   .then(data => {
     games = data;
@@ -121,7 +121,7 @@ fetch('games.json')
   })
   .catch(() => {
     emptyNote.style.display = 'block';
-    emptyNote.textContent = 'Could not load games.json.';
+    emptyNote.textContent = 'Could not load miscG.json.';
   });
 
 window.addEventListener('ug-auth-changed', () => { loadServerVotes(); renderGrid(); });

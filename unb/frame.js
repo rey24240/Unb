@@ -295,9 +295,9 @@ function openAboutBlank(url, title, sideGames, currentUser, contentType='game'){
       <nav class="player-sidebar" aria-label="Player navigation">
         <div class="player-nav">
           <div class="side-profile" title="Profile"><i class="bi bi-person-fill"></i></div>
-          <a href="${siteLink('index.html')}" title="Home"><i class="bi bi-house-fill"></i></a>
-          <a href="${siteLink('index.html#apps')}" title="Apps" class="${isApp ? 'active' : ''}"><i class="bi bi-grid-1x2-fill"></i></a>
-          <a href="${siteLink('index.html')}" title="Games" class="${!isApp ? 'active' : ''}"><i class="bi bi-controller"></i></a>
+          <a href="${siteLink('/index.html')}" title="Home"><i class="bi bi-house-fill"></i></a>
+          <a href="${siteLink('/index.html#apps')}" title="Apps" class="${isApp ? 'active' : ''}"><i class="bi bi-grid-1x2-fill"></i></a>
+          <a href="${siteLink('/index.html')}" title="Games" class="${!isApp ? 'active' : ''}"><i class="bi bi-controller"></i></a>
           <button type="button" class="player-action" id="playerInfo" title="Info"><i class="bi bi-info-circle-fill"></i></button>
           <button type="button" class="player-action settings" id="playerSettings" title="Settings"><i class="bi bi-gear-fill"></i></button>
         </div>
