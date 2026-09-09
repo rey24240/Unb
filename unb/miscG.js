@@ -130,10 +130,14 @@ loadServerVotes();
 gameSearch.addEventListener('input', renderGrid);
 categorySelect.addEventListener('change', renderGrid);
 
-/* ---------- Open games in the same-origin player so the proxy can control the iframe ---------- */
+/* ---------- Open games in a minimal about:blank tab ---------- */
 function openCard(card){
-  const url=`player.html?type=game&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
-  location.href=url;
+  const win=window.open('about:blank','_blank');
+  if(!win){ location.href=`player.html?type=game&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`; return; }
+  const url=card.dataset.url.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  win.document.open();
+  win.document.write(`<!doctype html><html><head><title>${card.dataset.name||'Game'}</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#000}</style></head><body><iframe src="${url}" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe></body></html>`);
+  win.document.close();
 }
 
 grid.addEventListener('click', e => {
