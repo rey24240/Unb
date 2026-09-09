@@ -18,6 +18,13 @@
     <span>UNBLOCKED GAMES!!</span>
   </a>
   <div class="header-spacer"></div>
+  <button class="nav-icon-btn" id="loadDataBtn" type="button" title="Load Data" aria-label="Load Data">
+    <i class="bi bi-upload"></i>
+  </button>
+  <button class="nav-icon-btn" id="saveDataBtn" type="button" title="Save Data" aria-label="Save Data">
+    <i class="bi bi-download"></i>
+  </button>
+  <input id="loadDataInput" type="file" accept="application/json,.json" hidden>
   <button class="nav-icon-btn" id="settingsBtn" type="button" title="Settings" aria-label="Settings">
     <i class="bi bi-gear-fill"></i>
   </button>
@@ -32,6 +39,18 @@
     <span><i class="bi bi-palette-fill"></i> Accent color</span>
     <select id="accentSelect" aria-label="Accent color">
       <option value="green">Green</option><option value="purple">Purple</option><option value="blue">Blue</option><option value="red">Red</option><option value="amber">Amber</option>
+    </select>
+  </div>
+  <div class="settings-row">
+    <span><i class="bi bi-shield-check"></i> Proxy engine</span>
+    <select id="proxySelect" aria-label="Proxy engine">
+      <option value="utopia">Utopia / Ultraviolet</option><option value="direct">Direct / No proxy</option>
+    </select>
+  </div>
+  <div class="settings-row">
+    <span><i class="bi bi-search"></i> Search engine</span>
+    <select id="searchEngineSelect" aria-label="Search engine">
+      <option value="google">Google</option><option value="bing">Bing</option><option value="duckduckgo">DuckDuckGo</option><option value="brave">Brave Search</option>
     </select>
   </div>
   <button class="settings-link" id="homeSettingsBtn" type="button"><i class="bi bi-house-fill"></i> Home</button>
@@ -91,6 +110,11 @@ const settingsBtn = document.getElementById('settingsBtn');
 const settingsPopover = document.getElementById('settingsPopover');
 const settingsClose = document.getElementById('settingsClose');
 const accentSelect = document.getElementById('accentSelect');
+const proxySelect = document.getElementById('proxySelect');
+const searchEngineSelect = document.getElementById('searchEngineSelect');
+const saveDataBtn = document.getElementById('saveDataBtn');
+const loadDataBtn = document.getElementById('loadDataBtn');
+const loadDataInput = document.getElementById('loadDataInput');
 const homeSettingsBtn = document.getElementById('homeSettingsBtn');
 
 function escapeHTML(value='') {
@@ -115,8 +139,6 @@ function updateFavoriteCount() { favoriteCount.textContent = state.favorites.siz
 function currentItems() {
   if (state.view === 'apps') return state.apps;
   if (state.view === 'favorites') return [...state.games, ...state.apps].filter(x => state.favorites.has(x.url));
-  if (state.view === 'new') return state.games.filter(x => String(x.badge || '').toLowerCase().includes('new') || String(x.badge || '').toLowerCase().includes('limited'));
-  if (state.view === 'popular') return state.games.filter(x => String(x.badge || '').toLowerCase().includes('popular')).concat(state.games.filter(x => !String(x.badge || '').toLowerCase().includes('popular')));
   return state.games;
 }
 function populateCategories() {
@@ -130,8 +152,8 @@ function updateHeader() {
   const appMode = state.view === 'apps';
   const label = appMode ? 'APPS' : favoriteMode ? 'FAVORITES' : 'GAMES';
   eyebrow.textContent = label;
-  if (pageTitle) pageTitle.textContent = appMode ? 'Browse Apps' : favoriteMode ? 'Your Favorites' : state.view === 'new' ? 'New Games' : state.view === 'popular' ? 'Popular Games' : 'Library';
-  pageSubtitle.textContent = favoriteMode ? 'Your saved games and apps are right here.' : appMode ? 'Browse apps through the same unblocking player.' : state.view === 'new' ? 'Check out the newest games in the collection.' : state.view === 'popular' ? 'Jump into the games marked as popular.' : 'Find a game, search by category, or save your favorites.';
+  if (pageTitle) pageTitle.textContent = appMode ? 'Browse Apps' : favoriteMode ? 'Your Favorites' : 'Library';
+  pageSubtitle.textContent = favoriteMode ? 'Your saved games and apps are right here.' : appMode ? 'Browse apps through the same unblocking player.' : 'Find a game, search by category, or save your favorites.';
   searchInput.placeholder = appMode ? 'Search through apps...' : favoriteMode ? 'Search your favorites...' : 'Search through games...';
   const hideCategory = appMode || favoriteMode;
   document.querySelector('.category-wrap').hidden = hideCategory;
@@ -144,13 +166,16 @@ function cardHTML(item, isApp) {
   const cats = (item.categories || []).join(' • ') || (isApp ? 'App' : 'Game');
   const image = escapeHTML(item.image || item.thumbnail || faviconFor(item.url));
   const fallbackImage = escapeHTML(faviconFor(item.url.startsWith('http') ? item.url : `${location.origin}${item.url}`));
-  const badge = escapeHTML(item.badge || '');
-  const badgeTone = /popular/i.test(item.badge || '') ? 'popular' : /new|limited/i.test(item.badge || '') ? 'new' : '';
+  const rawBadge = String(item.badge || '');
+  const badgeTone = /popular/i.test(rawBadge) ? 'popular' : /new|limited/i.test(rawBadge) ? 'new' : '';
+  const badgeText = escapeHTML(rawBadge.replace(/[⭐🆕🔥]/g, '').trim());
+  const badgeIcon = badgeTone === 'popular' ? 'bi-fire' : badgeTone === 'new' ? 'bi-stars' : '';
+  const badge = badgeText ? `<span class="card-badge ${badgeTone}"><i class="bi ${badgeIcon}"></i>${badgeText}</span>` : '';
   return `<article class="game-card" data-url="${url}" data-name="${name}" data-proxy="${useProxy}" tabindex="0" role="button">
     <div class="card-image">
       <img src="${image}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackImage}'">
       <div class="play-overlay"><i class="bi bi-play-fill"></i></div>
-      ${badge ? `<span class="card-badge ${badgeTone}">${badge}</span>` : ''}
+      ${badge}
     </div>
     <div class="card-body">
       <h2>${name}</h2>
@@ -180,7 +205,7 @@ function openItem(card) {
   const type = isApp ? 'app' : 'game';
   const player = !isApp && card.dataset.proxy === 'false' ? 'player-file.html' : 'player.html';
   const source = player === 'player-file.html' ? 'file' : 'url';
-  location.href = `${player}?type=${type}&${source}=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
+  location.href = `./unb/${player}?type=${type}&${source}=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
 }
 
 document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.addEventListener('click', () => {
@@ -210,7 +235,7 @@ grid.addEventListener('keydown', e => {
 });
 
 const hashView = location.hash.replace('#','');
-if (['games','new','popular','apps','favorites'].includes(hashView)) state.view = hashView;
+if (['games','apps','favorites'].includes(hashView)) state.view = hashView;
 
 Promise.all([
   fetch('./unb/miscG.json').then(r => r.ok ? r.json() : []).catch(() => []),
@@ -235,6 +260,62 @@ accentSelect.addEventListener('change', () => {
   const value = accentSelect.value;
   document.documentElement.dataset.theme = value;
   localStorage.setItem('ug_theme', value);
+});
+const savedProxy = localStorage.getItem('ug_proxy') || 'utopia';
+const savedSearchEngine = localStorage.getItem('ug_search_engine') || 'google';
+proxySelect.value = ['utopia','direct'].includes(savedProxy) ? savedProxy : 'utopia';
+searchEngineSelect.value = ['google','bing','duckduckgo','brave'].includes(savedSearchEngine) ? savedSearchEngine : 'google';
+proxySelect.addEventListener('change', () => localStorage.setItem('ug_proxy', proxySelect.value));
+searchEngineSelect.addEventListener('change', () => localStorage.setItem('ug_search_engine', searchEngineSelect.value));
+
+function collectSaveData() {
+  return {
+    format: 'unblocked-games-save',
+    version: 1,
+    savedAt: new Date().toISOString(),
+    favorites: [...state.favorites],
+    settings: {
+      theme: localStorage.getItem('ug_theme') || 'green',
+      proxy: localStorage.getItem('ug_proxy') || 'utopia',
+      searchEngine: localStorage.getItem('ug_search_engine') || 'google'
+    }
+  };
+}
+saveDataBtn.addEventListener('click', () => {
+  const data = collectSaveData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'unblocked-games-data.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+loadDataBtn.addEventListener('click', () => loadDataInput.click());
+loadDataInput.addEventListener('change', async () => {
+  const file = loadDataInput.files?.[0];
+  loadDataInput.value = '';
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (!data || data.format !== 'unblocked-games-save' || data.version !== 1) throw new Error('This is not a valid site save file.');
+    if (!Array.isArray(data.favorites) || !data.favorites.every(x => typeof x === 'string')) throw new Error('Favorites data is invalid.');
+    const settings = data.settings || {};
+    const themes = ['green','purple','blue','red','amber'];
+    const proxies = ['utopia','direct'];
+    const engines = ['google','bing','duckduckgo','brave'];
+    if (settings.theme && !themes.includes(settings.theme)) throw new Error('Invalid theme in save file.');
+    if (settings.proxy && !proxies.includes(settings.proxy)) throw new Error('Invalid proxy setting in save file.');
+    if (settings.searchEngine && !engines.includes(settings.searchEngine)) throw new Error('Invalid search engine in save file.');
+    state.favorites = new Set(data.favorites);
+    saveFavorites();
+    if (settings.theme) { localStorage.setItem('ug_theme', settings.theme); document.documentElement.dataset.theme = settings.theme; accentSelect.value = settings.theme; }
+    if (settings.proxy) { localStorage.setItem('ug_proxy', settings.proxy); proxySelect.value = settings.proxy; }
+    if (settings.searchEngine) { localStorage.setItem('ug_search_engine', settings.searchEngine); searchEngineSelect.value = settings.searchEngine; }
+    render();
+    alert('Data loaded successfully.');
+  } catch (err) {
+    alert(err.message || 'Could not load that save file.');
+  }
 });
 document.addEventListener('click', (e) => {
   if (!settingsPopover.hidden && !settingsPopover.contains(e.target) && e.target !== settingsBtn && !settingsBtn.contains(e.target)) settingsPopover.hidden = true;

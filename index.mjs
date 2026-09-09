@@ -176,7 +176,7 @@ const server=http.createServer(async(req,res)=>{
   try{
     if(await api(req,res)) return;
     if(bare.shouldRoute(req)) return bare.routeRequest(req,res);
-    if(req.url.startsWith('/uv/') || req.url==='/sw.js') return rootServe.serve(req,res);
+    if(req.url === '/' || req.url === '/index.html' || req.url.startsWith('/uv/') || req.url === '/sw.js' || req.url.startsWith('/unb/')) return rootServe.serve(req,res);
     serve.serve(req,res);
   }catch(err){
     if(!res.headersSent) send(res,500,{error:'Server error.'});

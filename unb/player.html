@@ -34,11 +34,11 @@ body{margin:0;background:radial-gradient(circle at 50% 5%,rgba(var(--player-rgb)
  <aside class="side-games" id="rightGames"></aside>
 </div></main>
 <nav class="player-bottom-nav" aria-label="Main navigation">
- <a href="/index.html" data-nav="home"><i class="bi bi-house-fill"></i><span>Home</span></a>
- <a href="/index.html#games" data-nav="games"><i class="bi bi-controller"></i><span>Games</span></a>
- <a href="/index.html#favorites" data-nav="favorites"><i class="bi bi-heart"></i><span>Favorites</span></a>
- <a href="/index.html#apps" data-nav="apps"><i class="bi bi-grid-1x2-fill"></i><span>Apps</span></a>
- <a href="/index.html" data-nav="settings"><i class="bi bi-gear-fill"></i><span>Settings</span></a>
+ <a href="../index.html" data-nav="home"><i class="bi bi-house-fill"></i><span>Home</span></a>
+ <a href="../index.html#games" data-nav="games"><i class="bi bi-controller"></i><span>Games</span></a>
+ <a href="../index.html#favorites" data-nav="favorites"><i class="bi bi-heart"></i><span>Favorites</span></a>
+ <a href="../index.html#apps" data-nav="apps"><i class="bi bi-grid-1x2-fill"></i><span>Apps</span></a>
+ <a href="../index.html" data-nav="settings"><i class="bi bi-gear-fill"></i><span>Settings</span></a>
 </nav>
 <script>
 const params=new URLSearchParams(location.search);const type=params.get('type')==='app'?'app':'game';const target=params.get('url')||'https://www.google.com';const title=decodeURIComponent(params.get('title')||'Player');
