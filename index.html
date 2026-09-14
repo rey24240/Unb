@@ -18,11 +18,13 @@
     <span>UNBLOCKED GAMES!!</span>
   </a>
   <div class="header-spacer"></div>
-  <button class="nav-icon-btn" id="loadDataBtn" type="button" title="Load Data" aria-label="Load Data">
+  <button class="nav-icon-btn" id="loadDataBtn" type="button" title="Import Data" aria-label="Import Data">
     <i class="bi bi-upload"></i>
+    <span>Import Data</span>
   </button>
   <button class="nav-icon-btn" id="saveDataBtn" type="button" title="Save Data" aria-label="Save Data">
     <i class="bi bi-download"></i>
+    <span>Save Data</span>
   </button>
   <input id="loadDataInput" type="file" accept="application/json,.json" hidden>
   <button class="nav-icon-btn" id="settingsBtn" type="button" title="Settings" aria-label="Settings">
@@ -166,10 +168,15 @@ function cardHTML(item, isApp) {
   const cats = (item.categories || []).join(' • ') || (isApp ? 'App' : 'Game');
   const image = escapeHTML(item.image || item.thumbnail || faviconFor(item.url));
   const fallbackImage = escapeHTML(faviconFor(item.url.startsWith('http') ? item.url : `${location.origin}${item.url}`));
-  const rawBadge = String(item.badge || '');
-  const badgeTone = /popular/i.test(rawBadge) ? 'popular' : /new|limited/i.test(rawBadge) ? 'new' : '';
-  const badgeText = escapeHTML(rawBadge.replace(/[⭐🆕🔥]/g, '').trim());
-  const badgeIcon = badgeTone === 'popular' ? 'bi-fire' : badgeTone === 'new' ? 'bi-stars' : '';
+  const rawBadge = String(item.badge || '').trim();
+  const normalizedBadge = rawBadge.toLowerCase();
+  const badgeTone = /(popular|fire|hot|trending|featured)/i.test(normalizedBadge)
+    ? 'popular'
+    : /(new|limited|fresh)/i.test(normalizedBadge)
+      ? 'new'
+      : 'default';
+  const badgeText = escapeHTML(rawBadge.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim());
+  const badgeIcon = badgeTone === '' ? '' :   '' ? '' : '';
   const badge = badgeText ? `<span class="card-badge ${badgeTone}"><i class="bi ${badgeIcon}"></i>${badgeText}</span>` : '';
   return `<article class="game-card" data-url="${url}" data-name="${name}" data-proxy="${useProxy}" tabindex="0" role="button">
     <div class="card-image">
