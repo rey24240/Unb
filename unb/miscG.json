@@ -4,15 +4,13 @@
     "url": "/unb/misc/clgrassmowing.html",
     "categories": ["simulator"],
     "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr5RFy8KKZF7oENWcF5OqyihFUjOf6mrUGnd5O2_72eI5Kd6JzrZH6zLc&s=10",
-    "badge": "Fire 🔥",
     "proxy": false
   },
    {
     "name": "Drift Hunters",
     "url": "/unb/misc/cldrifthuntersmerge.html",
-    "categories": ["car", "drift"],
+    "categories": ["drifting"],
     "image": "/unb/misc/images/drifthunters.avif",
-    "badge": "Ok 👍",
     "proxy": false
   },
   {
@@ -20,7 +18,6 @@
     "url": "/unb/misc/clportalflash.html",
     "categories": ["Thinking"],
     "image": "/unb/misc/images/portalflash.jpeg",
-    "badge": "New 🆕",
     "proxy": false
   },
   {
@@ -28,23 +25,20 @@
     "url": "/unb/misc/clbigshotboxing2.html",
     "categories": ["Fighting"],
     "image": "/unb/misc/images/bigshotboxing.jpeg",
-    "badge": "New 🆕",
     "proxy": false
   },
   {
     "name": "Drive Mad",
     "url": "/unb/misc/cldrivemad.html",
-    "categories": ["car"],
+    "categories": ["Driving"],
     "image": "/unb/misc/images/drivemad.jpeg",
-    "badge": "New 🆕",
     "proxy": false
   },
   {
     "name": "Drive Wild",
     "url": "/unb/misc/cldrivenwild.html",
-    "categories": ["car"],
+    "categories": ["Driving"],
     "image": "/unb/misc/images/drivewild.jpeg",
-    "badge": "New 🆕",
     "proxy": false
   },
   {
@@ -52,7 +46,6 @@
     "url": "/unb/misc/cltag-.html",
     "categories": ["2 player"],
     "image": "/unb/misc/images/tag.jpeg",
-    "badge": "Fun 😎",
     "proxy": false
   },
   {
@@ -60,7 +53,6 @@
     "url": "/unb/misc/cltagcm.html",
     "categories": ["2 player"],
     "image": "/unb/misc/images/tagcoolmathgames.png",
-    "badge": "Fun 😎",
     "proxy": false
   },
   {
@@ -68,15 +60,48 @@
     "url": "/unb/misc/Friday Night Funkin VS Mario Ultra Rebooted.html",
     "categories": ["FNF"],
     "image": "/unb/misc/images/mario fridayfunken.jpeg",
-    "badge": "New 🆕",
     "proxy": false
   },
   {
     "name": "Bloxors",
-    "url": "/unb/misc/bloxors/",
+    "url": "/unb/misc/bloxors",
     "categories": ["Thinking"],
     "image": "/unb/misc/images/bloxors.jpeg",
-    "badge": "New 🆕",
     "proxy": false
+  },
+  {
+    "name": "Basketbros",
+    "url": "/unb/misc/clbasketbros.html",
+    "categories": ["Sports, 2 Player"],
+    "image": "/unb/misc/images/basketbros.jpeg",
+    "proxy": false
+  },
+  {
+    "name": "Doge Miner",
+    "url": "/unb/misc/cldogeminer.html",
+    "categories": ["Simulator"],
+    "image": "/unb/misc/images/dogeminer1.jpeg",
+    "proxy": false
+  },
+  {
+    "name": "Doge Miner 2",
+    "url": "/unb/misc/cldogeminer2.html",
+    "categories": ["Simulator"],
+    "image": "/unb/misc/images/dogeminer2 .png",
+    "proxy": false
+  },
+   {
+    "name": "Burrito Bison: Launcha Libre",
+    "url": "/unb/misc/clburritobisonlaunchalibre.html",
+    "categories": ["Simulator"],
+    "image": "/unb/misc/images/burritobison.jpeg",
+    "proxy": false
+  },
+  {
+    "name": "Burrito Bison: Launcha Libre",
+    "url": "https://smashkarts.io",
+    "categories": ["Driving"],
+    "image": "/unb/misc/images/burritobison.jpeg",
+    "proxy": true
   }
 ]

@@ -1,22 +1,3 @@
 [
-  { "name": "YouTube", "url": "https://www.youtube.com" },
-  { "name": "Discord", "url": "https://discord.com/app" },
-  { "name": "Google Docs", "url": "https://docs.google.com" },
-  { "name": "Google Classroom", "url": "https://classroom.google.com" },
-  { "name": "Gmail", "url": "https://mail.google.com" },
-  { "name": "Spotify", "url": "https://open.spotify.com" },
-  { "name": "Netflix", "url": "https://www.netflix.com" },
-  { "name": "Canva", "url": "https://www.canva.com" },
-  { "name": "Khan Academy", "url": "https://www.khanacademy.org" },
-  { "name": "Duolingo", "url": "https://www.duolingo.com" },
-  { "name": "Notion", "url": "https://www.notion.so" },
-  { "name": "Reddit", "url": "https://www.reddit.com" },
-  { "name": "Instagram", "url": "https://www.instagram.com" },
-  { "name": "TikTok", "url": "https://www.tiktok.com" },
-  { "name": "Twitch", "url": "https://www.twitch.tv" },
-  { "name": "Pinterest", "url": "https://www.pinterest.com" },
-  { "name": "Google Drive", "url": "https://drive.google.com" },
-  { "name": "Google Slides", "url": "https://slides.google.com" },
-  { "name": "Google Sheets", "url": "https://sheets.google.com" },
-  { "name": "Quizlet", "url": "https://quizlet.com" }
+  { "name": "YouTube", "url": "https://www.youtube.com" }
 ]

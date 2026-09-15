@@ -18,7 +18,6 @@ function restoreSessions(){
     if(session && session.username && db.users[session.username]) sessions.set(token,session);
   }
 }
-restoreSessions();
 
 function loadData(){
   try{
@@ -28,6 +27,7 @@ function loadData(){
   }catch(_){return {users:{},votes:{},comments:{},sessions:{}}}
 }
 let db=loadData();
+restoreSessions();
 function saveData(){
   const tmp=DATA_FILE+'.tmp';
   fs.writeFileSync(tmp,JSON.stringify(db,null,2));

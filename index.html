@@ -71,7 +71,7 @@
   <section class="content-tabs" aria-label="Library views">
     <button class="content-tab active" data-view="games" type="button"><i class="bi bi-controller"></i> All Games</button>
     <button class="content-tab" data-view="favorites" type="button"><i class="bi bi-heart"></i> Favorite Games <span id="favoriteCount" class="favorite-count">0</span></button>
-    <button class="content-tab" data-view="apps" type="button"><i class="bi bi-grid-1x2-fill"></i>/</button>
+    <button class="content-tab" data-view="apps" type="button"><i class="bi bi-grid-1x2-fill"></i> Apps</button>
   </section>
 
   <section class="catalog-tools" aria-label="Search and filters">
@@ -210,9 +210,29 @@ function render() {
 function openItem(card) {
   const isApp = state.view === 'apps' || (state.view === 'favorites' && state.apps.some(a => a.url === card.dataset.url));
   const type = isApp ? 'app' : 'game';
-  const player = !isApp && card.dataset.proxy === 'false' ? 'player-file.html' : 'player.html';
-  const source = player === 'player-file.html' ? 'file' : 'url';
-  location.href = `./unb/${player}?type=${type}&${source}=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`;
+  const useProxy = card.dataset.proxy !== 'false';
+  const player = 'player-file.html';
+  const source = useProxy ? 'url' : 'file';
+  if (!isApp || useProxy) {
+    const win = window.open('about:blank', '_blank');
+    if (win) {
+      const playerUrl = new URL(`/unb/${player}?type=${type}&${source}=${encodeURIComponent(card.dataset.url)}&proxy=${useProxy}&title=${encodeURIComponent(card.dataset.name || 'Game')}`, location.origin).href;
+      win.document.open();
+      win.document.close();
+      win.document.title = card.dataset.name || 'Game';
+      const style = win.document.createElement('style');
+      style.textContent = 'html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#000}';
+      const iframe = win.document.createElement('iframe');
+      iframe.src = playerUrl;
+      iframe.allow = 'fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share';
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = 'no-referrer';
+      win.document.head.append(style);
+      win.document.body.append(iframe);
+      return;
+    }
+  }
+  location.href = `/unb/${player}?type=${type}&${source}=${encodeURIComponent(card.dataset.url)}&proxy=${useProxy}&title=${encodeURIComponent(card.dataset.name)}`;
 }
 
 document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.addEventListener('click', () => {
