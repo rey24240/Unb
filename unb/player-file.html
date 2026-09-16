@@ -31,7 +31,10 @@ const loading=document.getElementById('loading');
 const loadingNotice=document.getElementById('loadingNotice');
 async function loadTarget(){
 	if(!target)return;
-	const warningTimer=setTimeout(()=>loadingNotice.classList.add('visible'),8000);
+	const warningTimer=setTimeout(()=>{
+		loadingNotice.textContent=useProxy?'The proxy could not load this site. It may block embedding or the proxy server may be unavailable.':'This game is taking a while to load. It might be slow or unavailable.';
+		loadingNotice.classList.add('visible');
+	},8000);
 	frame.addEventListener('load',()=>{
 		clearTimeout(warningTimer);
 		loading.classList.add('hidden');
@@ -52,7 +55,10 @@ async function loadTarget(){
 			});
 		}
 		frame.src=window.__uv$config.prefix+window.__uv$config.encodeUrl(target);
-	}catch{frame.src=target}
+	}catch{
+		loadingNotice.textContent='The proxy could not connect to this site.';
+		loadingNotice.classList.add('visible');
+	}
 }
 if(target){
 	loadTarget();

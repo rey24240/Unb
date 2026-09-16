@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Search</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="browser.css">
+</head>
+<body>
+  <div class="browser-shell">
+    <div class="browser-toolbar">
+      <button id="backBtn" type="button" aria-label="Back"><i class="bi bi-arrow-left"></i></button>
+      <button id="forwardBtn" type="button" aria-label="Forward"><i class="bi bi-arrow-right"></i></button>
+      <button id="reloadBtn" type="button" aria-label="Reload"><i class="bi bi-arrow-clockwise"></i></button>
+      <button id="homeBtn" type="button" aria-label="Home"><i class="bi bi-house-door"></i></button>
+      <div class="browser-address-wrap">
+        <i class="bi bi-search"></i>
+        <input id="addressBar" type="text" aria-label="Search or URL" autocomplete="off">
+      </div>
+      <button id="fullscreenBtn" type="button" aria-label="Fullscreen"><i class="bi bi-fullscreen"></i></button>
+    </div>
+    <div class="loading" id="loading"><div class="spinner"></div><span>Loading...</span></div>
+    <iframe id="webFrame" title="Web content" allow="fullscreen; autoplay; clipboard-read; clipboard-write" referrerpolicy="no-referrer"></iframe>
+  </div>
+  <script src="uv/uv.bundle.js"></script>
+  <script src="uv/uv.config.js"></script>
+  <script src="browser.js"></script>
+</body>
+</html>

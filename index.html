@@ -70,6 +70,7 @@
 
   <section class="content-tabs" aria-label="Library views">
     <button class="content-tab active" data-view="games" type="button"><i class="bi bi-controller"></i> All Games</button>
+    <button class="content-tab" data-view="search" type="button"><i class="bi bi-search"></i> Search</button>
     <button class="content-tab" data-view="favorites" type="button"><i class="bi bi-heart"></i> Favorite Games <span id="favoriteCount" class="favorite-count">0</span></button>
     <button class="content-tab" data-view="apps" type="button"><i class="bi bi-grid-1x2-fill"></i> Apps</button>
   </section>
@@ -141,6 +142,7 @@ function updateFavoriteCount() { favoriteCount.textContent = state.favorites.siz
 function currentItems() {
   if (state.view === 'apps') return state.apps;
   if (state.view === 'favorites') return [...state.games, ...state.apps].filter(x => state.favorites.has(x.url));
+  if (state.view === 'search') return [];
   return state.games;
 }
 function populateCategories() {
@@ -149,14 +151,36 @@ function populateCategories() {
   categorySelect.innerHTML = '<option value="All">All categories</option>' +
     [...values].sort((a,b)=>a.localeCompare(b)).map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
 }
+function selectedSearchEngine() {
+  const key = localStorage.getItem('ug_search_engine') || 'google';
+  return ['google','bing','duckduckgo','brave'].includes(key) ? key : 'google';
+}
+function webSearchUrl(query) {
+  const engines = {
+    google: q => `https://www.google.com/search?q=${encodeURIComponent(q)}`,
+    bing: q => `https://www.bing.com/search?q=${encodeURIComponent(q)}`,
+    duckduckgo: q => `https://duckduckgo.com/?q=${encodeURIComponent(q)}`,
+    brave: q => `https://search.brave.com/search?q=${encodeURIComponent(q)}`
+  };
+  const engine = selectedSearchEngine();
+  return engines[engine] ? engines[engine](query) : engines.google(query);
+}
+function openWebSearch(query) {
+  const text = query.trim();
+  if (!text) return;
+  const target = webSearchUrl(text);
+  const win = window.open('/unb/browser.html?url=' + encodeURIComponent(target), '_blank', 'noopener,noreferrer');
+  if (!win) location.href = `/unb/browser.html?url=${encodeURIComponent(target)}`;
+}
 function updateHeader() {
   const favoriteMode = state.view === 'favorites';
   const appMode = state.view === 'apps';
-  const label = appMode ? 'APPS' : favoriteMode ? 'FAVORITES' : 'GAMES';
+  const searchMode = state.view === 'search';
+  const label = appMode ? 'APPS' : favoriteMode ? 'FAVORITES' : searchMode ? 'SEARCH' : 'GAMES';
   eyebrow.textContent = label;
-  if (pageTitle) pageTitle.textContent = appMode ? 'Browse Apps' : favoriteMode ? 'Your Favorites' : 'Library';
-  pageSubtitle.textContent = favoriteMode ? 'Your saved games and apps are right here.' : appMode ? 'Browse apps through the same unblocking player.' : 'Find a game, search by category, or save your favorites.';
-  searchInput.placeholder = appMode ? 'Search through apps...' : favoriteMode ? 'Search your favorites...' : 'Search through games...';
+  if (pageTitle) pageTitle.textContent = appMode ? 'Browse Apps' : favoriteMode ? 'Your Favorites' : searchMode ? 'Search Library' : 'Library';
+  pageSubtitle.textContent = favoriteMode ? 'Your saved games and apps are right here.' : appMode ? 'Browse apps through the same unblocking player.' : searchMode ? 'Search the web through the site proxy.' : 'Find a game, search by category, or save your favorites.';
+  searchInput.placeholder = appMode ? 'Search through apps...' : favoriteMode ? 'Search your favorites...' : searchMode ? 'Search the web with proxy...' : 'Search through games...';
   const hideCategory = appMode || favoriteMode;
   document.querySelector('.category-wrap').hidden = hideCategory;
   categorySelect.disabled = hideCategory;
@@ -195,6 +219,17 @@ function render() {
   const query = searchInput.value.trim().toLowerCase();
   let items = currentItems();
   const category = categorySelect.value;
+
+  if (state.view === 'search') {
+    grid.innerHTML = '';
+    resultCount.textContent = 0;
+    emptyState.hidden = false;
+    emptyState.innerHTML = '<i class="bi bi-globe2"></i><h2>Search the web</h2><p>Use this tab to search the web through the built-in proxy.</p>';
+    clearSearch.hidden = !searchInput.value;
+    document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === state.view));
+    return;
+  }
+
   const filtered = items.filter(item => {
     const text = `${item.name || ''} ${(item.categories || []).join(' ')}`.toLowerCase();
     const matchesSearch = !query || text.includes(query);
@@ -204,6 +239,7 @@ function render() {
   grid.innerHTML = filtered.map(item => cardHTML(item, state.view === 'apps' || (state.view === 'favorites' && state.apps.some(a => a.url === item.url)))).join('');
   resultCount.textContent = filtered.length;
   emptyState.hidden = filtered.length !== 0;
+  emptyState.innerHTML = '<i class="bi bi-search"></i><h2>Nothing found</h2><p>Try another search or category.</p>';
   clearSearch.hidden = !searchInput.value;
   document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === state.view));
 }
@@ -238,9 +274,22 @@ function openItem(card) {
 document.querySelectorAll('.content-tab[data-view]').forEach(btn => btn.addEventListener('click', () => {
   state.view = btn.dataset.view; window.history.replaceState(null, '', `#${state.view}`);
   if (state.view !== 'favorites' && state.view !== 'apps') categorySelect.value = 'All';
+  if (state.view === 'search') {
+    searchInput.focus();
+    searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+  }
   render();
 }));
 searchInput.addEventListener('input', render);
+searchInput.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter') return;
+  const query = searchInput.value.trim();
+  if (!query) return;
+  event.preventDefault();
+  if (state.view === 'search' || state.view === 'games' || state.view === 'apps') {
+    openWebSearch(query);
+  }
+});
 clearSearch.addEventListener('click', () => { searchInput.value = ''; searchInput.focus(); render(); });
 categorySelect.addEventListener('change', render);
 
