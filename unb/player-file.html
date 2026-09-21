@@ -7,6 +7,13 @@
 <style>
 html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}
 #playerFrame{width:100%;height:100%;border:0;display:block}
+#playerControls{position:fixed;inset:0;z-index:5;pointer-events:none}
+.side-control{position:absolute;top:18px;right:18px;width:42px;height:42px;display:grid;place-items:center;border:0;border-radius:0;background:#111923d9;color:#eef2f8;cursor:pointer;pointer-events:auto;touch-action:none;transition:.15s ease}
+.side-control:hover,.side-control:focus-visible{background:#1f303d;color:#4ade80;outline:none}
+.control-menu{position:absolute;top:68px;right:18px;display:none;padding:4px;border:0;border-radius:0;background:#111923f2;box-shadow:0 10px 28px #0008;pointer-events:auto}
+.control-menu.open{display:block}
+.control-menu button{display:flex;align-items:center;gap:8px;min-width:110px;padding:9px 10px;border:0;border-radius:0;background:transparent;color:#eef2f8;font:600 13px system-ui,sans-serif;cursor:pointer;text-align:left}
+.control-menu button:hover,.control-menu button:focus-visible{background:#ffffff16;color:#4ade80;outline:none}
 #loading{position:fixed;inset:0;z-index:2;display:grid;place-items:center;background:linear-gradient(145deg,#101722,#182437);color:#eef2f8;font:600 16px system-ui,sans-serif;transition:opacity .2s ease}
 #loading.hidden{opacity:0;pointer-events:none}
 #loadingInner{text-align:center}
@@ -19,6 +26,10 @@ html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}
 <body>
 <div id="loading" role="status" aria-live="polite"><div id="loadingInner"><div id="spinner"></div><div id="loadingText">Loading game...</div><div id="loadingNotice">This game is taking a while to load. It might be slow or unavailable.</div></div></div>
 <iframe id="playerFrame" src="about:blank" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe>
+<div id="playerControls" aria-label="Game controls">
+<button class="side-control" id="playerControl" type="button" aria-label="Open game menu" aria-expanded="false">&#8594;</button>
+<div class="control-menu" id="playerMenu"><button type="button" data-refresh><span aria-hidden="true">&#8635;</span> Refresh game</button><button type="button" data-close><span aria-hidden="true">&#10005;</span> Close game</button></div>
+</div>
 <script>
 const params=new URLSearchParams(location.search);
 const useProxy=params.get('proxy')==='true';
@@ -29,6 +40,34 @@ document.title=title;
 const frame=document.getElementById('playerFrame');
 const loading=document.getElementById('loading');
 const loadingNotice=document.getElementById('loadingNotice');
+const control=document.getElementById('playerControl');
+const menu=document.getElementById('playerMenu');
+let holdTimer, dragging=false, moved=false, offsetX=0, offsetY=0;
+control.addEventListener('pointerdown',event=>{
+	control.setPointerCapture(event.pointerId);
+	const bounds=control.getBoundingClientRect();
+	offsetX=event.clientX-bounds.left; offsetY=event.clientY-bounds.top;
+	moved=false;
+	holdTimer=setTimeout(()=>{ dragging=true; menu.classList.remove('open'); control.setAttribute('aria-expanded','false'); },300);
+});
+control.addEventListener('pointermove',event=>{
+	if(!dragging)return;
+	moved=true;
+	const x=Math.max(0,Math.min(window.innerWidth-control.offsetWidth,event.clientX-offsetX));
+	const y=Math.max(0,Math.min(window.innerHeight-control.offsetHeight,event.clientY-offsetY));
+	control.style.left=`${x}px`; control.style.top=`${y}px`; control.style.right='auto';
+	menu.style.left=`${x}px`; menu.style.top=`${Math.min(window.innerHeight-65,y+control.offsetHeight+8)}px`; menu.style.right='auto';
+});
+control.addEventListener('pointerup',()=>{ clearTimeout(holdTimer); if(dragging){dragging=false;return;} if(!moved){const open=menu.classList.toggle('open');control.setAttribute('aria-expanded',String(open));} });
+control.addEventListener('pointercancel',()=>{clearTimeout(holdTimer);dragging=false;});
+document.querySelectorAll('[data-refresh]').forEach(button=>button.addEventListener('click',()=>{
+	frame.src=frame.src;
+	menu.classList.remove('open'); control.setAttribute('aria-expanded','false');
+}));
+document.querySelector('[data-close]').addEventListener('click',()=>{
+	window.close();
+	setTimeout(()=>{ if(!window.closed) history.back(); },100);
+});
 async function loadTarget(){
 	if(!target)return;
 	const warningTimer=setTimeout(()=>{

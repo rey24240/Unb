@@ -169,8 +169,13 @@ function openWebSearch(query) {
   const text = query.trim();
   if (!text) return;
   const target = webSearchUrl(text);
-  const win = window.open('/unb/browser.html?url=' + encodeURIComponent(target), '_blank', 'noopener,noreferrer');
-  if (!win) location.href = `/unb/browser.html?url=${encodeURIComponent(target)}`;
+  const win = window.open('about:blank', '_blank');
+  const browserUrl = `/unb/browser.html?url=${encodeURIComponent(target)}`;
+  if (win) {
+    win.location.href = browserUrl;
+    return;
+  }
+  location.href = browserUrl;
 }
 function updateHeader() {
   const favoriteMode = state.view === 'favorites';

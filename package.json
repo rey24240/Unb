@@ -2,12 +2,12 @@
   "name": "Utopia",
   "version": "1.0.0",
   "description": "Epic proxy",
-  "main": "index.mjs",
+  "main": "index.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "start": "node index.mjs"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",

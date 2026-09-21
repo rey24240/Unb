@@ -44,14 +44,14 @@
   {
     "name": "Tag",
     "url": "/unb/misc/cltag-.html",
-    "categories": ["2 player"],
+    "categories": ["2 Player"],
     "image": "/unb/misc/images/tag.jpeg",
     "proxy": false
   },
   {
     "name": "Tag: Cool math games",
     "url": "/unb/misc/cltagcm.html",
-    "categories": ["2 player"],
+    "categories": ["2 Player"],
     "image": "/unb/misc/images/tagcoolmathgames.png",
     "proxy": false
   },
@@ -87,7 +87,7 @@
     "name": "Doge Miner 2",
     "url": "/unb/misc/cldogeminer2.html",
     "categories": ["Simulator"],
-    "image": "/unb/misc/images/dogeminer2 .png",
+    "image": "/unb/misc/images/dogeminer2.png",
     "proxy": false
   },
    {
@@ -98,10 +98,31 @@
     "proxy": false
   },
   {
-    "name": "Burrito Bison: Launcha Libre",
-    "url": "https://www.google.com/?client=safari",
-    "categories": ["Driving"],
-    "image": "/unb/misc/images/burritobison.jpeg",
-    "proxy": true
+    "name": "Gladdihoppers",
+    "url": "/unb/misc/clgladdihopper.html",
+    "categories": ["Action"],
+    "image": "/unb/misc/images/gladihopper.jpeg",
+    "proxy": false
+  },
+  {
+    "name": "Block craft parkour",
+    "url": "/unb/misc/clblockcraftparkour.html",
+    "categories": ["Parkour"],
+    "image": "/unb/misc/images/minecrafparkour.jpeg",
+    "proxy": false
+  
+  },
+  {
+    "name": "Getaway shoot",
+    "url": "/unb/misc/clgetawayshootoutv2.html",
+    "categories": ["2 player"],
+    "image": "/unb/misc/images/getawaysho.jpeg",
+    "proxy": false
+  },
+   {
+    "name": "Agar",
+    "url": "/unb/misc/agar.html",
+    "image": "/unb/misc/images/Agar.jpeg",
+    "proxy": false
   }
 ]

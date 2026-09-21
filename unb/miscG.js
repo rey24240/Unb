@@ -133,10 +133,10 @@ categorySelect.addEventListener('change', renderGrid);
 /* ---------- Open games in a minimal about:blank tab ---------- */
 function openCard(card){
   const win=window.open('about:blank','_blank');
-  if(!win){ location.href=`player.html?type=game&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name)}`; return; }
-  const url=card.dataset.url.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const playerUrl=`/unb/player-file.html?type=game&proxy=false&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name||'Game')}`;
+  if(!win){ location.href=playerUrl; return; }
   win.document.open();
-  win.document.write(`<!doctype html><html><head><title>${card.dataset.name||'Game'}</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#000}</style></head><body><iframe src="${url}" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe></body></html>`);
+  win.document.write(`<!doctype html><html><head><title>${card.dataset.name||'Game'}</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#000}</style></head><body><iframe src="${playerUrl}" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe></body></html>`);
   win.document.close();
 }
 
