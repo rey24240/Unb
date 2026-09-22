@@ -64,7 +64,7 @@
   },
   {
     "name": "Bloxors",
-    "url": "/unb/misc/bloxors/index.html",
+    "url": "/unb/misc/clbloxorz.html",
     "categories": ["Thinking"],
     "image": "/unb/misc/images/bloxors.jpeg",
     "proxy": false
@@ -123,6 +123,40 @@
     "name": "Agar",
     "url": "/unb/misc/agar.html",
     "image": "/unb/misc/images/Agar.jpeg",
+    "proxy": false
+  },
+  {
+    "name": "RetroBowl",
+    "url": "/unb/misc/retrofootbal.html",
+    "categories": ["Sports"],
+    "image": "/unb/misc/images/retrofootball.jpeg",
+    "proxy": false
+  },
+  {
+    "name": "Ragdoll Archers",
+    "url": "/unb/misc/clragdollarchers.html",
+    "categories": ["Action"],
+    "image": "/unb/misc/images/Ragdoll Archers.jpeg",
+    "proxy": false
+  },
+{
+    "name": "Super Mario64",
+    "url": "/unb/misc/mario.html",
+    "categories": ["Action"],
+    "image": "/unb/misc/images/mario.jpeg",
+    "proxy": false
+  },
+  {
+    "name": "Escape Road",
+    "url": "/unb/misc/clescaperoad.html",
+    "categories": ["Driving"],
+    "image": "/unb/misc/images/escape-road-city.webp",
+    "proxy": false
+  },
+  {
+    "name": "Tomb of the mask",
+    "url": "/unb/misc/cltotm.html",
+    "image": "/unb/misc/images/totm.jpeg",
     "proxy": false
   }
 ]
