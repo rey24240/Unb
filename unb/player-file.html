@@ -33,6 +33,7 @@ html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}
 <script>
 const params=new URLSearchParams(location.search);
 const useProxy=params.get('proxy')==='true';
+const proxyEngine=localStorage.getItem('ug_proxy')||'dogeub';
 const rawTarget=params.get('file')||params.get('url')||'';
 const target=useProxy&&!/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(rawTarget)?`https://${rawTarget}`:rawTarget;
 const title=decodeURIComponent(params.get('title')||'Game');
@@ -80,24 +81,38 @@ async function loadTarget(){
 	},{once:true});
 	if(!useProxy){frame.src=target;return}
 	try{
-		await navigator.serviceWorker.register(new URL('../sw.js',location.href),{scope:'/'});
-		if(!navigator.serviceWorker.controller){
-			navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload(),{once:true});
-			return;
+		if(proxyEngine==='dogeub'){
+			const registration=await navigator.serviceWorker.register('/s_sw.js',{scope:'/ham/'});
+			if(registration.installing){await new Promise((resolve,reject)=>{const worker=registration.installing;const timer=setTimeout(()=>reject(new Error('Proxy worker activation timed out')),15000);worker.addEventListener('statechange',()=>{if(worker.state==='activated'){clearTimeout(timer);resolve()}else if(worker.state==='redundant'){clearTimeout(timer);reject(new Error('Proxy worker failed to activate'))}});});}
+			await loadDogeRuntime();
+			const encoded=encodeDogeUrl(target);
+			frame.src='/ham/'+encoded;
+		}else{
+			await navigator.serviceWorker.register('/sw.js',{scope:'/'});
+			if(!navigator.serviceWorker.controller){navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload(),{once:true});return;}
+			if(!window.__uv$config){await new Promise((resolve,reject)=>{const bundle=document.createElement('script'),config=document.createElement('script');bundle.src='/uv/uv.bundle.js';config.src='/uv/uv.config.js';config.onload=()=>window.__uv$config?resolve():reject(new Error('UV config unavailable'));config.onerror=reject;document.head.append(bundle,config);});}
+			frame.src=window.__uv$config.prefix+window.__uv$config.encodeUrl(target);
 		}
-		if(!window.__uv$config){
-			await new Promise((resolve,reject)=>{
-				const bundle=document.createElement('script'),config=document.createElement('script');
-				bundle.src='../uv/uv.bundle.js';config.src='../uv/uv.config.js';
-				config.onload=()=>window.__uv$config?resolve():reject(new Error('UV config unavailable'));config.onerror=reject;
-				document.head.append(bundle,config);
-			});
-		}
-		frame.src=window.__uv$config.prefix+window.__uv$config.encodeUrl(target);
-	}catch{
-		loadingNotice.textContent='The proxy could not connect to this site.';
+	}catch(error){
+		loadingNotice.textContent='The proxy could not connect. Check that DogeUB proxy dependencies are installed and the server is running.';
 		loadingNotice.classList.add('visible');
 	}
+}
+async function loadDogeRuntime(){
+	if(window.ScramjetController && window.BareMuxConnection)return;
+	await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='/eggs/scramjet.all.js';script.onload=resolve;script.onerror=reject;document.head.appendChild(script);});
+	if(!window.BareMuxConnection){await new Promise((resolve,reject)=>{const script=document.createElement('script');script.type='module';script.textContent="import { BareMuxConnection } from '/baremux/index.js'; window.BareMuxConnection=BareMuxConnection; window.dispatchEvent(new Event('baremux-ready'));";script.onerror=reject;window.addEventListener('baremux-ready',resolve,{once:true});document.head.appendChild(script);});}
+	const {ScramjetController}=$scramjetLoadController();
+	window.scr=new ScramjetController({prefix:'/ham/',files:{wasm:'/eggs/scramjet.wasm.wasm',all:'/eggs/scramjet.all.js',sync:'/eggs/scramjet.sync.js'},flags:{rewriterLogs:false,scramitize:false,cleanErrors:true,sourcemaps:true}});
+	window.scr.init();
+	const connection=new window.BareMuxConnection('/baremux/worker.js');
+	await connection.setTransport('/libcurl/index.mjs',[{wisp:`${location.protocol==='http:'?'ws:':'wss:'}//${location.host}/wisp/`}]);
+}
+function encodeDogeUrl(value){
+	const key=new TextEncoder().encode(btoa(new Date().toISOString().slice(0,10)+location.host).split('').reverse().join('').slice(6.7));
+	const bytes=new TextEncoder().encode(value),out=new Uint8Array(bytes.length);
+	for(let i=0;i<bytes.length;i++)out[i]=bytes[i]^key[i%8];
+	return Array.from(out,b=>b.toString(16).padStart(2,'0')).join('');
 }
 if(target){
 	loadTarget();

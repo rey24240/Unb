@@ -2,6 +2,10 @@ import createServer from '@tomphttp/bare-server-node';
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
+import { server as wisp, logging } from '@mercuryworkshop/wisp-js/server';
+import { scramjetPath } from '@mercuryworkshop/scramjet/path';
+import { baremuxPath } from 'bare-mux-fork/node';
+import { libcurlPath } from '@mercuryworkshop/libcurl-transport';
 
 const port = process.env.PORT || 8080;
 const rootDir = process.cwd();
@@ -32,7 +36,9 @@ const mimeTypes = {
   '.map': 'application/json; charset=utf-8',
 };
 
-const bare = createServer('/bare/');
+const bare = createServer('/seal/');
+logging.set_level(logging.NONE);
+Object.assign(wisp.options, { dns_method: 'resolve', dns_servers: ['1.1.1.3', '1.0.0.3'], dns_result_order: 'ipv4first' });
 const server = http.createServer();
 
 function resolveFileFromUrl(url) {
@@ -106,6 +112,15 @@ function sendFile(filePath, req, res) {
   stream.pipe(res);
 }
 
+function servePackageAsset(req, res, prefix, baseDir) {
+  const relative = decodeURIComponent((req.url || '').split('?')[0].slice(prefix.length));
+  const target = path.resolve(baseDir, relative);
+  const root = path.resolve(baseDir);
+  if (target !== root && !target.startsWith(root + path.sep)) { res.writeHead(403); res.end('Forbidden'); return true; }
+  fs.stat(target, (err, stat) => { if (err || !stat.isFile()) { res.writeHead(404); res.end('Not found'); return; } sendFile(target, req, res); });
+  return true;
+}
+
 server.on('request', (req, res) => {
   if (bare.shouldRoute(req)) {
     bare.routeRequest(req, res);
@@ -113,6 +128,10 @@ server.on('request', (req, res) => {
   }
 
   const url = req.url || '/';
+  if (url.startsWith('/eggs/')) return servePackageAsset(req, res, '/eggs/', scramjetPath);
+  if (url.startsWith('/baremux/')) return servePackageAsset(req, res, '/baremux/', baremuxPath);
+  if (url.startsWith('/libcurl/')) return servePackageAsset(req, res, '/libcurl/', libcurlPath);
+  if (url.startsWith('/wisp/')) return wisp.routeRequest(req, res);
 
   if (
     url === '/' ||
@@ -145,6 +164,8 @@ server.on('request', (req, res) => {
 server.on('upgrade', (req, socket, head) => {
   if (bare.shouldRoute(req, socket, head)) {
     bare.routeUpgrade(req, socket, head);
+  } else if ((req.url || '').startsWith('/wisp/')) {
+    wisp.routeRequest(req, socket, head);
   } else {
     socket.end();
   }

@@ -33,3 +33,8 @@ The Settings panel includes a **Save Data** button. When logged in, it explicitl
 - Games show random game suggestions on both sides; Apps use the full-width iframe with no game rails/comments/votes.
 - The custom browser tab toolbar only contains Back, Forward, Refresh, Home, and Fullscreen.
 - The custom browser and player register the root `sw.js` before using the `/service/` Ultraviolet prefix.
+
+
+## DogeUB proxy setup
+
+This project uses the DogeUB Scramjet runtime with a Wisp transport. After extracting the project, run `npm install` to install the proxy dependencies, then run `npm start`. Deployments must run the Node server (not a static-only host) and support WebSocket upgrades for the `/wisp/` endpoint.

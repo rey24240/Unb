@@ -1,4 +1,4 @@
-:root{--bg:#0d1117;--panel:#151b22;--panel2:#1c2430;--edge:#2c3745;--text:#edf2f7;--dim:#93a0ad;--green:#4ade80;--green2:#22c55e;--shadow:rgba(0,0,0,.35)}
+:root{--bg:#0d1420;--panel:#142235;--panel2:#1b2a3c;--edge:#293d55;--text:#edf4ff;--dim:#91a7c0;--green:#1688ff;--green2:#0875ed;--shadow:rgba(0,0,0,.38)}
 [data-theme="purple"]{--green:#a879ff;--green2:#7b5bff}[data-theme="blue"]{--green:#38bdf8;--green2:#0ea5e9}[data-theme="red"]{--green:#f87171;--green2:#ef4444}[data-theme="amber"]{--green:#fbbf24;--green2:#f59e0b}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Rubik,system-ui,sans-serif}body{overflow-x:hidden}.page-bg{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% -10%,color-mix(in srgb,var(--green) 13%,transparent),transparent 38%),radial-gradient(circle at 90% 70%,color-mix(in srgb,var(--green2) 7%,transparent),transparent 35%)}
 .site-header{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:22px;padding:14px 22px;background:rgba(13,17,23,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--edge)}
@@ -48,3 +48,67 @@
 @media(max-width:700px){.suggestion-area{grid-template-columns:1fr}.announcement-card{padding:26px 20px}.announcement-card h2{font-size:21px}}
 
 @media(max-width:700px){.site-header{gap:7px}.nav-icon-btn{width:40px;height:40px;flex-basis:40px}}
+
+
+/* Modern unified catalog design */
+:root{--bg:#0b1420;--panel:#142235;--panel2:#1b2a3c;--edge:#293d55;--text:#edf4ff;--dim:#91a7c0;--green:#1688ff;--green2:#0875ed;--shadow:rgba(0,0,0,.38)}
+[data-theme="purple"]{--green:#a879ff;--green2:#7b5bff}[data-theme="blue"]{--green:#1688ff;--green2:#0875ed}[data-theme="red"]{--green:#f87171;--green2:#ef4444}[data-theme="amber"]{--green:#fbbf24;--green2:#f59e0b}
+html,body{background:#0b1420}.page-bg{background:radial-gradient(ellipse at 50% -20%,rgba(30,111,202,.16),transparent 55%)}
+.site-header{margin:9px 14px 0;padding:12px 20px;min-height:64px;border:1px solid #293d55;border-radius:15px;background:rgba(17,31,48,.96);box-shadow:0 8px 25px rgba(0,0,0,.16)}
+.brand{letter-spacing:0;font-size:clamp(17px,2vw,25px);font-weight:800;gap:12px}.brand-title b{color:#1688ff}.brand-mark{width:42px;height:42px;border:0;border-radius:12px;color:#1688ff;box-shadow:none;font-size:25px}.nav-icon-btn{width:44px;height:44px;padding:0;border:0;background:transparent;color:#e8f2ff;font-size:21px}.nav-icon-btn:hover{background:#1d3047;color:#1688ff;border-color:transparent}
+.content{max-width:1600px;padding:14px 5.2% 65px}.hero{display:none}.content-tabs{width:max-content;max-width:100%;margin:10px auto 16px;border:1px solid #263a52;border-radius:14px;padding:4px;background:#111f30;gap:5px}.content-tab{min-width:130px;justify-content:center;padding:11px 22px;border-radius:11px;color:#a7bad1;font-size:15px}.content-tab.active{background:linear-gradient(135deg,#168cff,#0875ed);color:#fff;box-shadow:0 5px 18px rgba(22,136,255,.27)}.content-tab.active:after{display:none}.content-tab:hover{color:#fff;background-color:#1b3049}.content-tab.active:hover{background:linear-gradient(135deg,#168cff,#0875ed)}
+.catalog-tools{grid-template-columns:minmax(0,1fr) auto;gap:12px;margin-bottom:22px}.catalog-search,.category-wrap{height:48px;border:1px solid #2a405b;background:#101e2e;border-radius:14px}.catalog-search:focus-within{border-color:#1688ff;box-shadow:0 0 0 3px rgba(22,136,255,.1)}.catalog-search input{font-size:14px}.category-wrap select{font-size:13px}.catalog-heading{display:flex;align-items:baseline;justify-content:space-between;margin:4px 0 13px}.catalog-heading h2{font-size:21px;margin:0;color:#f0f6ff}.catalog-heading h2:after{content:"";display:inline-block;width:7px;height:7px;margin:0 0 2px 8px;border-radius:50%;background:#1688ff;box-shadow:0 0 12px #1688ff}.catalog-heading span{font-size:12px;color:#91a7c0}
+.card-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}.game-card{padding:8px;background:linear-gradient(160deg,#142439,#101d2d);border:1px solid #293e58;border-radius:13px;box-shadow:0 6px 18px rgba(0,0,0,.13);overflow:hidden;transform:translateZ(0)}.game-card:hover,.game-card:focus-visible{border-color:#1688ff;box-shadow:0 10px 24px rgba(0,0,0,.3),0 0 0 1px rgba(22,136,255,.2);filter:none}.card-image{height:auto;aspect-ratio:1.48;border:0;border-radius:9px;background:#0b1522}.card-body{padding:9px 2px 2px}.card-body h2{font-size:13px;margin:0 0 8px;color:#eef5ff}.card-body p{display:none}.play-overlay{opacity:0;background:rgba(4,15,29,.46)}.play-overlay i{background:#1688ff;color:#fff}.card-body:after{content:"▶  Play";height:34px;margin-top:0;display:flex;align-items:center;justify-content:center;border-radius:9px;background:linear-gradient(135deg,#168cff,#0875ed);color:#fff;font-size:13px;font-weight:700;box-shadow:0 4px 12px rgba(0,111,240,.17)}.game-card:hover .card-body:after{filter:brightness(1.12)}
+.settings-popover{top:79px;right:15px;background:rgba(17,31,48,.99);border-color:#2b4058}.settings-data-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.settings-data-actions .settings-link{margin-top:8px;justify-content:center}.settings-link{border-color:#293e58;background:#142439;color:#dce9fa}.settings-link:hover{border-color:#1688ff;color:#1688ff}.settings-row{border-color:#293e58}.settings-row span i{color:#1688ff}.empty-state{padding:65px 20px}
+@media(max-width:1250px){.card-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:950px){.card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.content{padding-left:3%;padding-right:3%}}
+@media(max-width:680px){.site-header{margin:7px 8px 0;padding:9px 12px}.content{padding:12px 12px 45px}.content-tabs{margin:10px auto 14px}.content-tab{min-width:112px}.catalog-tools{grid-template-columns:1fr}.category-wrap{height:43px}.card-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.game-card{padding:6px;border-radius:11px}.card-image{aspect-ratio:1.2}.card-body h2{font-size:12px}.card-body:after{height:30px;font-size:12px}.catalog-heading h2{font-size:18px}}
+@media(max-width:430px){.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.brand{font-size:17px}.brand-mark{width:34px;height:34px;font-size:21px}}
+
+/* Unified Unblocked Games redesign: shared palette and persistent accent themes */
+:root{--bg:#0d1420;--panel:#142235;--panel2:#1b2a3c;--edge:#293d55;--text:#edf4ff;--dim:#91a7c0;--green:#1688ff;--green2:#0875ed;--shadow:rgba(0,0,0,.38)}
+html,body{background:var(--bg);color:var(--text)}
+[data-theme="green"]{--green:#35d07f;--green2:#16a765}
+[data-theme="purple"]{--green:#a879ff;--green2:#7b5bff}
+[data-theme="blue"]{--green:#1688ff;--green2:#0875ed}
+[data-theme="red"]{--green:#ff647c;--green2:#e83e5b}
+[data-theme="amber"]{--green:#ffbf4a;--green2:#e99518}
+.brand-title b,.brand-mark,.settings-row span i,.settings-link:hover{color:var(--green)}
+.brand-mark{border-color:var(--green);box-shadow:0 0 16px color-mix(in srgb,var(--green) 20%,transparent)}
+.content-tab.active,.card-body:after{background:linear-gradient(135deg,var(--green),var(--green2))}
+.content-tab.active{color:#fff;box-shadow:0 5px 18px color-mix(in srgb,var(--green) 27%,transparent)}
+.game-card:hover,.game-card:focus-visible{border-color:var(--green);box-shadow:0 10px 24px rgba(0,0,0,.3),0 0 0 1px color-mix(in srgb,var(--green) 22%,transparent)}
+.catalog-search:focus-within{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 12%,transparent)}
+.settings-link:hover{border-color:var(--green)}
+@media(max-width:680px){.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.content-tabs{width:max-content}.content-tab{min-width:108px;padding:10px 15px}}
+
+/* Compact category picker and page-to-page loading transition */
+.catalog-tools{display:flex;justify-content:flex-start;gap:10px;margin-bottom:22px}
+.category-wrap{width:max-content;max-width:100%;height:42px;padding:0 12px;gap:8px;border-radius:12px}
+.category-wrap select{width:auto;min-width:0;max-width:180px;font-size:13px;cursor:pointer}
+@media(max-width:680px){.catalog-tools{display:flex;grid-template-columns:none}.category-wrap{height:40px}.category-wrap select{max-width:155px}}
+.page-transition{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(13,20,32,.97);opacity:0;visibility:hidden;transition:opacity .18s ease,visibility .18s ease}
+.page-transition.show{opacity:1;visibility:visible}
+.transition-brand{display:flex;align-items:center;gap:10px;color:var(--text);font-size:24px;font-weight:800}
+.transition-brand i,.transition-brand b{color:var(--green)}
+.transition-spinner{width:34px;height:34px;border:3px solid var(--edge);border-top-color:var(--green);border-radius:50%;animation:pageSpin .7s linear infinite}
+.page-transition p{margin:0;color:var(--dim);font-size:13px}
+@keyframes pageSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.transition-spinner{animation-duration:2s}.page-transition{transition:none}}
+
+/* In-page game player popup */
+.game-modal[hidden]{display:none!important}.game-modal{position:fixed;inset:0;z-index:10000;background:rgba(5,9,15,.94);backdrop-filter:blur(10px);display:flex;flex-direction:column;padding:clamp(8px,2vw,22px)}
+.game-modal-bar{height:52px;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 12px;background:var(--panel);border:1px solid var(--edge);border-bottom:0;border-radius:14px 14px 0 0;color:var(--text)}
+.game-modal-bar strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.game-modal-actions{display:flex;align-items:center;gap:8px}
+.game-modal-actions button{display:flex;align-items:center;justify-content:center;gap:7px;min-width:38px;height:36px;padding:0 10px;border:1px solid var(--edge);border-radius:9px;background:var(--panel);color:var(--text);font:600 13px Rubik;cursor:pointer}
+.game-modal-actions button:hover{border-color:var(--green);color:var(--green)}#gameModalFrame{display:block;flex:1;width:100%;min-height:0;border:1px solid var(--edge);border-radius:0 0 14px 14px;background:#000}body.game-modal-open{overflow:hidden}
+@media(max-width:600px){.game-modal{padding:0}.game-modal-bar{border-radius:0;height:48px;min-height:48px}.game-modal-actions button span{display:none}#gameModalFrame{border-radius:0}}
+
+/* Custom background setting and legible image overlay */
+.page-bg{background-image:radial-gradient(circle at 50% -10%,color-mix(in srgb,var(--green) 13%,transparent),transparent 38%),radial-gradient(circle at 90% 70%,color-mix(in srgb,var(--green2) 7%,transparent),transparent 35%),var(--custom-bg-image,none);background-position:center,center,center;background-size:auto,auto,cover;background-repeat:no-repeat,no-repeat,no-repeat;opacity:.95}
+body.has-custom-background .page-bg{filter:saturate(.82)}
+body.has-custom-background:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(8,13,22,.62)}
+.background-setting{align-items:flex-start!important}
+.background-controls{display:flex;align-items:center;gap:8px}
+.background-upload,.background-reset{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border:1px solid var(--edge);border-radius:9px;background:var(--panel);color:var(--text);font:600 12px Rubik;cursor:pointer}
+.background-upload:hover,.background-reset:hover{border-color:var(--green);color:var(--green)}
