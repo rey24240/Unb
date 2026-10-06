@@ -91,7 +91,7 @@
     "proxy": false
   },
    {
-    "name": "Burrito Bison: Launcha Libre",
+    "name": "BurritoBison",
     "url": "/unb/misc/clburritobisonlaunchalibre.html",
     "categories": ["Simulator"],
     "image": "/unb/misc/images/burritobison.jpeg",
@@ -157,6 +157,12 @@
     "name": "Tomb of the mask",
     "url": "/unb/misc/cltotm.html",
     "image": "/unb/misc/images/totm.jpeg",
+    "proxy": false
+  },
+  {
+    "name": "Doblox",
+    "url": "/unb/misc/cldoblox.html",
+    "image": "/unb/misc/images/doblox.jpeg",
     "proxy": false
   }
 ]

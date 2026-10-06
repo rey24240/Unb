@@ -6,8 +6,6 @@ let games = [];
 
 const grid = document.getElementById('grid');
 const emptyNote = document.getElementById('emptyNote');
-const gameSearch = document.getElementById('gameSearch');
-const categorySelect = document.getElementById('categorySelect');
 
 function faviconFor(url){
   try{
@@ -75,7 +73,6 @@ function cardHTML(g){
   const img = g.image || g.thumbnail || faviconFor(g.url);
   const category = (g.categories || []).join(', ') || 'Game';
   const description = g.description || `Play ${category.toLowerCase()} game`;
-  const v=getVotes(g.url), who=v.myVote || v.voters?.[voterKey()] || null;
   return `
     <div class="card" data-url="${g.url}" data-name="${g.name}" tabindex="0" role="button" aria-label="Play ${g.name}">
       <div class="thumb">
@@ -89,34 +86,21 @@ function cardHTML(g){
           <i class="bi bi-three-dots-vertical card-menu" aria-hidden="true"></i>
         </div>
         <div class="description" title="${description}">${description}</div>
-        <div class="card-meta">
-          <button class="favorite-btn" data-favorite="${g.url}" type="button" title="Favorite"><i class="bi bi-star"></i></button>
-        </div>
       </div>
     </div>
   `;
 }
 
 function renderGrid(){
-  const query = gameSearch.value.trim().toLowerCase();
-  const cat = categorySelect.value;
-  const filtered = games.filter(g => {
-    const matchesQuery = g.name.toLowerCase().includes(query);
-    const matchesCat = cat === 'All' || (g.categories || []).includes(cat);
-    return matchesQuery && matchesCat;
-  });
-  grid.innerHTML = filtered.map(cardHTML).join('');
-  emptyNote.style.display = filtered.length === 0 ? 'block' : 'none';
-  emptyNote.textContent = 'No games match that search.';
+  grid.innerHTML = games.map(cardHTML).join('');
+  emptyNote.style.display = games.length === 0 ? 'block' : 'none';
+  emptyNote.textContent = 'No games available.';
 }
 
 fetch('miscG.json')
   .then(res => res.json())
   .then(data => {
-    games = data;
-    gameSearch.placeholder = `Search through our ${games.length} games!`;
-    populateCategories();
-    categorySelect.value = 'All';
+    games = Array.isArray(data) ? data : [];
     renderGrid();
   })
   .catch(() => {
@@ -127,22 +111,17 @@ fetch('miscG.json')
 window.addEventListener('ug-auth-changed', () => { loadServerVotes(); renderGrid(); });
 loadServerVotes();
 
-gameSearch.addEventListener('input', renderGrid);
-categorySelect.addEventListener('change', renderGrid);
-
 /* ---------- Open games in a minimal about:blank tab ---------- */
 function openCard(card){
   const win=window.open('about:blank','_blank');
   const playerUrl=`/unb/player-file.html?type=game&proxy=false&url=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name||'Game')}`;
   if(!win){ location.href=playerUrl; return; }
   win.document.open();
-  win.document.write(`<!doctype html><html><head><title>${card.dataset.name||'Game'}</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#000}</style></head><body><iframe src="${playerUrl}" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe></body></html>`);
+  win.document.write(`<!doctype html><html><head><title>${card.dataset.name||'Game'}</title><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#000}</style></head><body><iframe src="${playerUrl}" frameborder="0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe></body></html>`);
   win.document.close();
 }
 
 grid.addEventListener('click', e => {
-  const favorite=e.target.closest('[data-favorite]');
-  if(favorite){ e.preventDefault(); e.stopPropagation(); const list=new Set(JSON.parse(localStorage.getItem('ug_favorites')||'[]')); const url=favorite.dataset.favorite; list.has(url)?list.delete(url):list.add(url); localStorage.setItem('ug_favorites',JSON.stringify([...list])); renderGrid(); return; }
   const card=e.target.closest('.card'); if(card) openCard(card);
 });
 grid.addEventListener('keydown',e=>{const card=e.target.closest('.card');if(card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openCard(card)}});

@@ -313,7 +313,7 @@ function openAboutBlank(url, title, sideGames, currentUser, contentType='game'){
                 <div class="spinner"></div>
                 <span>Loading game...</span>
               </div>
-              <iframe id="gf" src="${url}" data-src="${url}" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen onload="hideLoading()"></iframe>
+              <iframe id="gf" src="${url}" data-src="${url}" frameborder="0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen onload="hideLoading()"></iframe>
             </div>
             <div class="bar">
               <div class="bar-left">

@@ -1,6 +1,6 @@
 :root{--bg:#0d1420;--panel:#142235;--panel2:#1b2a3c;--edge:#293d55;--text:#edf4ff;--dim:#91a7c0;--green:#1688ff;--green2:#0875ed;--shadow:rgba(0,0,0,.38)}
 [data-theme="purple"]{--green:#a879ff;--green2:#7b5bff}[data-theme="blue"]{--green:#38bdf8;--green2:#0ea5e9}[data-theme="red"]{--green:#f87171;--green2:#ef4444}[data-theme="amber"]{--green:#fbbf24;--green2:#f59e0b}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Rubik,system-ui,sans-serif}body{overflow-x:hidden}.page-bg{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% -10%,color-mix(in srgb,var(--green) 13%,transparent),transparent 38%),radial-gradient(circle at 90% 70%,color-mix(in srgb,var(--green2) 7%,transparent),transparent 35%)}
+*{box-sizing:border-box}iframe{border:0;outline:none;background:transparent}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Rubik,system-ui,sans-serif}body{overflow-x:hidden}.page-bg{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% -10%,color-mix(in srgb,var(--green) 13%,transparent),transparent 38%),radial-gradient(circle at 90% 70%,color-mix(in srgb,var(--green2) 7%,transparent),transparent 35%)}
 .site-header{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:22px;padding:14px 22px;background:rgba(13,17,23,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--edge)}
 .brand{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:800;letter-spacing:1px;text-decoration:none;white-space:nowrap}.brand-mark{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--green);border-radius:12px;color:var(--green);box-shadow:0 0 18px color-mix(in srgb,var(--green) 18%,transparent)}
 .header-spacer{flex:1}.nav-icon-btn{height:44px;padding:0 12px;min-width:0;border:1px solid var(--edge);background:var(--panel);color:var(--dim);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:17px;cursor:pointer;transition:.15s}.nav-icon-btn span{font-size:11px;font-weight:700;letter-spacing:.4px;white-space:nowrap}.nav-icon-btn:hover,.nav-icon-btn:focus-visible{color:var(--text);border-color:color-mix(in srgb,var(--green) 55%,var(--edge));background:color-mix(in srgb,var(--green) 9%,var(--panel));outline:none}
@@ -68,11 +68,11 @@ html,body{background:#0b1420}.page-bg{background:radial-gradient(ellipse at 50% 
 /* Unified Unblocked Games redesign: shared palette and persistent accent themes */
 :root{--bg:#0d1420;--panel:#142235;--panel2:#1b2a3c;--edge:#293d55;--text:#edf4ff;--dim:#91a7c0;--green:#1688ff;--green2:#0875ed;--shadow:rgba(0,0,0,.38)}
 html,body{background:var(--bg);color:var(--text)}
-[data-theme="green"]{--green:#35d07f;--green2:#16a765}
-[data-theme="purple"]{--green:#a879ff;--green2:#7b5bff}
-[data-theme="blue"]{--green:#1688ff;--green2:#0875ed}
-[data-theme="red"]{--green:#ff647c;--green2:#e83e5b}
-[data-theme="amber"]{--green:#ffbf4a;--green2:#e99518}
+[data-theme="green"]{--green:#41d98b;--green2:#1dbb72}
+[data-theme="purple"]{--green:#b58cff;--green2:#8c67e8}
+[data-theme="blue"]{--green:#50baff;--green2:#218fe0}
+[data-theme="red"]{--green:#ff7185;--green2:#e74662}
+[data-theme="amber"]{--green:#ffc45c;--green2:#e99b2e}
 .brand-title b,.brand-mark,.settings-row span i,.settings-link:hover{color:var(--green)}
 .brand-mark{border-color:var(--green);box-shadow:0 0 16px color-mix(in srgb,var(--green) 20%,transparent)}
 .content-tab.active,.card-body:after{background:linear-gradient(135deg,var(--green),var(--green2))}
@@ -80,13 +80,16 @@ html,body{background:var(--bg);color:var(--text)}
 .game-card:hover,.game-card:focus-visible{border-color:var(--green);box-shadow:0 10px 24px rgba(0,0,0,.3),0 0 0 1px color-mix(in srgb,var(--green) 22%,transparent)}
 .catalog-search:focus-within{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 12%,transparent)}
 .settings-link:hover{border-color:var(--green)}
+.nav-icon-btn:hover,.nav-icon-btn:focus-visible{color:var(--green)}
+.catalog-heading h2:after,.play-overlay i{background:var(--green);box-shadow:0 0 12px color-mix(in srgb,var(--green) 48%,transparent)}
 @media(max-width:680px){.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.content-tabs{width:max-content}.content-tab{min-width:108px;padding:10px 15px}}
 
 /* Compact category picker and page-to-page loading transition */
 .catalog-tools{display:flex;justify-content:flex-start;gap:10px;margin-bottom:22px}
+.catalog-search{flex:1;min-width:0}
 .category-wrap{width:max-content;max-width:100%;height:42px;padding:0 12px;gap:8px;border-radius:12px}
 .category-wrap select{width:auto;min-width:0;max-width:180px;font-size:13px;cursor:pointer}
-@media(max-width:680px){.catalog-tools{display:flex;grid-template-columns:none}.category-wrap{height:40px}.category-wrap select{max-width:155px}}
+@media(max-width:680px){.catalog-tools{display:flex;grid-template-columns:none}.catalog-search{flex:1}.category-wrap{height:40px}.category-wrap select{max-width:155px}}
 .page-transition{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(13,20,32,.97);opacity:0;visibility:hidden;transition:opacity .18s ease,visibility .18s ease}
 .page-transition.show{opacity:1;visibility:visible}
 .transition-brand{display:flex;align-items:center;gap:10px;color:var(--text);font-size:24px;font-weight:800}
@@ -105,10 +108,35 @@ html,body{background:var(--bg);color:var(--text)}
 @media(max-width:600px){.game-modal{padding:0}.game-modal-bar{border-radius:0;height:48px;min-height:48px}.game-modal-actions button span{display:none}#gameModalFrame{border-radius:0}}
 
 /* Custom background setting and legible image overlay */
-.page-bg{background-image:radial-gradient(circle at 50% -10%,color-mix(in srgb,var(--green) 13%,transparent),transparent 38%),radial-gradient(circle at 90% 70%,color-mix(in srgb,var(--green2) 7%,transparent),transparent 35%),var(--custom-bg-image,none);background-position:center,center,center;background-size:auto,auto,cover;background-repeat:no-repeat,no-repeat,no-repeat;opacity:.95}
+.page-bg{background-image:linear-gradient(118deg,color-mix(in srgb,var(--green) 11%,transparent),transparent 40%),linear-gradient(302deg,color-mix(in srgb,var(--green2) 8%,transparent),transparent 42%),linear-gradient(to bottom,transparent 65%,var(--bg) 100%),repeating-linear-gradient(0deg,transparent 0 47px,color-mix(in srgb,var(--text) 2.5%,transparent) 48px),repeating-linear-gradient(90deg,transparent 0 47px,color-mix(in srgb,var(--text) 2.5%,transparent) 48px),var(--custom-bg-image,none);background-position:center,center,center,left top,left top,center;background-size:auto,auto,auto,48px 48px,48px 48px,cover;background-repeat:no-repeat,no-repeat,no-repeat,repeat,repeat,no-repeat;opacity:1}
 body.has-custom-background .page-bg{filter:saturate(.82)}
 body.has-custom-background:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(8,13,22,.62)}
 .background-setting{align-items:flex-start!important}
 .background-controls{display:flex;align-items:center;gap:8px}
 .background-upload,.background-reset{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;border:1px solid var(--edge);border-radius:9px;background:var(--panel);color:var(--text);font:600 12px Rubik;cursor:pointer}
 .background-upload:hover,.background-reset:hover{border-color:var(--green);color:var(--green)}
+
+/* Centered settings window */
+.settings-popover[hidden]{display:none!important}
+.settings-popover:not([hidden]){position:fixed;inset:0;z-index:11000;display:grid;place-items:center;width:auto;padding:20px;background:rgba(3,8,15,.72);backdrop-filter:blur(9px);border:0;border-radius:0;box-shadow:none}
+.settings-dialog{width:min(560px,100%);max-height:min(760px,calc(100vh - 40px));overflow-y:auto;padding:24px;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 96%,var(--green) 4%),var(--panel));border:1px solid color-mix(in srgb,var(--green) 25%,var(--edge));border-radius:22px;box-shadow:0 30px 100px rgba(0,0,0,.62)}
+.settings-dialog .settings-popover-head{padding-bottom:18px;border-bottom:1px solid var(--edge);margin-bottom:6px}
+.settings-dialog .settings-popover-head strong{font-size:22px;letter-spacing:-.4px}
+.settings-dialog .settings-popover-head small{font-size:13px}
+.settings-dialog .settings-popover-head button{width:38px;height:38px;font-size:15px}
+.settings-dialog .settings-row{min-height:64px;padding:14px 0;border:0;border-bottom:1px solid color-mix(in srgb,var(--edge) 78%,transparent)}
+.settings-dialog .settings-row span{font-size:14px;font-weight:600}
+.settings-dialog .settings-row select{min-width:165px;padding:10px 12px;font:500 13px Rubik}
+.settings-dialog .background-setting{align-items:center!important}
+.settings-dialog .settings-data-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.settings-dialog .settings-link{margin-top:12px;padding:13px 15px;border-radius:12px;font-size:14px;transition:background .16s,border-color .16s,transform .16s}
+.settings-dialog .settings-data-actions .settings-link{margin:0}
+.settings-dialog .settings-link i{margin-right:8px;color:var(--green)}
+.settings-dialog .settings-link:hover{background:color-mix(in srgb,var(--green) 10%,var(--panel2));transform:translateY(-1px)}
+
+/* Keep the player in a centered, resizable-feeling window on the library page */
+.game-modal{display:grid;place-items:center;padding:24px}
+.game-modal-window{display:flex;flex-direction:column;width:min(1440px,96vw);height:min(900px,92vh);min-height:320px;overflow:hidden;border:1px solid var(--edge);border-radius:18px;background:var(--panel);box-shadow:0 30px 100px rgba(0,0,0,.7)}
+.game-modal-window .game-modal-bar{flex:none;border-radius:0;border:0;border-bottom:1px solid var(--edge)}
+.game-modal-window #gameModalFrame{flex:1;width:100%;height:auto;min-height:0;border:0;border-radius:0}
+@media(max-width:600px){.settings-popover:not([hidden]){padding:12px}.settings-dialog{max-height:calc(100vh - 24px);padding:18px;border-radius:17px}.settings-dialog .settings-row{align-items:flex-start;flex-direction:column;gap:10px}.settings-dialog .settings-row select{width:100%}.game-modal{padding:10px}.game-modal-window{width:100%;height:calc(100vh - 20px);border-radius:12px}.game-modal-window .game-modal-bar{border-radius:12px 12px 0 0}}

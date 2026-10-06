@@ -2,21 +2,231 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Web Browser</title>
+<meta name="theme-color" content="#0d1420">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apps | Unblocked Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="browser.css">
+<link rel="stylesheet" href="./unb/index.css?v=redesign20261002">
 </head>
 <body>
-<div class="browser-shell">
-  <div class="browser-toolbar">
+<div class="page-bg"></div>
+<div class="page-transition show" id="pageTransition" aria-hidden="true"><div class="transition-brand"><i class="bi bi-controller"></i><span>Unblocked <b>Games</b></span></div><div class="transition-spinner"></div><p>Loading your library...</p></div>
+
+<header class="site-header">
+  <a class="brand" href="/index.html" aria-label="Home">
+    <span class="brand-mark"><i class="bi bi-controller"></i></span>
+    <span class="brand-title">Unblocked <b>Games</b></span>
+  </a>
+  <div class="header-spacer"></div>
+  <input id="loadDataInput" type="file" accept="application/json,.json" hidden>
+  <button class="nav-icon-btn" id="settingsBtn" type="button" title="Settings" aria-label="Settings">
+    <i class="bi bi-gear-fill"></i>
+  </button>
+</header>
+
+<div class="settings-popover" id="settingsPopover" hidden>
+  <section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="settings-popover-head">
+      <div><strong id="settingsTitle">Settings</strong><small>Personalize your library</small></div>
+      <button id="settingsClose" type="button" aria-label="Close settings"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="settings-row">
+      <span><i class="bi bi-palette-fill"></i> Accent color</span>
+      <select id="accentSelect" aria-label="Accent color">
+        <option value="green">Green</option><option value="purple">Purple</option><option value="blue">Blue</option><option value="red">Red</option><option value="amber">Amber</option>
+      </select>
+    </div>
+    <div class="settings-row background-setting">
+      <span><i class="bi bi-image"></i> Custom background</span>
+      <div class="background-controls">
+        <label class="background-upload" for="backgroundInput">Choose image</label>
+        <input id="backgroundInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+        <button class="background-reset" id="backgroundReset" type="button">Reset</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <span><i class="bi bi-shield-check"></i> Proxy engine</span>
+      <select id="proxySelect" aria-label="Proxy engine">
+        <option value="utopia">Utopia / Ultraviolet</option><option value="direct">Direct / No proxy</option>
+      </select>
+    </div>
+    <div class="settings-data-actions">
+      <button class="settings-link" id="loadDataBtn" type="button"><i class="bi bi-upload"></i> Import Data</button>
+      <button class="settings-link" id="saveDataBtn" type="button"><i class="bi bi-download"></i> Export Data</button>
+    </div>
+    <button class="settings-link" id="homeSettingsBtn" type="button"><i class="bi bi-house-fill"></i> Home</button>
+  </section>
+</div>
+
+<main class="content">
+  <section class="hero">
+    <div>
+      <div class="eyebrow" id="eyebrow">GAMES</div>
+      <h1 id="pageTitle">Library</h1>
+      <p id="pageSubtitle">Choose a game to start playing.</p>
+    </div>
+    <div class="result-count"><span id="resultCount">0</span> results</div>
+  </section>
+
+  <nav class="content-tabs" aria-label="Games and apps">
+    <a class="content-tab" id="gamesTab" href="/games.html"><i class="bi bi-controller"></i> Games</a>
+    <a class="content-tab" id="appsTab" href="/apps.html"><i class="bi bi-grid-1x2-fill"></i> Apps</a>
+  </nav>
+
+  <section class="catalog-tools" aria-label="Filters">
+    <label class="catalog-search">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <input id="catalogSearch" type="search" placeholder="Search through apps..." autocomplete="off" aria-label="Search apps">
+    </label>
+    <label class="category-wrap" title="Choose a category">
+      <i class="bi bi-funnel"></i>
+      <select id="categorySelect" aria-label="Category">
+        <option value="All">All Categories</option>
+      </select>
+    </label>
+  </section>
+
+  <div class="catalog-heading"><h2 id="catalogHeading">All Games</h2><span id="resultLabel">Browse the full library</span></div>
+  <section id="grid" class="card-grid" aria-live="polite"></section>
+  <div id="emptyState" class="empty-state" hidden>
+    <i class="bi bi-search"></i>
+    <h2>Nothing found</h2>
+    <p>Try another search or category.</p>
   </div>
-    <div class="loading" id="loading"><div class="spinner"></div><span>Loading...</span></div>
-    <iframe id="webFrame" title="Web content" allow="fullscreen; autoplay; clipboard-read; clipboard-write" referrerpolicy="no-referrer"></iframe>
+</main>
+
+<div id="gameModal" class="game-modal" hidden role="dialog" aria-modal="true" aria-label="Game player">
+  <div class="game-modal-window">
+    <div class="game-modal-bar"><strong id="gameModalTitle">Playing game</strong><div class="game-modal-actions"><button id="gameFullscreen" type="button" aria-label="Fullscreen"><i class="bi bi-fullscreen"></i></button><button id="gameClose" type="button" aria-label="Close game"><i class="bi bi-x-lg"></i><span>Close</span></button></div></div>
+    <iframe id="gameModalFrame" title="Game" frameborder="0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe>
   </div>
 </div>
-<script src="uv/uv.BP.js"></script>
-<script src="uv/uv.config.js"></script>
-<script src="browser.js"></script>
+<script>
+const PAGE = location.pathname.endsWith('/apps.html') ? 'apps' : 'games';
+const pageTransition=document.getElementById('pageTransition');
+document.querySelectorAll('.content-tab').forEach(link=>link.addEventListener('click',e=>{
+ const target=new URL(link.href,location.href);
+ if(target.pathname===location.pathname)return;
+ e.preventDefault();pageTransition.classList.add('show');
+ window.setTimeout(()=>location.href=target.href,180);
+}));
+const state = { games: [], apps: [] };
+const grid = document.getElementById('grid');
+const catalogSearch = document.getElementById('catalogSearch');
+const categorySelect = document.getElementById('categorySelect');
+const resultCount = document.getElementById('resultCount');
+const emptyState = document.getElementById('emptyState');
+const pageTitle = document.getElementById('pageTitle');
+const pageSubtitle = document.getElementById('pageSubtitle');
+const eyebrow = document.getElementById('eyebrow');
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsPopover = document.getElementById('settingsPopover');
+const settingsClose = document.getElementById('settingsClose');
+const accentSelect = document.getElementById('accentSelect');
+const proxySelect = document.getElementById('proxySelect');
+const saveDataBtn = document.getElementById('saveDataBtn');
+const loadDataBtn = document.getElementById('loadDataBtn');
+const loadDataInput = document.getElementById('loadDataInput');
+const homeSettingsBtn = document.getElementById('homeSettingsBtn');
+function escapeHTML(value='') { return String(value).replace(/[&<>\'\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch])); }
+function faviconFor(url) { try { return `https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(new URL(url).hostname)}`; } catch (_) { return ''; } }
+function populateCategories() {
+ const vals = new Set(); state[PAGE].forEach(item => (item.categories||[]).forEach(c=>vals.add(c)));
+ categorySelect.innerHTML='<option value="All">All categories</option>'+[...vals].sort((a,b)=>a.localeCompare(b)).map(c=>`<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
+}
+function cardHTML(item) {
+ const url=escapeHTML(item.url||''), name=escapeHTML(item.name||'Untitled');
+ const useProxy=item.proxy===true||item.proxy==='true'||item.proxy===undefined;
+ const image=escapeHTML(item.image||item.thumbnail||faviconFor(item.url));
+ const fallback=escapeHTML(faviconFor(item.url?.startsWith('http')?item.url:`${location.origin}${item.url||''}`));
+ return `<article class="game-card" data-url="${url}" data-name="${name}" data-proxy="${useProxy}" tabindex="0" role="button"><div class="card-image"><img src="${image}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'"><div class="play-overlay"><i class="bi bi-play-fill"></i></div></div><div class="card-body"><h2>${name}</h2><p>${(item.categories||[]).map(escapeHTML).join(' • ')|| (PAGE==='apps'?'App':'Game')}</p></div></article>`;
+}
+function render() {
+ const items=state[PAGE], category=categorySelect.value;
+ const query=catalogSearch.value.trim().toLowerCase();
+ const filtered=items.filter(item=>{
+  const searchable=`${item.name||''} ${(item.categories||[]).join(' ')}`.toLowerCase();
+  return searchable.includes(query)&&(category==='All'||(item.categories||[]).includes(category));
+ });
+ grid.innerHTML=filtered.map(cardHTML).join(''); resultCount.textContent=filtered.length;
+ emptyState.hidden=filtered.length!==0;
+ document.getElementById('catalogHeading').textContent=PAGE==='apps'?'All Apps':'All Games';
+ document.getElementById('resultLabel').textContent=PAGE==='apps'?'Browse the full app library':'Browse the full game library';
+ eyebrow.textContent=PAGE.toUpperCase(); pageTitle.textContent=PAGE==='apps'?'Browse Apps':'Browse Games';
+ pageSubtitle.textContent=PAGE==='apps'?'Open apps through the site player.':'Choose a game to start playing.';
+ document.getElementById('gamesTab').classList.toggle('active',PAGE==='games');
+ document.getElementById('appsTab').classList.toggle('active',PAGE==='apps');
+}
+function openItem(card) {
+ const useProxy=card.dataset.proxy!=='false', type=PAGE==='apps'?'app':'game', player='player-file.html', source=useProxy?'url':'file';
+ const query=`type=${type}&${source}=${encodeURIComponent(card.dataset.url)}&proxy=${useProxy}&title=${encodeURIComponent(card.dataset.name||'Game')}`;
+ const title=card.dataset.name||'Playing game';
+ openPlayerTab(`/unb/${player}?${query}`,title);
+}
+function openPlayerTab(playerUrl,title) {
+ const playerTab=window.open('about:blank','_blank');
+ if(!playerTab){alert('Please allow pop-ups to open games in a new tab.');return;}
+ const playerDocument=playerTab.document;
+ playerDocument.documentElement.style.cssText='width:100%;height:100%;';
+ playerDocument.body.style.cssText='display:flex;flex-direction:column;width:100%;height:100%;margin:0;overflow:hidden;background:#05090f;color:#edf4ff;font:600 14px system-ui,sans-serif;';
+ playerDocument.title=title;
+ const bar=playerDocument.createElement('header');
+ bar.style.cssText='display:flex;flex:none;align-items:center;justify-content:space-between;gap:12px;height:44px;padding:0 14px;background:#111923;border-bottom:1px solid #293d55;';
+ const titleElement=playerDocument.createElement('strong');
+ titleElement.textContent=title;
+ titleElement.style.cssText='overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+ const closeButton=playerDocument.createElement('button');
+ closeButton.type='button';closeButton.textContent='Close tab';
+ closeButton.style.cssText='border:1px solid #293d55;border-radius:8px;background:#1b2a3c;color:#edf4ff;padding:7px 12px;font:inherit;cursor:pointer;';
+ closeButton.addEventListener('click',()=>playerTab.close());
+ const actions=playerDocument.createElement('div');
+ actions.style.cssText='display:flex;gap:8px;flex:none;';
+ const refreshButton=playerDocument.createElement('button');
+ refreshButton.type='button';refreshButton.textContent='Refresh';
+ const fullscreenButton=playerDocument.createElement('button');
+ fullscreenButton.type='button';fullscreenButton.textContent='Fullscreen';
+ for(const button of [refreshButton,fullscreenButton])button.style.cssText=closeButton.style.cssText;
+ refreshButton.addEventListener('click',()=>{playerFrame.src=playerUrl;});
+ fullscreenButton.addEventListener('click',()=>{if(playerFrame.requestFullscreen)playerFrame.requestFullscreen().catch(error=>console.error('Could not enter fullscreen:',error));});
+ actions.append(refreshButton,fullscreenButton,closeButton);
+ bar.append(titleElement,actions);
+ const playerFrame=playerDocument.createElement('iframe');
+ playerFrame.title=title;
+ playerFrame.allow='fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share';
+ playerFrame.allowFullscreen=true;playerFrame.referrerPolicy='no-referrer';
+ playerFrame.style.cssText='display:block;flex:1;width:100%;min-height:0;border:0;background:#000;';
+ playerFrame.src=playerUrl;
+ playerDocument.body.replaceChildren(bar,playerFrame);
+}
+const gameModal=document.getElementById('gameModal'), gameFrame=document.getElementById('gameModalFrame');
+function closeGameModal(){gameModal.hidden=true;gameFrame.onload=null;gameFrame.src='about:blank';document.body.classList.remove('game-modal-open');}
+document.getElementById('gameClose').addEventListener('click',closeGameModal);
+document.getElementById('gameFullscreen').addEventListener('click',()=>{const frame=document.getElementById('gameModalFrame');if(frame.requestFullscreen)frame.requestFullscreen().catch(()=>{});});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!gameModal.hidden)closeGameModal();if(e.key==='Escape'&&!settingsPopover.hidden)settingsPopover.hidden=true;});
+categorySelect.addEventListener('change',render);
+catalogSearch.addEventListener('input',render);
+grid.addEventListener('click',e=>{const card=e.target.closest('.game-card');if(card)openItem(card);});
+grid.addEventListener('keydown',e=>{const card=e.target.closest('.game-card');if(card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openItem(card);}});
+const theme=localStorage.getItem('ug_theme')||'blue';document.documentElement.dataset.theme=theme;accentSelect.value=theme;
+const backgroundInput=document.getElementById('backgroundInput'), backgroundReset=document.getElementById('backgroundReset');
+function applyCustomBackground(data){if(data){document.documentElement.style.setProperty('--custom-bg-image',`url("${data}")`);document.body.classList.add('has-custom-background');}else{document.documentElement.style.removeProperty('--custom-bg-image');document.body.classList.remove('has-custom-background');}}
+try{applyCustomBackground(localStorage.getItem('ug_custom_background'));}catch(e){}
+backgroundInput?.addEventListener('change',()=>{const file=backgroundInput.files?.[0];if(!file)return;if(!['image/png','image/jpeg','image/webp'].includes(file.type)){alert('Choose a PNG, JPG, or WebP image.');backgroundInput.value='';return;}if(file.size>3*1024*1024){alert('Please choose an image under 3 MB.');backgroundInput.value='';return;}const reader=new FileReader();reader.onload=()=>{try{localStorage.setItem('ug_custom_background',reader.result);applyCustomBackground(reader.result);}catch(e){alert('This image is too large for browser storage. Try a smaller image.');}};reader.readAsDataURL(file);});
+backgroundReset?.addEventListener('click',()=>{localStorage.removeItem('ug_custom_background');applyCustomBackground(null);if(backgroundInput)backgroundInput.value='';});
+settingsBtn.addEventListener('click',e=>{e.stopPropagation();settingsPopover.hidden=!settingsPopover.hidden;});
+settingsClose.addEventListener('click',()=>settingsPopover.hidden=true);
+settingsPopover.addEventListener('click',e=>{if(e.target===settingsPopover)settingsPopover.hidden=true;});
+homeSettingsBtn.addEventListener('click',()=>{settingsPopover.hidden=true;location.href='/games.html';});
+accentSelect.addEventListener('change',()=>{document.documentElement.dataset.theme=accentSelect.value;localStorage.setItem('ug_theme',accentSelect.value);});
+const savedProxy=localStorage.getItem('ug_proxy')||'utopia';proxySelect.value=['utopia','direct'].includes(savedProxy)?savedProxy:'utopia';proxySelect.addEventListener('change',()=>localStorage.setItem('ug_proxy',proxySelect.value));
+function collectSaveData(){return {format:'unblocked-games-save',version:1,savedAt:new Date().toISOString(),favorites:[],settings:{theme:localStorage.getItem('ug_theme')||'blue',proxy:localStorage.getItem('ug_proxy')||'utopia'}};}
+saveDataBtn.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(collectSaveData(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='unblocked-games-data.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+loadDataBtn.addEventListener('click',()=>loadDataInput.click());
+loadDataInput.addEventListener('change',async()=>{const file=loadDataInput.files?.[0];loadDataInput.value='';if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.format!=='unblocked-games-save'||data.version!==1)throw Error('This is not a valid site save file.');const st=data.settings||{},themes=['green','purple','blue','red','amber'];if(st.theme&&!themes.includes(st.theme))throw Error('Invalid theme.');if(st.proxy&&!['utopia','direct'].includes(st.proxy))throw Error('Invalid proxy.');if(st.theme){localStorage.setItem('ug_theme',st.theme);document.documentElement.dataset.theme=st.theme;accentSelect.value=st.theme;}if(st.proxy){localStorage.setItem('ug_proxy',st.proxy);proxySelect.value=st.proxy;}alert('Settings imported successfully.');}catch(err){alert(err.message||'Could not import that file.');}});
+document.addEventListener('click',e=>{if(!settingsPopover.hidden&&!settingsPopover.contains(e.target)&&!settingsBtn.contains(e.target))settingsPopover.hidden=true;});
+fetch(PAGE==='apps'?'./unb/apps.json':'./unb/miscG.json').then(r=>r.ok?r.json():Promise.reject()).then(data=>{state[PAGE]=Array.isArray(data)?data:[];populateCategories();render();}).catch(()=>{grid.innerHTML='';emptyState.hidden=false;emptyState.innerHTML='<i class="bi bi-exclamation-circle"></i><h2>Could not load library</h2><p>Please refresh the page.</p>';}).finally(()=>pageTransition.classList.remove('show'));
+</script>
 </body>
 </html>
