@@ -8,22 +8,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="./index.css?v=redesign20261002">
+<link rel="stylesheet" href="./index.css?v=sidebar20261008">
 </head>
 <body>
 <div class="page-bg"></div>
 <div class="page-transition show" id="pageTransition" aria-hidden="true"><div class="transition-brand"><i class="bi bi-controller"></i><span>Unblocked <b>Games</b></span></div><div class="transition-spinner"></div><p>Loading your library...</p></div>
 
 <header class="site-header">
-  <a class="brand" href="/index.html" aria-label="Home">
-    <span class="brand-mark"><i class="bi bi-controller"></i></span>
+  <a class="brand" href="/unb/games.html" aria-label="Games home">
     <span class="brand-title">Unblocked <b>Games</b></span>
   </a>
-  <div class="header-spacer"></div>
+  <label class="catalog-search navbar-search">
+    <i class="bi bi-search" aria-hidden="true"></i>
+    <input id="catalogSearch" type="search" placeholder="Search through games..." autocomplete="off" aria-label="Search games">
+  </label>
   <input id="loadDataInput" type="file" accept="application/json,.json" hidden>
-  <button class="nav-icon-btn" id="settingsBtn" type="button" title="Settings" aria-label="Settings">
-    <i class="bi bi-gear-fill"></i>
-  </button>
 </header>
 
 <div class="settings-popover" id="settingsPopover" hidden>
@@ -60,6 +59,14 @@
   </section>
 </div>
 
+<div class="library-layout">
+<aside class="library-sidebar">
+  <nav class="sidebar-nav" aria-label="Main navigation">
+    <a class="sidebar-link active" id="gamesTab" href="/unb/games.html"><i class="bi bi-controller"></i><span>Games</span></a>
+    <a class="sidebar-link" id="appsTab" href="/unb/apps.html"><i class="bi bi-grid-1x2-fill"></i><span>Apps</span></a>
+    <button class="sidebar-link" id="settingsBtn" type="button"><i class="bi bi-gear-fill"></i><span>Settings</span></button>
+  </nav>
+</aside>
 <main class="content">
   <section class="hero">
     <div>
@@ -70,16 +77,7 @@
     <div class="result-count"><span id="resultCount">0</span> results</div>
   </section>
 
-  <nav class="content-tabs" aria-label="Games and apps">
-    <a class="content-tab" id="gamesTab" href="/games.html"><i class="bi bi-controller"></i> Games</a>
-    <a class="content-tab" id="appsTab" href="/apps.html"><i class="bi bi-grid-1x2-fill"></i> Apps</a>
-  </nav>
-
   <section class="catalog-tools" aria-label="Filters">
-    <label class="catalog-search">
-      <i class="bi bi-search" aria-hidden="true"></i>
-      <input id="catalogSearch" type="search" placeholder="Search through games..." autocomplete="off" aria-label="Search games">
-    </label>
     <label class="category-wrap" title="Choose a category">
       <i class="bi bi-funnel"></i>
       <select id="categorySelect" aria-label="Category">
@@ -96,6 +94,7 @@
     <p>Try another search or category.</p>
   </div>
 </main>
+</div>
 
 <div id="gameModal" class="game-modal" hidden role="dialog" aria-modal="true" aria-label="Game player">
   <div class="game-modal-window">
@@ -145,7 +144,7 @@
       const image = escapeHTML(item.image || item.thumbnail || '');
       const useProxy = item.proxy === true || item.proxy === 'true' || item.proxy === undefined;
       const categories = (item.categories || []).map(escapeHTML).join(' • ') || 'Game';
-      return `<article class="game-card" data-url="${url}" data-name="${name}" data-proxy="${String(useProxy)}" tabindex="0" role="button"><div class="card-image"><img src="${image}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(new URL(item.url || 'https://example.com', location.href).hostname)}'"><div class="play-overlay"><i class="bi bi-play-fill"></i></div></div><div class="card-body"><h2>${name}</h2><p>${categories}</p></div></article>`;
+      return `<article class="game-card" data-url="${url}" data-name="${name}" data-proxy="${String(useProxy)}" tabindex="0" role="button"><div class="card-image"><img src="${image}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(new URL(item.url || 'https://example.com', location.href).hostname)}'"></div><div class="card-body"><h2>${name}</h2><p>${categories}</p></div></article>`;
     }).join('');
 
     resultCount.textContent = filtered.length;
@@ -157,7 +156,7 @@
     pageSubtitle.textContent = 'Choose a game to start playing.';
   }
 
-  document.querySelectorAll('.content-tab').forEach(link => {
+  document.querySelectorAll('.sidebar-link[href]').forEach(link => {
     link.addEventListener('click', event => {
       const target = new URL(link.href, location.href);
       if (target.href === location.href) return;
@@ -178,7 +177,11 @@
     const source = useProxy ? 'url' : 'file';
     const title = card.dataset.name || 'Game';
     const query = `type=game&${source}=${encodeURIComponent(card.dataset.url || '')}&proxy=${useProxy}&title=${encodeURIComponent(title)}`;
-    openPlayerTab(`/unb/player-file.html?${query}`, title);
+    document.getElementById('gameModalTitle').textContent = title;
+    gameFrame.src = `/unb/player-file.html?${query}`;
+    gameModal.hidden = false;
+    document.body.classList.add('game-modal-open');
+    document.getElementById('gameClose').focus();
   }
   function openPlayerTab(playerUrl, title) {
     const playerTab = window.open('about:blank', '_blank');

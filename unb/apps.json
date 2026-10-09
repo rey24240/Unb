@@ -1,3 +1,9 @@
 [
-  { "name": "YouTube", "url": "https://www.youtube.com" }
+  { "name": "YouTube", "url": "https://www.youtube.com" },
+  {
+    "name": "CrazyGames",
+    "url": "https://www.crazygames.com/",
+    "categories": ["Games", "Proxy test"],
+    "proxy": true
+  }
 ]

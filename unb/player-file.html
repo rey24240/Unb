@@ -42,12 +42,32 @@ async function loadTarget(){
 	},{once:true});
 	if(!useProxy){frame.src=target;return}
 	try{
+		if(!window.isSecureContext||!('serviceWorker' in navigator))throw new Error('The proxy requires a secure HTTPS connection (or localhost) with service worker support.');
 		await navigator.serviceWorker.register('/sw.js',{scope:'/'});
-		if(!navigator.serviceWorker.controller){navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload(),{once:true});return;}
-		if(!window.__uv$config){await new Promise((resolve,reject)=>{const bundle=document.createElement('script'),config=document.createElement('script');bundle.src='/uv/uv.bundle.js';config.src='/uv/uv.config.js';config.onload=()=>window.__uv$config?resolve():reject(new Error('UV config unavailable'));config.onerror=reject;document.head.append(bundle,config);});}
+		if(!navigator.serviceWorker.controller){
+			await new Promise((resolve,reject)=>{
+				const timeout=setTimeout(()=>reject(new Error('The proxy service worker did not take control. Please reload and try again.')),10000);
+				navigator.serviceWorker.addEventListener('controllerchange',()=>{clearTimeout(timeout);resolve();},{once:true});
+			});
+		}
+		if(!window.__uv$config){
+			const loadScript=src=>new Promise((resolve,reject)=>{
+				const script=document.createElement('script');
+				script.src=src;
+				script.onload=resolve;
+				script.onerror=()=>reject(new Error(`Could not load ${src}`));
+				document.head.append(script);
+			});
+			await loadScript('/uv/uv.bundle.js');
+			await loadScript('/uv/uv.config.js');
+			if(!window.__uv$config)throw new Error('Ultraviolet configuration was not initialized.');
+		}
 		frame.src=window.__uv$config.prefix+window.__uv$config.encodeUrl(target);
 	}catch(error){
-		loadingNotice.textContent='The proxy could not connect. Check that the Utopia / Ultraviolet proxy dependencies are installed and the server is running.';
+		clearTimeout(warningTimer);
+		console.error('Could not initialize the Ultraviolet proxy:',error);
+		document.getElementById('loadingText').textContent='Proxy setup failed';
+		loadingNotice.textContent=error.message||'The Ultraviolet proxy could not be initialized.';
 		loadingNotice.classList.add('visible');
 	}
 }

@@ -1,4 +1,4 @@
-import createServer from '@tomphttp/bare-server-node';
+import { createBareServer } from '@tomphttp/bare-server-node';
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
@@ -36,7 +36,7 @@ const mimeTypes = {
   '.map': 'application/json; charset=utf-8',
 };
 
-const bare = createServer('/seal/');
+const bare = createBareServer('/bare/');
 logging.set_level(logging.NONE);
 Object.assign(wisp.options, { dns_method: 'resolve', dns_servers: ['1.1.1.3', '1.0.0.3'], dns_result_order: 'ipv4first' });
 const server = http.createServer();

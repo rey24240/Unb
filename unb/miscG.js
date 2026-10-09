@@ -78,7 +78,6 @@ function cardHTML(g){
       <div class="thumb">
         ${badgeHtml}
         <img src="${img}" alt="${g.name}" loading="lazy" onerror="this.style.display='none'">
-        <div class="thumb-overlay"><i class="bi bi-play-fill"></i></div>
       </div>
       <div class="card-info">
         <div class="name-row">

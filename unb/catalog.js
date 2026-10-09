@@ -50,7 +50,7 @@
     const image = escapeHTML(item.image || item.thumbnail || faviconFor(item.url));
     const fallback = escapeHTML(faviconFor(item.url));
     const categories = (item.categories || []).map(escapeHTML).join(' • ') || (PAGE === 'apps' ? 'App' : 'Game');
-    return `<article class="game-card" data-url="${url}" data-name="${name}" tabindex="0" role="button"><div class="card-image"><img src="${image}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'"><div class="play-overlay"><i class="bi bi-play-fill"></i></div></div><div class="card-body"><h2>${name}</h2><p>${categories}</p></div></article>`;
+    return `<article class="game-card" data-url="${url}" data-name="${name}" tabindex="0" role="button"><div class="card-image"><img src="${image}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'"></div><div class="card-body"><h2>${name}</h2><p>${categories}</p></div></article>`;
   }
 
   function render() {

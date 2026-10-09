@@ -8,22 +8,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="./unb/index.css?v=redesign20261002">
+<link rel="stylesheet" href="./index.css?v=sidebar20261008">
 </head>
 <body>
 <div class="page-bg"></div>
 <div class="page-transition show" id="pageTransition" aria-hidden="true"><div class="transition-brand"><i class="bi bi-controller"></i><span>Unblocked <b>Games</b></span></div><div class="transition-spinner"></div><p>Loading your library...</p></div>
 
 <header class="site-header">
-  <a class="brand" href="/index.html" aria-label="Home">
-    <span class="brand-mark"><i class="bi bi-controller"></i></span>
+  <a class="brand" href="/unb/games.html" aria-label="Games home">
     <span class="brand-title">Unblocked <b>Games</b></span>
   </a>
-  <div class="header-spacer"></div>
+  <label class="catalog-search navbar-search">
+    <i class="bi bi-search" aria-hidden="true"></i>
+    <input id="catalogSearch" type="search" placeholder="Search through apps..." autocomplete="off" aria-label="Search apps">
+  </label>
   <input id="loadDataInput" type="file" accept="application/json,.json" hidden>
-  <button class="nav-icon-btn" id="settingsBtn" type="button" title="Settings" aria-label="Settings">
-    <i class="bi bi-gear-fill"></i>
-  </button>
 </header>
 
 <div class="settings-popover" id="settingsPopover" hidden>
@@ -60,6 +59,14 @@
   </section>
 </div>
 
+<div class="library-layout">
+<aside class="library-sidebar">
+  <nav class="sidebar-nav" aria-label="Main navigation">
+    <a class="sidebar-link" id="gamesTab" href="/unb/games.html"><i class="bi bi-controller"></i><span>Games</span></a>
+    <a class="sidebar-link" id="appsTab" href="/unb/apps.html"><i class="bi bi-grid-1x2-fill"></i><span>Apps</span></a>
+    <button class="sidebar-link" id="settingsBtn" type="button"><i class="bi bi-gear-fill"></i><span>Settings</span></button>
+  </nav>
+</aside>
 <main class="content">
   <section class="hero">
     <div>
@@ -70,16 +77,7 @@
     <div class="result-count"><span id="resultCount">0</span> results</div>
   </section>
 
-  <nav class="content-tabs" aria-label="Games and apps">
-    <a class="content-tab" id="gamesTab" href="/games.html"><i class="bi bi-controller"></i> Games</a>
-    <a class="content-tab" id="appsTab" href="/apps.html"><i class="bi bi-grid-1x2-fill"></i> Apps</a>
-  </nav>
-
   <section class="catalog-tools" aria-label="Filters">
-    <label class="catalog-search">
-      <i class="bi bi-search" aria-hidden="true"></i>
-      <input id="catalogSearch" type="search" placeholder="Search through apps..." autocomplete="off" aria-label="Search apps">
-    </label>
     <label class="category-wrap" title="Choose a category">
       <i class="bi bi-funnel"></i>
       <select id="categorySelect" aria-label="Category">
@@ -96,6 +94,7 @@
     <p>Try another search or category.</p>
   </div>
 </main>
+</div>
 
 <div id="gameModal" class="game-modal" hidden role="dialog" aria-modal="true" aria-label="Game player">
   <div class="game-modal-window">
@@ -106,7 +105,7 @@
 <script>
 const PAGE = location.pathname.endsWith('/apps.html') ? 'apps' : 'games';
 const pageTransition=document.getElementById('pageTransition');
-document.querySelectorAll('.content-tab').forEach(link=>link.addEventListener('click',e=>{
+document.querySelectorAll('.sidebar-link[href]').forEach(link=>link.addEventListener('click',e=>{
  const target=new URL(link.href,location.href);
  if(target.pathname===location.pathname)return;
  e.preventDefault();pageTransition.classList.add('show');
@@ -141,7 +140,7 @@ function cardHTML(item) {
  const useProxy=item.proxy===true||item.proxy==='true'||item.proxy===undefined;
  const image=escapeHTML(item.image||item.thumbnail||faviconFor(item.url));
  const fallback=escapeHTML(faviconFor(item.url?.startsWith('http')?item.url:`${location.origin}${item.url||''}`));
- return `<article class="game-card" data-url="${url}" data-name="${name}" data-proxy="${useProxy}" tabindex="0" role="button"><div class="card-image"><img src="${image}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'"><div class="play-overlay"><i class="bi bi-play-fill"></i></div></div><div class="card-body"><h2>${name}</h2><p>${(item.categories||[]).map(escapeHTML).join(' • ')|| (PAGE==='apps'?'App':'Game')}</p></div></article>`;
+ return `<article class="game-card" data-url="${url}" data-name="${name}" data-proxy="${useProxy}" tabindex="0" role="button"><div class="card-image"><img src="${image}" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'"></div><div class="card-body"><h2>${name}</h2><p>${(item.categories||[]).map(escapeHTML).join(' • ')|| (PAGE==='apps'?'App':'Game')}</p></div></article>`;
 }
 function render() {
  const items=state[PAGE], category=categorySelect.value;
@@ -218,7 +217,7 @@ backgroundReset?.addEventListener('click',()=>{localStorage.removeItem('ug_custo
 settingsBtn.addEventListener('click',e=>{e.stopPropagation();settingsPopover.hidden=!settingsPopover.hidden;});
 settingsClose.addEventListener('click',()=>settingsPopover.hidden=true);
 settingsPopover.addEventListener('click',e=>{if(e.target===settingsPopover)settingsPopover.hidden=true;});
-homeSettingsBtn.addEventListener('click',()=>{settingsPopover.hidden=true;location.href='/games.html';});
+homeSettingsBtn.addEventListener('click',()=>{settingsPopover.hidden=true;location.href='/unb/games.html';});
 accentSelect.addEventListener('change',()=>{document.documentElement.dataset.theme=accentSelect.value;localStorage.setItem('ug_theme',accentSelect.value);});
 const savedProxy=localStorage.getItem('ug_proxy')||'utopia';proxySelect.value=['utopia','direct'].includes(savedProxy)?savedProxy:'utopia';proxySelect.addEventListener('change',()=>localStorage.setItem('ug_proxy',proxySelect.value));
 function collectSaveData(){return {format:'unblocked-games-save',version:1,savedAt:new Date().toISOString(),favorites:[],settings:{theme:localStorage.getItem('ug_theme')||'blue',proxy:localStorage.getItem('ug_proxy')||'utopia'}};}
@@ -226,7 +225,7 @@ saveDataBtn.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(co
 loadDataBtn.addEventListener('click',()=>loadDataInput.click());
 loadDataInput.addEventListener('change',async()=>{const file=loadDataInput.files?.[0];loadDataInput.value='';if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.format!=='unblocked-games-save'||data.version!==1)throw Error('This is not a valid site save file.');const st=data.settings||{},themes=['green','purple','blue','red','amber'];if(st.theme&&!themes.includes(st.theme))throw Error('Invalid theme.');if(st.proxy&&!['utopia','direct'].includes(st.proxy))throw Error('Invalid proxy.');if(st.theme){localStorage.setItem('ug_theme',st.theme);document.documentElement.dataset.theme=st.theme;accentSelect.value=st.theme;}if(st.proxy){localStorage.setItem('ug_proxy',st.proxy);proxySelect.value=st.proxy;}alert('Settings imported successfully.');}catch(err){alert(err.message||'Could not import that file.');}});
 document.addEventListener('click',e=>{if(!settingsPopover.hidden&&!settingsPopover.contains(e.target)&&!settingsBtn.contains(e.target))settingsPopover.hidden=true;});
-fetch(PAGE==='apps'?'./unb/apps.json':'./unb/miscG.json').then(r=>r.ok?r.json():Promise.reject()).then(data=>{state[PAGE]=Array.isArray(data)?data:[];populateCategories();render();}).catch(()=>{grid.innerHTML='';emptyState.hidden=false;emptyState.innerHTML='<i class="bi bi-exclamation-circle"></i><h2>Could not load library</h2><p>Please refresh the page.</p>';}).finally(()=>pageTransition.classList.remove('show'));
+fetch(PAGE==='apps'?'./apps.json':'./miscG.json').then(r=>r.ok?r.json():Promise.reject()).then(data=>{state[PAGE]=Array.isArray(data)?data:[];populateCategories();render();}).catch(()=>{grid.innerHTML='';emptyState.hidden=false;emptyState.innerHTML='<i class="bi bi-exclamation-circle"></i><h2>Could not load library</h2><p>Please refresh the page.</p>';}).finally(()=>pageTransition.classList.remove('show'));
 </script>
 </body>
 </html>

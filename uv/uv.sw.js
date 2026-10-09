@@ -194,18 +194,22 @@ class UVServiceWorker extends EventEmitter {
         };
     };
     getBarerResponse(response) {
-        const headers = {};
-        const raw = JSON.parse(response.headers.get('x-bare-headers'));
+        const rawHeaders = response.headers.get('x-bare-headers');
+        const headers = rawHeaders === null
+            ? Object.fromEntries([...response.headers.entries()].map(([key, value]) => [key.toLowerCase(), value]))
+            : Object.fromEntries(Object.entries(JSON.parse(rawHeaders)).map(([key, value]) => [key.toLowerCase(), value]));
+        const rawStatus = response.headers.get('x-bare-status');
+        const status = rawStatus === null ? response.status : Number(rawStatus);
 
-        for (const key in raw) {
-            headers[key.toLowerCase()] = raw[key];
+        if (!Number.isInteger(status) || status < 200 || status > 599) {
+            throw new RangeError(`Bare response contained invalid HTTP status: ${rawStatus ?? response.status}`);
         };
 
         return {
             headers,
-            status: +response.headers.get('x-bare-status'),
-            statusText: response.headers.get('x-bare-status-text'),
-            body: !this.statusCode.empty.includes(+response.headers.get('x-bare-status')) ? response.body : null,
+            status,
+            statusText: response.headers.get('x-bare-status-text') || response.statusText,
+            body: !this.statusCode.empty.includes(status) ? response.body : null,
         };
     };
     get address() {
