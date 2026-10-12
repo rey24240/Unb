@@ -36,7 +36,7 @@ const mimeTypes = {
   '.map': 'application/json; charset=utf-8',
 };
 
-const bare = createBareServer('/bare/');
+const bare = createBareServer('/t/');
 logging.set_level(logging.NONE);
 Object.assign(wisp.options, { dns_method: 'resolve', dns_servers: ['1.1.1.3', '1.0.0.3'], dns_result_order: 'ipv4first' });
 const server = http.createServer();

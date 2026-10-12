@@ -8,11 +8,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="./index.css?v=sidebar20261008">
+<link rel="stylesheet" href="./index.css?v=cards20261009">
 </head>
 <body>
 <div class="page-bg"></div>
-<div class="page-transition show" id="pageTransition" aria-hidden="true"><div class="transition-brand"><i class="bi bi-controller"></i><span>Unblocked <b>Games</b></span></div><div class="transition-spinner"></div><p>Loading your library...</p></div>
+<div class="page-transition" id="pageTransition" aria-hidden="true"><div class="transition-brand"><i class="bi bi-controller"></i><span>Unblocked <b>Games</b></span></div><div class="transition-spinner"></div><p>Loading your library...</p></div>
 
 <header class="site-header">
   <a class="brand" href="/unb/games.html" aria-label="Games home">
@@ -62,9 +62,9 @@
 <div class="library-layout">
 <aside class="library-sidebar">
   <nav class="sidebar-nav" aria-label="Main navigation">
-    <a class="sidebar-link" id="gamesTab" href="/unb/games.html"><i class="bi bi-controller"></i><span>Games</span></a>
-    <a class="sidebar-link" id="appsTab" href="/unb/apps.html"><i class="bi bi-grid-1x2-fill"></i><span>Apps</span></a>
-    <button class="sidebar-link" id="settingsBtn" type="button"><i class="bi bi-gear-fill"></i><span>Settings</span></button>
+    <a class="sidebar-link" id="gamesTab" href="/unb/games.html" aria-label="Games" title="Games"><i class="bi bi-controller"></i><span>Games</span></a>
+    <a class="sidebar-link" id="appsTab" href="/unb/apps.html" aria-label="Apps" title="Apps"><i class="bi bi-grid-1x2-fill"></i><span>Apps</span></a>
+    <button class="sidebar-link" id="settingsBtn" type="button" aria-label="Settings" title="Settings"><i class="bi bi-gear-fill"></i><span>Settings</span></button>
   </nav>
 </aside>
 <main class="content">
@@ -158,46 +158,25 @@ function render() {
  document.getElementById('gamesTab').classList.toggle('active',PAGE==='games');
  document.getElementById('appsTab').classList.toggle('active',PAGE==='apps');
 }
+function openBlankPlayerTab(playerUrl,title) {
+ const popup=window.open('about:blank','_blank');
+ if(!popup) return false;
+ const safeTitle=escapeHTML(title||'Game');
+ popup.document.open();
+ popup.document.write(`<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${safeTitle}</title><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#000}body{overflow:hidden}</style></head><body><iframe src="${playerUrl}" frameborder="0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe></body></html>`);
+ popup.document.close();
+ return true;
+}
 function openItem(card) {
  const useProxy=card.dataset.proxy!=='false', type=PAGE==='apps'?'app':'game', player='player-file.html', source=useProxy?'url':'file';
  const query=`type=${type}&${source}=${encodeURIComponent(card.dataset.url)}&proxy=${useProxy}&title=${encodeURIComponent(card.dataset.name||'Game')}`;
- const title=card.dataset.name||'Playing game';
- openPlayerTab(`/unb/${player}?${query}`,title);
-}
-function openPlayerTab(playerUrl,title) {
- const playerTab=window.open('about:blank','_blank');
- if(!playerTab){alert('Please allow pop-ups to open games in a new tab.');return;}
- const playerDocument=playerTab.document;
- playerDocument.documentElement.style.cssText='width:100%;height:100%;';
- playerDocument.body.style.cssText='display:flex;flex-direction:column;width:100%;height:100%;margin:0;overflow:hidden;background:#05090f;color:#edf4ff;font:600 14px system-ui,sans-serif;';
- playerDocument.title=title;
- const bar=playerDocument.createElement('header');
- bar.style.cssText='display:flex;flex:none;align-items:center;justify-content:space-between;gap:12px;height:44px;padding:0 14px;background:#111923;border-bottom:1px solid #293d55;';
- const titleElement=playerDocument.createElement('strong');
- titleElement.textContent=title;
- titleElement.style.cssText='overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
- const closeButton=playerDocument.createElement('button');
- closeButton.type='button';closeButton.textContent='Close tab';
- closeButton.style.cssText='border:1px solid #293d55;border-radius:8px;background:#1b2a3c;color:#edf4ff;padding:7px 12px;font:inherit;cursor:pointer;';
- closeButton.addEventListener('click',()=>playerTab.close());
- const actions=playerDocument.createElement('div');
- actions.style.cssText='display:flex;gap:8px;flex:none;';
- const refreshButton=playerDocument.createElement('button');
- refreshButton.type='button';refreshButton.textContent='Refresh';
- const fullscreenButton=playerDocument.createElement('button');
- fullscreenButton.type='button';fullscreenButton.textContent='Fullscreen';
- for(const button of [refreshButton,fullscreenButton])button.style.cssText=closeButton.style.cssText;
- refreshButton.addEventListener('click',()=>{playerFrame.src=playerUrl;});
- fullscreenButton.addEventListener('click',()=>{if(playerFrame.requestFullscreen)playerFrame.requestFullscreen().catch(error=>console.error('Could not enter fullscreen:',error));});
- actions.append(refreshButton,fullscreenButton,closeButton);
- bar.append(titleElement,actions);
- const playerFrame=playerDocument.createElement('iframe');
- playerFrame.title=title;
- playerFrame.allow='fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share';
- playerFrame.allowFullscreen=true;playerFrame.referrerPolicy='no-referrer';
- playerFrame.style.cssText='display:block;flex:1;width:100%;min-height:0;border:0;background:#000;';
- playerFrame.src=playerUrl;
- playerDocument.body.replaceChildren(bar,playerFrame);
+ const playerUrl=`/unb/${player}?${query}`;
+ if(openBlankPlayerTab(playerUrl, card.dataset.name||'Game'))return;
+ document.getElementById('gameModalTitle').textContent=card.dataset.name||'Playing game';
+ gameFrame.src=playerUrl;
+ gameModal.hidden=false;
+ document.body.classList.add('game-modal-open');
+ document.getElementById('gameClose').focus();
 }
 const gameModal=document.getElementById('gameModal'), gameFrame=document.getElementById('gameModalFrame');
 function closeGameModal(){gameModal.hidden=true;gameFrame.onload=null;gameFrame.src='about:blank';document.body.classList.remove('game-modal-open');}
@@ -220,12 +199,15 @@ settingsPopover.addEventListener('click',e=>{if(e.target===settingsPopover)setti
 homeSettingsBtn.addEventListener('click',()=>{settingsPopover.hidden=true;location.href='/unb/games.html';});
 accentSelect.addEventListener('change',()=>{document.documentElement.dataset.theme=accentSelect.value;localStorage.setItem('ug_theme',accentSelect.value);});
 const savedProxy=localStorage.getItem('ug_proxy')||'utopia';proxySelect.value=['utopia','direct'].includes(savedProxy)?savedProxy:'utopia';proxySelect.addEventListener('change',()=>localStorage.setItem('ug_proxy',proxySelect.value));
-function collectSaveData(){return {format:'unblocked-games-save',version:1,savedAt:new Date().toISOString(),favorites:[],settings:{theme:localStorage.getItem('ug_theme')||'blue',proxy:localStorage.getItem('ug_proxy')||'utopia'}};}
-saveDataBtn.addEventListener('click',()=>{const blob=new Blob([JSON.stringify(collectSaveData(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='unblocked-games-data.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+function collectSaveData(){return {format:'unblocked-games-save',version:1,savedAt:new Date().toISOString(),settings:{theme:localStorage.getItem('ug_theme')||'blue',proxy:localStorage.getItem('ug_proxy')||'utopia',customBackground:localStorage.getItem('ug_custom_background')||'',reduceMotion:localStorage.getItem('ug_reduce_motion')==='1',compactSidebar:localStorage.getItem('ug_compact_sidebar')==='1',searchEngine:localStorage.getItem('ug_search_engine')||'google'}};}
+saveDataBtn.addEventListener('click',()=>{try{const blob=new Blob([JSON.stringify(collectSaveData(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='unblocked-games-data.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}catch(err){alert('Export failed: '+(err.message||'Unable to create the backup file.'));}});
 loadDataBtn.addEventListener('click',()=>loadDataInput.click());
-loadDataInput.addEventListener('change',async()=>{const file=loadDataInput.files?.[0];loadDataInput.value='';if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.format!=='unblocked-games-save'||data.version!==1)throw Error('This is not a valid site save file.');const st=data.settings||{},themes=['green','purple','blue','red','amber'];if(st.theme&&!themes.includes(st.theme))throw Error('Invalid theme.');if(st.proxy&&!['utopia','direct'].includes(st.proxy))throw Error('Invalid proxy.');if(st.theme){localStorage.setItem('ug_theme',st.theme);document.documentElement.dataset.theme=st.theme;accentSelect.value=st.theme;}if(st.proxy){localStorage.setItem('ug_proxy',st.proxy);proxySelect.value=st.proxy;}alert('Settings imported successfully.');}catch(err){alert(err.message||'Could not import that file.');}});
+loadDataInput.addEventListener('change',async()=>{const file=loadDataInput.files?.[0];loadDataInput.value='';if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.format!=='unblocked-games-save'||data.version!==1)throw Error('This is not a valid site backup file.');const st=data.settings||{},themes=['green','purple','blue','red','amber'];if(st.theme&&!themes.includes(st.theme))throw Error('Invalid theme.');if(st.proxy&&!['utopia','direct'].includes(st.proxy))throw Error('Invalid proxy.');if(st.theme){localStorage.setItem('ug_theme',st.theme);document.documentElement.dataset.theme=st.theme;accentSelect.value=st.theme;}if(st.proxy){localStorage.setItem('ug_proxy',st.proxy);proxySelect.value=st.proxy;}if(typeof st.customBackground==='string'){if(st.customBackground)localStorage.setItem('ug_custom_background',st.customBackground);else localStorage.removeItem('ug_custom_background');applyCustomBackground(st.customBackground||null);}if(typeof st.reduceMotion==='boolean'){localStorage.setItem('ug_reduce_motion',st.reduceMotion?'1':'0');document.documentElement.classList.toggle('reduce-motion',st.reduceMotion);}if(typeof st.compactSidebar==='boolean'){localStorage.setItem('ug_compact_sidebar',st.compactSidebar?'1':'0');document.documentElement.classList.toggle('compact-sidebar',st.compactSidebar);}if(st.searchEngine)localStorage.setItem('ug_search_engine',st.searchEngine);alert('Backup imported successfully.');}catch(err){alert(err.message||'Could not import that file.');}});
 document.addEventListener('click',e=>{if(!settingsPopover.hidden&&!settingsPopover.contains(e.target)&&!settingsBtn.contains(e.target))settingsPopover.hidden=true;});
-fetch(PAGE==='apps'?'./apps.json':'./miscG.json').then(r=>r.ok?r.json():Promise.reject()).then(data=>{state[PAGE]=Array.isArray(data)?data:[];populateCategories();render();}).catch(()=>{grid.innerHTML='';emptyState.hidden=false;emptyState.innerHTML='<i class="bi bi-exclamation-circle"></i><h2>Could not load library</h2><p>Please refresh the page.</p>';}).finally(()=>pageTransition.classList.remove('show'));
+render();
+emptyState.hidden=false;
+emptyState.innerHTML='<h2>Loading apps...</h2>';
+fetch(PAGE==='apps'?'./apps.json':'./miscG.json').then(r=>r.ok?r.json():Promise.reject()).then(data=>{state[PAGE]=Array.isArray(data)?data:[];populateCategories();render();if(state[PAGE].length===0)emptyState.innerHTML='<h2>No apps available</h2>';}).catch(()=>{grid.innerHTML='';emptyState.hidden=false;emptyState.innerHTML='<i class="bi bi-exclamation-circle"></i><h2>Could not load library</h2><p>Please refresh the page.</p>';});
 </script>
 </body>
 </html>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Game</title>
 <style>
-html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}
+html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}body{display:flex;flex-direction:column}#playerBar{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;background:#111923;color:#edf4ff;border-bottom:1px solid #293d55;font:600 14px system-ui,sans-serif}#playerTitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#playerActions{display:flex;gap:7px}#playerActions button{border:1px solid #293d55;border-radius:8px;background:#1b2a3c;color:#edf4ff;padding:7px 10px;font:inherit;cursor:pointer}#playerFrame{flex:1;min-height:0}
 #playerFrame{width:100%;height:100%;border:0;display:block}
 #loading{position:fixed;inset:0;z-index:2;display:grid;place-items:center;background:linear-gradient(145deg,#101722,#182437);color:#eef2f8;font:600 16px system-ui,sans-serif;transition:opacity .2s ease}
 #loading.hidden{opacity:0;pointer-events:none}
@@ -17,6 +17,7 @@ html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}
 </style>
 </head>
 <body>
+<header id="playerBar"><strong id="playerTitle">Loading app...</strong><div id="playerActions"><button id="refreshPlayer" type="button">Refresh</button><button id="fullscreenPlayer" type="button">Fullscreen</button><button id="closePlayer" type="button">Close tab</button></div></header>
 <div id="loading" role="status" aria-live="polite"><div id="loadingInner"><div id="spinner"></div><div id="loadingText">Loading game...</div><div id="loadingNotice">This game is taking a while to load. It might be slow or unavailable.</div></div></div>
 <iframe id="playerFrame" src="about:blank" frameborder="0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe>
 <script>
@@ -27,7 +28,11 @@ const rawTarget=params.get('file')||params.get('url')||'';
 const target=useProxy&&!/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(rawTarget)?`https://${rawTarget}`:rawTarget;
 const title=decodeURIComponent(params.get('title')||'Game');
 document.title=title;
+document.getElementById('playerTitle').textContent=title;
 const frame=document.getElementById('playerFrame');
+document.getElementById('refreshPlayer').addEventListener('click',()=>{frame.src='about:blank';setTimeout(()=>loadTarget(),30);});
+document.getElementById('fullscreenPlayer').addEventListener('click',()=>{if(frame.requestFullscreen)frame.requestFullscreen().catch(()=>{});});
+document.getElementById('closePlayer').addEventListener('click',()=>window.close());
 const loading=document.getElementById('loading');
 const loadingNotice=document.getElementById('loadingNotice');
 async function loadTarget(){

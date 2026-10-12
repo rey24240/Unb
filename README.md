@@ -10,7 +10,7 @@ This build adds a Utopia-style browser page with an iframe and browser toolbar, 
 - Settings are stored in `localStorage` and apply across the site.
 
 ## Important deployment note
-Ultraviolet's browser-side service worker is included, but Utopia's proxy requires a Bare server. GitHub Pages alone cannot provide `/bare/` routing. Deploy this folder with the included Node server on a Node-capable host.
+Ultraviolet's browser-side service worker is included, but Utopia's proxy requires a Bare server. GitHub Pages alone cannot provide `/t/` routing. Deploy this folder with the included Node server on a Node-capable host.
 
 Run:
 

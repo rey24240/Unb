@@ -69,16 +69,36 @@
     document.getElementById('appsTab').classList.toggle('active', PAGE === 'apps');
   }
 
+  function openBlankPlayerTab(playerUrl, title) {
+    const newTab = window.open('about:blank', '_blank');
+    if (!newTab) return false;
+
+    const safeTitle = escapeHTML(title || 'Game');
+    newTab.document.open();
+    newTab.document.write(`<!doctype html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${safeTitle}</title>
+          <style>
+            html, body, iframe { width: 100%; height: 100%; margin: 0; border: 0; display: block; background: #000; }
+            body { overflow: hidden; }
+          </style>
+        </head>
+        <body>
+          <iframe src="${playerUrl}" frameborder="0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe>
+        </body>
+      </html>`);
+    newTab.document.close();
+    return true;
+  }
+
   function openItem(card) {
     const type = PAGE === 'apps' ? 'app' : 'game';
     const query = `type=${type}&file=${encodeURIComponent(card.dataset.url)}&title=${encodeURIComponent(card.dataset.name || 'Game')}`;
     const playerUrl = `/unb/player-file.html?${query}`;
-    const newTab = window.open('about:blank', '_blank');
-
-    if (newTab) {
-      newTab.location.href = playerUrl;
-      return;
-    }
+    if (openBlankPlayerTab(playerUrl, card.dataset.name || 'Game')) return;
 
     const modal = document.getElementById('gameModal');
     const frame = document.getElementById('gameModalFrame');
