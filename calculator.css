@@ -21,8 +21,8 @@ body {
   margin: 0;
   color: var(--ink);
   background-color: var(--paper);
-  background-image: linear-gradient(rgba(37, 44, 37, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(37, 44, 37, .035) 1px, transparent 1px);
-  background-size: 32px 32px;
+  background-image: radial-gradient(ellipse at 50% 42%, rgba(255, 255, 255, .82), transparent 60%), linear-gradient(rgba(37, 44, 37, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(37, 44, 37, .035) 1px, transparent 1px);
+  background-size: auto, 32px 32px, 32px 32px;
 }
 
 .workspace { width: min(100% - 48px, 1080px); min-height: 100vh; margin: 0 auto; display: flex; flex-direction: column; }
@@ -33,7 +33,7 @@ body {
 .library-link span:last-child { color: var(--orange); font-size: 18px; transition: transform .18s ease; }
 .library-link:hover span:last-child { transform: translate(2px, -2px); }
 
-.calculator { position: relative; width: min(100%, 408px); margin: auto; padding: 26px; border: 1px solid #deddd5; border-radius: 8px; background: var(--panel); box-shadow: 0 20px 60px rgba(45, 48, 39, .09); animation: arrive .42s ease both; }
+.calculator { position: relative; width: min(100%, 408px); margin: auto; padding: 26px; border: 1px solid rgba(215, 214, 206, .85); border-radius: 14px; background: rgba(251, 250, 246, .96); box-shadow: 0 24px 70px rgba(45, 48, 39, .13), 0 3px 10px rgba(45, 48, 39, .04); animation: arrive .42s ease both; }
 .tap-counter { position: absolute; top: 15px; right: 15px; display: inline-flex; align-items: center; gap: 8px; min-height: 30px; padding: 0 9px; border: 1px solid var(--ink); border-radius: 5px; background: var(--ink); color: var(--lime); cursor: pointer; font: 500 11px "DM Mono", monospace; }
 .tap-counter:hover { background: #394339; }
 .tap-counter-label { color: #c1c8b9; font-size: 9px; }
@@ -41,18 +41,18 @@ body {
 .calculator-heading { display: flex; align-items: flex-start; justify-content: space-between; margin: 0 0 21px; }
 .eyebrow { margin: 0 0 5px; color: var(--orange); font: 500 10px "DM Mono", monospace; }
 h1 { margin: 0; font-size: 25px; font-weight: 800; }
-.screen { min-height: 112px; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; gap: 4px; overflow: hidden; padding: 14px 15px; border-radius: 5px; background: #202720; color: #f5f5eb; }
+.screen { min-height: 112px; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; gap: 4px; overflow: hidden; padding: 14px 15px; border: 1px solid rgba(255, 255, 255, .08); border-radius: 9px; background: linear-gradient(145deg, #273128, #1c231d); color: #f5f5eb; box-shadow: inset 0 2px 8px rgba(0, 0, 0, .16); }
 .screen-expression { width: 100%; min-height: 17px; overflow: hidden; color: #aab1a3; text-align: right; text-overflow: ellipsis; white-space: nowrap; font: 12px "DM Mono", monospace; }
-.screen-value { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font: 500 42px/1.15 "DM Mono", monospace; letter-spacing: 0; }
-.keypad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; margin-top: 15px; }
-.key { min-width: 0; height: 59px; border: 1px solid #e5e3db; border-radius: 5px; background: var(--key); color: var(--ink); cursor: pointer; font: 500 20px "DM Mono", monospace; transition: transform .12s ease, background-color .12s ease, border-color .12s ease; }
-.key:hover { border-color: #c5c7bc; background: #eeede5; }
-.key:active { transform: scale(.96); }
+.screen-value { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font: 500 clamp(32px, 10vw, 42px)/1.15 "DM Mono", monospace; letter-spacing: 0; }
+.keypad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.key { min-width: 0; height: 59px; border: 1px solid #e5e3db; border-radius: 8px; background: var(--key); color: var(--ink); cursor: pointer; font: 500 20px "DM Mono", monospace; transition: transform .12s ease, background-color .12s ease, border-color .12s ease, box-shadow .12s ease; }
+.key:hover { transform: translateY(-1px); border-color: #c5c7bc; background: #eeede5; box-shadow: 0 3px 8px rgba(45, 48, 39, .07); }
+.key:active { transform: scale(.96); box-shadow: none; }
 .key:focus-visible, .library-link:focus-visible, .wordmark:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .key.utility { background: #e9e8e0; font-size: 15px; }
 .key.operator { border-color: #e6c1b2; background: #f9ede7; color: #b64323; font-size: 23px; }
-.key.operator[aria-pressed="true"] { background: var(--orange); color: white; }
-.key.equals { border-color: var(--ink); background: var(--ink); color: white; font-size: 23px; }
+.key.operator[aria-pressed="true"] { border-color: var(--orange); background: var(--orange); color: white; box-shadow: 0 3px 9px rgba(233, 102, 59, .2); }
+.key.equals { border-color: var(--ink); background: var(--ink); color: white; font-size: 23px; box-shadow: 0 3px 8px rgba(32, 37, 32, .14); }
 .key.equals:hover { background: #394339; }
 .keyboard-hint { margin: 15px 0 0; color: var(--muted); text-align: center; font: 10px "DM Mono", monospace; }
 .keyboard-hint span { padding: 0 4px; color: var(--orange); }

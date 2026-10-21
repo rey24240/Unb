@@ -10,8 +10,9 @@
   let pendingOperation = null;
   let waitingForOperand = false;
   let lastExpression = '';
-  let consecutiveZeros = 0;
+  let shortcutBuffer = '';
   let totalClicks = 0;
+  const libraryShortcut = '2424';
 
   function countClick() {
     totalClicks += 1;
@@ -78,6 +79,13 @@
     if (pendingOperation && !waitingForOperand) {
       const result = calculate(storedValue, input, pendingOperation);
       displayValue = formatted(result);
+      if (displayValue === 'Error') {
+        storedValue = null;
+        pendingOperation = null;
+        waitingForOperand = true;
+        lastExpression = '';
+        return;
+      }
       storedValue = Number(displayValue);
     } else {
       storedValue = input;
@@ -107,13 +115,16 @@
       lastExpression = '';
     } else if (action === 'sign' && displayValue !== '0' && displayValue !== 'Error') {
       displayValue = displayValue.startsWith('-') ? displayValue.slice(1) : `-${displayValue}`;
+      lastExpression = '';
     } else if (action === 'percent' && displayValue !== 'Error') {
       displayValue = formatted(Number(displayValue) / 100);
       waitingForOperand = false;
+      lastExpression = '';
     } else if (action === 'backspace' && displayValue !== 'Error') {
       if (waitingForOperand) return;
       displayValue = displayValue.length > 1 ? displayValue.slice(0, -1) : '0';
       if (displayValue === '-') displayValue = '0';
+      lastExpression = '';
     } else if (action === 'equals') {
       equals();
     }
@@ -124,9 +135,9 @@
     const digit = target.closest('[data-digit]')?.dataset.digit;
     const operation = target.closest('[data-operation]')?.dataset.operation;
     const action = target.closest('[data-action]')?.dataset.action;
-    consecutiveZeros = digit === '0' ? consecutiveZeros + 1 : 0;
-    if (consecutiveZeros === 4) {
-      consecutiveZeros = 0;
+    shortcutBuffer = digit === undefined ? '' : (shortcutBuffer + digit).slice(-libraryShortcut.length);
+    if (shortcutBuffer === libraryShortcut) {
+      shortcutBuffer = '';
       openLibrary();
       return;
     }
