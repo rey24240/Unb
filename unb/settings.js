@@ -12,7 +12,23 @@
   const backgroundReset = document.getElementById('backgroundReset');
 
   let savedTheme = 'blue';
-  try { savedTheme = localStorage.getItem('ug_theme') || 'blue'; } catch (_) {}
+  let hasSavedTheme = false;
+  try {
+    const storedTheme = localStorage.getItem('ug_theme');
+    if (storedTheme) {
+      savedTheme = storedTheme;
+      hasSavedTheme = true;
+    }
+  } catch (error) {
+    console.warn('Could not read the saved theme.', error);
+  }
+  if (!hasSavedTheme) {
+    try {
+      savedTheme = window.opener?.localStorage.getItem('ug_theme') || savedTheme;
+    } catch (error) {
+      console.warn('Could not read the saved theme from the opener.', error);
+    }
+  }
   if (!themes.includes(savedTheme)) savedTheme = 'blue';
 
   function applyTheme(theme) {
@@ -32,6 +48,11 @@
 
   applyTheme(savedTheme);
   try { applyCustomBackground(localStorage.getItem('ug_custom_background')); } catch (_) {}
+
+  window.addEventListener('storage', event => {
+    if (event.key !== 'ug_theme') return;
+    applyTheme(themes.includes(event.newValue) ? event.newValue : 'blue');
+  });
 
   if (accentSelect) {
     accentSelect.addEventListener('change', () => {

@@ -98,7 +98,7 @@
 
 <div id="gameModal" class="game-modal" hidden role="dialog" aria-modal="true" aria-label="Game player">
   <div class="game-modal-window">
-    <div class="game-modal-bar"><strong id="gameModalTitle">Playing game</strong><div class="game-modal-actions"><button id="gameFullscreen" type="button" aria-label="Fullscreen"><i class="bi bi-fullscreen"></i></button><button id="gameClose" type="button" aria-label="Close game"><i class="bi bi-x-lg"></i><span>Close</span></button></div></div>
+    <div class="game-modal-bar"><strong id="gameModalTitle">Playing game</strong><div class="game-modal-actions"><button id="gameRefresh" type="button" aria-label="Refresh app"><i class="bi bi-arrow-clockwise"></i><span>Refresh</span></button><button id="gameFullscreen" type="button" aria-label="Fullscreen"><i class="bi bi-fullscreen"></i><span>Fullscreen</span></button><button id="gameClose" type="button" aria-label="Close app"><i class="bi bi-x-lg"></i><span>Close</span></button></div></div>
     <iframe id="gameModalFrame" title="Game" frameborder="0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe>
   </div>
 </div>
@@ -161,10 +161,43 @@ function render() {
 function openBlankPlayerTab(playerUrl,title) {
  const popup=window.open('about:blank','_blank');
  if(!popup) return false;
- const safeTitle=escapeHTML(title||'Game');
- popup.document.open();
- popup.document.write(`<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${safeTitle}</title><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;display:block;background:#000}body{overflow:hidden}</style></head><body><iframe src="${playerUrl}" frameborder="0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe></body></html>`);
- popup.document.close();
+ const playerDocument=popup.document;
+ playerDocument.title=title||'Game';
+ playerDocument.documentElement.style.cssText='width:100%;height:100%;';
+ playerDocument.body.style.cssText='display:flex;flex-direction:column;width:100%;height:100%;margin:0;overflow:hidden;background:#05090f;color:#edf4ff;font:600 14px system-ui,sans-serif;';
+ const bar=playerDocument.createElement('header');
+ bar.style.cssText='display:flex;flex:none;align-items:center;justify-content:space-between;gap:12px;height:44px;padding:0 14px;background:#111923;border-bottom:1px solid #293d55;';
+ const titleElement=playerDocument.createElement('strong');
+ titleElement.textContent=title||'Game';
+ titleElement.style.cssText='overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+ const actions=playerDocument.createElement('div');
+ actions.style.cssText='display:flex;gap:8px;flex:none;';
+ const playerFrame=playerDocument.createElement('iframe');
+ playerFrame.title=title||'Game';
+ playerFrame.allow='fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share';
+ playerFrame.allowFullscreen=true;
+ playerFrame.referrerPolicy='no-referrer';
+ playerFrame.style.cssText='display:block;flex:1;width:100%;min-height:0;border:0;background:#000;';
+ playerFrame.src=playerUrl;
+ const buttonStyle='border:1px solid #293d55;border-radius:8px;background:#1b2a3c;color:#edf4ff;padding:7px 12px;font:inherit;cursor:pointer;';
+ const refreshButton=playerDocument.createElement('button');
+ refreshButton.type='button';
+ refreshButton.textContent='Refresh';
+ refreshButton.style.cssText=buttonStyle;
+ refreshButton.addEventListener('click',()=>{playerFrame.src=playerUrl;});
+ const fullscreenButton=playerDocument.createElement('button');
+ fullscreenButton.type='button';
+ fullscreenButton.textContent='Fullscreen';
+ fullscreenButton.style.cssText=buttonStyle;
+ fullscreenButton.addEventListener('click',()=>{if(playerFrame.requestFullscreen)playerFrame.requestFullscreen().catch(error=>console.error('Could not enter fullscreen:',error));});
+ const closeButton=playerDocument.createElement('button');
+ closeButton.type='button';
+ closeButton.textContent='Close tab';
+ closeButton.style.cssText=buttonStyle;
+ closeButton.addEventListener('click',()=>popup.close());
+ actions.append(refreshButton,fullscreenButton,closeButton);
+ bar.append(titleElement,actions);
+ playerDocument.body.replaceChildren(bar,playerFrame);
  return true;
 }
 function openItem(card) {
@@ -181,13 +214,23 @@ function openItem(card) {
 const gameModal=document.getElementById('gameModal'), gameFrame=document.getElementById('gameModalFrame');
 function closeGameModal(){gameModal.hidden=true;gameFrame.onload=null;gameFrame.src='about:blank';document.body.classList.remove('game-modal-open');}
 document.getElementById('gameClose').addEventListener('click',closeGameModal);
+document.getElementById('gameRefresh').addEventListener('click',()=>{if(gameFrame.src&&gameFrame.src!=='about:blank')gameFrame.src=gameFrame.src;});
 document.getElementById('gameFullscreen').addEventListener('click',()=>{const frame=document.getElementById('gameModalFrame');if(frame.requestFullscreen)frame.requestFullscreen().catch(()=>{});});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!gameModal.hidden)closeGameModal();if(e.key==='Escape'&&!settingsPopover.hidden)settingsPopover.hidden=true;});
 categorySelect.addEventListener('change',render);
 catalogSearch.addEventListener('input',render);
 grid.addEventListener('click',e=>{const card=e.target.closest('.game-card');if(card)openItem(card);});
 grid.addEventListener('keydown',e=>{const card=e.target.closest('.game-card');if(card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openItem(card);}});
-const theme=localStorage.getItem('ug_theme')||'blue';document.documentElement.dataset.theme=theme;accentSelect.value=theme;
+const themes=['green','purple','blue','red','amber'];
+function applyTheme(theme){const selectedTheme=themes.includes(theme)?theme:'blue';document.documentElement.dataset.theme=selectedTheme;accentSelect.value=selectedTheme;}
+function readPreference(key){
+ let value=null;
+ try{value=localStorage.getItem(key);}catch(error){console.warn(`Could not read ${key} from local storage.`,error);}
+ if(value)return value;
+ try{return window.opener?.localStorage.getItem(key)||null;}catch(error){console.warn(`Could not read ${key} from the opener.`,error);return null;}
+}
+applyTheme(readPreference('ug_theme')||'blue');
+window.addEventListener('storage',event=>{if(event.key==='ug_theme')applyTheme(event.newValue);});
 const backgroundInput=document.getElementById('backgroundInput'), backgroundReset=document.getElementById('backgroundReset');
 function applyCustomBackground(data){if(data){document.documentElement.style.setProperty('--custom-bg-image',`url("${data}")`);document.body.classList.add('has-custom-background');}else{document.documentElement.style.removeProperty('--custom-bg-image');document.body.classList.remove('has-custom-background');}}
 try{applyCustomBackground(localStorage.getItem('ug_custom_background'));}catch(e){}
@@ -197,12 +240,12 @@ settingsBtn.addEventListener('click',e=>{e.stopPropagation();settingsPopover.hid
 settingsClose.addEventListener('click',()=>settingsPopover.hidden=true);
 settingsPopover.addEventListener('click',e=>{if(e.target===settingsPopover)settingsPopover.hidden=true;});
 homeSettingsBtn.addEventListener('click',()=>{settingsPopover.hidden=true;location.href='/unb/games.html';});
-accentSelect.addEventListener('change',()=>{document.documentElement.dataset.theme=accentSelect.value;localStorage.setItem('ug_theme',accentSelect.value);});
-const savedProxy=localStorage.getItem('ug_proxy')||'utopia';proxySelect.value=['utopia','direct'].includes(savedProxy)?savedProxy:'utopia';proxySelect.addEventListener('change',()=>localStorage.setItem('ug_proxy',proxySelect.value));
+accentSelect.addEventListener('change',()=>{applyTheme(accentSelect.value);localStorage.setItem('ug_theme',accentSelect.value);});
+const savedProxy=readPreference('ug_proxy')||'utopia';proxySelect.value=['utopia','direct'].includes(savedProxy)?savedProxy:'utopia';proxySelect.addEventListener('change',()=>localStorage.setItem('ug_proxy',proxySelect.value));
 function collectSaveData(){return {format:'unblocked-games-save',version:1,savedAt:new Date().toISOString(),settings:{theme:localStorage.getItem('ug_theme')||'blue',proxy:localStorage.getItem('ug_proxy')||'utopia',customBackground:localStorage.getItem('ug_custom_background')||'',reduceMotion:localStorage.getItem('ug_reduce_motion')==='1',compactSidebar:localStorage.getItem('ug_compact_sidebar')==='1',searchEngine:localStorage.getItem('ug_search_engine')||'google'}};}
 saveDataBtn.addEventListener('click',()=>{try{const blob=new Blob([JSON.stringify(collectSaveData(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='unblocked-games-data.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}catch(err){alert('Export failed: '+(err.message||'Unable to create the backup file.'));}});
 loadDataBtn.addEventListener('click',()=>loadDataInput.click());
-loadDataInput.addEventListener('change',async()=>{const file=loadDataInput.files?.[0];loadDataInput.value='';if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.format!=='unblocked-games-save'||data.version!==1)throw Error('This is not a valid site backup file.');const st=data.settings||{},themes=['green','purple','blue','red','amber'];if(st.theme&&!themes.includes(st.theme))throw Error('Invalid theme.');if(st.proxy&&!['utopia','direct'].includes(st.proxy))throw Error('Invalid proxy.');if(st.theme){localStorage.setItem('ug_theme',st.theme);document.documentElement.dataset.theme=st.theme;accentSelect.value=st.theme;}if(st.proxy){localStorage.setItem('ug_proxy',st.proxy);proxySelect.value=st.proxy;}if(typeof st.customBackground==='string'){if(st.customBackground)localStorage.setItem('ug_custom_background',st.customBackground);else localStorage.removeItem('ug_custom_background');applyCustomBackground(st.customBackground||null);}if(typeof st.reduceMotion==='boolean'){localStorage.setItem('ug_reduce_motion',st.reduceMotion?'1':'0');document.documentElement.classList.toggle('reduce-motion',st.reduceMotion);}if(typeof st.compactSidebar==='boolean'){localStorage.setItem('ug_compact_sidebar',st.compactSidebar?'1':'0');document.documentElement.classList.toggle('compact-sidebar',st.compactSidebar);}if(st.searchEngine)localStorage.setItem('ug_search_engine',st.searchEngine);alert('Backup imported successfully.');}catch(err){alert(err.message||'Could not import that file.');}});
+loadDataInput.addEventListener('change',async()=>{const file=loadDataInput.files?.[0];loadDataInput.value='';if(!file)return;try{const data=JSON.parse(await file.text());if(!data||data.format!=='unblocked-games-save'||data.version!==1)throw Error('This is not a valid site backup file.');const st=data.settings||{};if(st.theme&&!themes.includes(st.theme))throw Error('Invalid theme.');if(st.proxy&&!['utopia','direct'].includes(st.proxy))throw Error('Invalid proxy.');if(st.theme){localStorage.setItem('ug_theme',st.theme);applyTheme(st.theme);}if(st.proxy){localStorage.setItem('ug_proxy',st.proxy);proxySelect.value=st.proxy;}if(typeof st.customBackground==='string'){if(st.customBackground)localStorage.setItem('ug_custom_background',st.customBackground);else localStorage.removeItem('ug_custom_background');applyCustomBackground(st.customBackground||null);}if(typeof st.reduceMotion==='boolean'){localStorage.setItem('ug_reduce_motion',st.reduceMotion?'1':'0');document.documentElement.classList.toggle('reduce-motion',st.reduceMotion);}if(typeof st.compactSidebar==='boolean'){localStorage.setItem('ug_compact_sidebar',st.compactSidebar?'1':'0');document.documentElement.classList.toggle('compact-sidebar',st.compactSidebar);}if(st.searchEngine)localStorage.setItem('ug_search_engine',st.searchEngine);alert('Backup imported successfully.');}catch(err){alert(err.message||'Could not import that file.');}});
 document.addEventListener('click',e=>{if(!settingsPopover.hidden&&!settingsPopover.contains(e.target)&&!settingsBtn.contains(e.target))settingsPopover.hidden=true;});
 render();
 emptyState.hidden=false;

@@ -33,6 +33,10 @@
     frame.src = '/unb/games.html';
     frame.style.cssText = 'display:block;width:100%;height:100%;border:0;';
     libraryTab.document.body.replaceChildren(frame);
+    window.close();
+    if (!window.closed) {
+      window.alert('The game library opened, but your browser blocked closing this calculator tab.');
+    }
   }
 
   function formatted(value) {

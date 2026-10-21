@@ -164,5 +164,19 @@
     "url": "/unb/misc/cldoblox.html",
     "image": "/unb/misc/images/doblox.jpeg",
     "proxy": false
+  },
+   {
+    "name": "Awesome Tanks 1",
+    "url": "/unb/misc/clawesometanks.html",
+    "categories": ["Driving"],
+    "image": "/unb/misc/images/awesometank 1.jpeg",
+    "proxy": false
+  },
+   {
+    "name": "Awesome Tanks 2",
+    "url": "/unb/misc/clawesometanks2.html",
+    "categories": ["Driving"],
+    "image": "/unb/misc/images/awesometank 2.jpeg",
+    "proxy": false
   }
 ]
