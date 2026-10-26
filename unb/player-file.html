@@ -5,7 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Game</title>
 <style>
-html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}#playerFrame{width:100%;height:100%;border:0;display:block}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}
+#appBrowser{height:92px;background:#202124;color:#e8eaed;font:14px Arial,sans-serif}
+#appBrowser[hidden]{display:none}
+#tabStrip{height:38px;display:flex;align-items:center;gap:8px;padding:5px 10px 0;background:#17181a}
+#appTab{height:32px;max-width:min(340px,70vw);min-width:120px;display:flex;align-items:center;gap:9px;padding:0 10px;background:#292a2d;border-radius:10px 10px 0 0;color:#e8eaed}
+#appTabTitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+#appTabClose,#newTab{width:24px;height:24px;padding:0;border:0;border-radius:50%;background:transparent;color:#bdc1c6;font-size:17px;cursor:pointer}
+#appTabClose:hover,#newTab:hover{background:#3c4043}
+#browserControls{height:54px;display:flex;align-items:center;gap:8px;padding:7px 12px}
+#browserControls button{width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:#e8eaed;font-size:19px;cursor:pointer}
+#browserControls button:hover{background:#3c4043}
+#browserControls button:focus-visible,#appTabClose:focus-visible,#newTab:focus-visible{outline:2px solid #8ab4f8;outline-offset:1px}
+#addressForm{height:36px;flex:1;display:flex;align-items:center;gap:8px;padding:0 12px;background:#303134;border-radius:20px}
+#addressForm span{color:#9aa0a6}
+#addressBar{width:100%;border:0;outline:0;background:transparent;color:#e8eaed;font:14px Arial,sans-serif}
+#addressForm:focus-within{background:#3c4043}
+#playerFrame{width:100%;height:100%;border:0;display:block}
+body.app-mode #playerFrame{height:calc(100% - 92px)}
 #loading{position:fixed;inset:0;z-index:2;display:grid;place-items:center;background:linear-gradient(145deg,#101722,#182437);color:#eef2f8;font:600 16px system-ui,sans-serif;transition:opacity .2s ease}
 #loading.hidden{opacity:0;pointer-events:none}
 #loadingInner{text-align:center}
@@ -16,6 +34,23 @@ html,body{width:100%;height:100%;margin:0;background:#000;overflow:hidden}#playe
 </style>
 </head>
 <body>
+<div id="appBrowser" hidden>
+  <div id="tabStrip">
+    <div id="appTab"><span id="appTabTitle">App</span><button id="appTabClose" type="button" aria-label="Close tab">&times;</button></div>
+    <button id="newTab" type="button" aria-label="Open apps in a new tab">+</button>
+  </div>
+  <div id="browserControls">
+    <button id="backButton" type="button" aria-label="Back">&#8592;</button>
+    <button id="forwardButton" type="button" aria-label="Forward">&#8594;</button>
+    <button id="reloadButton" type="button" aria-label="Reload">&#8635;</button>
+    <button id="homeButton" type="button" aria-label="Apps home">&#8962;</button>
+    <form id="addressForm">
+      <span aria-hidden="true">&#9679;</span>
+      <input id="addressBar" type="text" aria-label="Search or enter address" autocomplete="off" spellcheck="false">
+    </form>
+    <button id="fullscreenButton" type="button" aria-label="Fullscreen">&#x26F6;</button>
+  </div>
+</div>
 <div id="loading" role="status" aria-live="polite"><div id="loadingInner"><div id="spinner"></div><div id="loadingText">Loading game...</div><div id="loadingNotice">This game is taking a while to load. It might be slow or unavailable.</div></div></div>
 <iframe id="playerFrame" src="about:blank" frameborder="0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope; web-share" allowfullscreen referrerpolicy="no-referrer"></iframe>
 <script>
@@ -23,21 +58,48 @@ const params=new URLSearchParams(location.search);
 const useProxy=params.get('proxy')==='true';
 const proxyEngine=localStorage.getItem('ug_proxy')||'utopia';
 const rawTarget=params.get('file')||params.get('url')||'';
-const target=useProxy&&!/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(rawTarget)?`https://${rawTarget}`:rawTarget;
+let target=useProxy&&!/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(rawTarget)?`https://${rawTarget}`:rawTarget;
 const title=decodeURIComponent(params.get('title')||'Game');
+const isApp=params.get('type')==='app';
 document.title=title;
+if(isApp){
+	document.body.classList.add('app-mode');
+	document.getElementById('appBrowser').hidden=false;
+	document.getElementById('appTabTitle').textContent=title;
+	document.getElementById('loadingText').textContent='Loading app...';
+}
 const frame=document.getElementById('playerFrame');
 const loading=document.getElementById('loading');
 const loadingNotice=document.getElementById('loadingNotice');
-async function loadTarget(){
-	if(!target)return;
-	const warningTimer=setTimeout(()=>{
+const addressBar=document.getElementById('addressBar');
+let warningTimer;
+let navigationHistory=[];
+let navigationIndex=-1;
+function normalizeAddress(value){
+	value=value.trim();
+	if(!value)return '';
+	if(/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(value))return value;
+	if(/^[^\s]+\.[^\s]+/.test(value))return `https://${value}`;
+	return `https://www.google.com/search?q=${encodeURIComponent(value)}`;
+}
+async function loadTarget(nextTarget=target,push=true){
+	if(!nextTarget)return;
+	target=nextTarget;
+	if(isApp)addressBar.value=target;
+	if(push){
+		navigationHistory=navigationHistory.slice(0,navigationIndex+1);
+		navigationHistory.push(target);
+		navigationIndex++;
+	}
+	clearTimeout(warningTimer);
+	warningTimer=setTimeout(()=>{
 		loadingNotice.textContent=useProxy?'The proxy could not load this site. It may block embedding or the proxy server may be unavailable.':'This game is taking a while to load. It might be slow or unavailable.';
 		loadingNotice.classList.add('visible');
 	},8000);
 	frame.addEventListener('load',()=>{
 		clearTimeout(warningTimer);
 		loading.classList.add('hidden');
+		loadingNotice.classList.remove('visible');
 	},{once:true});
 	if(!useProxy){frame.src=target;return}
 	try{
@@ -70,10 +132,49 @@ async function loadTarget(){
 		loadingNotice.classList.add('visible');
 	}
 }
+function navigateBack(){
+	try{frame.contentWindow.history.back();}catch(error){
+		if(navigationIndex>0){
+			navigationIndex--;
+			loadTarget(navigationHistory[navigationIndex],false);
+			return;
+		}
+		console.error('Could not go back in the app frame:',error);
+	}
+}
+function navigateForward(){
+	try{frame.contentWindow.history.forward();}catch(error){
+		if(navigationIndex<navigationHistory.length-1){
+			navigationIndex++;
+			loadTarget(navigationHistory[navigationIndex],false);
+			return;
+		}
+		console.error('Could not go forward in the app frame:',error);
+	}
+}
+if(isApp){
+	document.getElementById('backButton').addEventListener('click',navigateBack);
+	document.getElementById('forwardButton').addEventListener('click',navigateForward);
+	document.getElementById('reloadButton').addEventListener('click',()=>loadTarget(target,false));
+	document.getElementById('homeButton').addEventListener('click',()=>{location.href='/unb/apps.html';});
+	document.getElementById('fullscreenButton').addEventListener('click',()=>{
+		if(frame.requestFullscreen)frame.requestFullscreen().catch(error=>console.error('Could not enter fullscreen:',error));
+	});
+	document.getElementById('addressForm').addEventListener('submit',event=>{
+		event.preventDefault();
+		const nextTarget=normalizeAddress(addressBar.value);
+		if(nextTarget)loadTarget(nextTarget);
+	});
+	document.getElementById('appTabClose').addEventListener('click',()=>{
+		window.close();
+		if(!window.closed)location.href='/unb/apps.html';
+	});
+	document.getElementById('newTab').addEventListener('click',()=>window.open('/unb/apps.html','_blank'));
+}
 if(target){
 	loadTarget();
 }else{
-	document.getElementById('loadingText').textContent='No game selected';
+	document.getElementById('loadingText').textContent=isApp?'No app selected':'No game selected';
 	document.getElementById('spinner').style.display='none';
 }
 </script>

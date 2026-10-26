@@ -12,7 +12,7 @@
   let lastExpression = '';
   let shortcutBuffer = '';
   let totalClicks = 0;
-  const libraryShortcut = '2424';
+  const libraryShortcut = '24240';
 
   function countClick() {
     totalClicks += 1;

@@ -25,9 +25,9 @@
   proxy.innerHTML=`
     <div class="settings-section-title">Web browsing</div>
     <div class="settings-section-sub">Choose how links are opened from the built-in browser.</div>
-    <label class="settings-field"><span>Browser mode</span><select id="proxySelect"><option value="utopia">Utopia / Ultraviolet</option><option value="direct">Direct / No proxy</option></select></label>
+    <label class="settings-field"><span>Browser mode</span><select id="proxySelect"><option value="utopia">Rey 8-bitGames / Ultraviolet</option><option value="direct">Direct / No proxy</option></select></label>
     <label class="settings-field"><span>Search engine</span><select id="searchEngineSelect"><option value="google">Google</option><option value="bing">Bing</option><option value="duckduckgo">DuckDuckGo</option><option value="brave">Brave Search</option></select></label>
-    <p class="settings-help">Utopia requires the included Node/Bare server. Direct mode is useful for sites that allow normal embedding.</p>
+    <p class="settings-help">Rey 8-bitGames provides the remote Bare proxy. Direct mode is useful for sites that allow normal embedding.</p>
   `;
   box.appendChild(proxy);
 

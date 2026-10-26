@@ -5,7 +5,7 @@ This build adds a Utopia-style browser page with an iframe and browser toolbar, 
 ## Features
 - Games and Apps search bars: press Enter or the globe button to open `browser.html`.
 - Browser toolbar: back, reload, forward, address/search, open in new tab, fullscreen, and menu.
-- Proxy setting: **Utopia • Ultraviolet** or **Direct / No proxy**.
+- Proxy setting: **Rey 8-bitGames • Ultraviolet** or **Direct / No proxy**.
 - Search engine setting: Google, Bing, DuckDuckGo, or Brave Search.
 - Settings are stored in `localStorage` and apply across the site.
 
@@ -35,6 +35,6 @@ The Settings panel includes a **Save Data** button. When logged in, it explicitl
 - The custom browser and player register the root `sw.js` before using the `/service/` Ultraviolet prefix.
 
 
-## DogeUB proxy setup
+## Proxy setup
 
-This project uses the DogeUB Scramjet runtime with a Wisp transport. After extracting the project, run `npm install` to install the proxy dependencies, then run `npm start`. Deployments must run the Node server (not a static-only host) and support WebSocket upgrades for the `/wisp/` endpoint.
+Ultraviolet uses the Bare proxy hosted by [rey24240/8-bitGames](https://github.com/rey24240/8-bitGames) at `https://hello090922.onrender.com/t/`. This requires that hosted service to remain available. The local Node server is still required for this site's backend and static files; run `npm install` and `npm start` on a Node-capable host.

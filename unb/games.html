@@ -18,10 +18,13 @@
   <a class="brand" href="/unb/games.html" aria-label="Games home">
     <span class="brand-title">Unblocked <b>Games</b></span>
   </a>
-  <label class="catalog-search navbar-search">
-    <i class="bi bi-search" aria-hidden="true"></i>
-    <input id="catalogSearch" type="search" placeholder="Search through games..." autocomplete="off" aria-label="Search games">
-  </label>
+  <div class="header-search-actions">
+    <label class="catalog-search navbar-search">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <input id="catalogSearch" type="search" placeholder="Search through games..." autocomplete="off" aria-label="Search games">
+    </label>
+    <button class="nav-icon-btn" id="refreshLibrary" type="button" aria-label="Refresh games" title="Refresh games"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i><span>Refresh</span></button>
+  </div>
   <input id="loadDataInput" type="file" accept="application/json,.json" hidden>
 </header>
 
@@ -48,7 +51,7 @@
     <div class="settings-row">
       <span><i class="bi bi-shield-check"></i> Proxy engine</span>
       <select id="proxySelect" aria-label="Proxy engine">
-        <option value="utopia">Utopia / Ultraviolet</option><option value="direct">Direct / No proxy</option>
+        <option value="utopia">Rey 8-bitGames / Ultraviolet</option><option value="direct">Direct / No proxy</option>
       </select>
     </div>
     <div class="settings-data-actions">
@@ -115,6 +118,7 @@
   const pageSubtitle = document.getElementById('pageSubtitle');
   const eyebrow = document.getElementById('eyebrow');
   const proxySelect = document.getElementById('proxySelect');
+  document.getElementById('refreshLibrary').addEventListener('click', () => location.reload());
 
   function escapeHTML(value = '') {
     return String(value).replace(/[&<>\'\"]/g, character => ({
